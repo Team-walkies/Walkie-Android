@@ -1,4 +1,4 @@
-package com.startup.walkie.di
+package com.startup.data.di
 
 import com.startup.data.repository.TempRepositoryImpl
 import com.startup.domain.repository.TempRepository
