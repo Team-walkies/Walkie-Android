@@ -1,0 +1,78 @@
+package com.startup.common.base
+
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.ViewModel
+import com.startup.domain.util.BaseUseCase
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+
+abstract class BaseViewModel : ViewModel(), DefaultLifecycleObserver {
+
+    abstract val state: State
+
+    private val _event = MutableSharedFlow<BaseEvent>(
+        extraBufferCapacity = Int.MAX_VALUE,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+    val event = _event.asSharedFlow()
+
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    private val ioDispatcher = Dispatchers.IO
+
+    protected fun notifyEvent(event: BaseEvent) {
+        coroutineScope.launch {
+            _event.emit(event)
+        }
+    }
+
+    protected fun <R, P, MR> BaseUseCase<R, P>.executeOnViewModel(
+        params: P = Unit as P,
+        onMap: (R) -> MR,
+        onEach: (MR) -> Unit,
+        onError: (Throwable) -> Unit,
+        onCanceled: () -> Unit = {},
+        onCompleted: () -> Unit = {},
+    ): Flow<MR> {
+        return invoke(params)
+            .map(onMap)
+            .onEach(onEach)
+            .catch {
+                onError.invoke(it)
+            }.onCompletion {
+                when (it) {
+                    is CancellationException -> onCanceled()
+                }
+                onCompleted()
+            }.flowOn(ioDispatcher)
+    }
+
+    protected fun <R, P> BaseUseCase<R, P>.executeOnViewModel(
+        params: P = Unit as P,
+        onEach: (R) -> Unit,
+        onError: (Throwable) -> Unit,
+        onCanceled: () -> Unit = {},
+        onCompleted: () -> Unit = {},
+    ): Flow<R> {
+        return invoke(params)
+            .onEach(onEach)
+            .catch {
+                onError.invoke(it)
+            }.onCompletion {
+                when (it) {
+                    is CancellationException -> onCanceled()
+                }
+                onCompleted()
+            }.flowOn(ioDispatcher)
+    }
+}
