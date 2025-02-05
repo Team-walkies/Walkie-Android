@@ -1,6 +1,5 @@
 package com.startup.home
 
-import android.app.Activity
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,9 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.startup.common.base.BaseActivity
-import com.startup.common.base.BaseViewModel
 import com.startup.common.base.NavigationEvent
 import com.startup.common.base.UiEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,7 +21,6 @@ class TestActivity : BaseActivity<UiEvent, NavigationEvent>() {
     override val viewModel: TempViewModel by viewModels<TempViewModel>()
 
     override fun handleNavigationEvent(navigationEventFlow: Flow<NavigationEvent>) {
-
     }
 
     override fun handleUiEvent(uiEvent: UiEvent) {

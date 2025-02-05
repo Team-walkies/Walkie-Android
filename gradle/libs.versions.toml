@@ -102,3 +102,4 @@ walkie-hilt = { id = "walkie.hilt", version = "unspecified" }
 walkie-android-library-compose = { id = "walkie.android.library.compose", version = "unspecified" }
 walkie-android-library = { id = "walkie.android.library", version = "unspecified" }
 walkie-kotlin-library = { id = "walkie.kotlin.library", version = "unspecified" }
+walkie-compose-library = { id = "walkie.compose.library", version = "unspecified" }
