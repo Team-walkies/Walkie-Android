@@ -23,14 +23,14 @@ fun WalkieToggle(checked: Boolean, onCheckedChanged: (Boolean) -> Unit) {
         checked = checked,
         onCheckedChange = onCheckedChanged,
         colors = SwitchColors(
-            checkedIconColor = WalkieTheme.colors.blue200,
-            checkedBorderColor = WalkieTheme.colors.blue200,
-            checkedTrackColor = WalkieTheme.colors.blue200,
+            checkedIconColor = WalkieTheme.colors.blue300,
+            checkedBorderColor = WalkieTheme.colors.blue300,
+            checkedTrackColor = WalkieTheme.colors.blue300,
             checkedThumbColor = WalkieTheme.colors.white,
-            uncheckedThumbColor = WalkieTheme.colors.white,
-            uncheckedBorderColor = WalkieTheme.colors.gray300,
-            uncheckedIconColor = WalkieTheme.colors.gray300,
-            uncheckedTrackColor = WalkieTheme.colors.gray300,
+            uncheckedThumbColor = WalkieTheme.colors.gray400,
+            uncheckedBorderColor = WalkieTheme.colors.gray400,
+            uncheckedIconColor = WalkieTheme.colors.gray200,
+            uncheckedTrackColor = WalkieTheme.colors.gray200,
             disabledUncheckedBorderColor = WalkieTheme.colors.gray300,
             disabledCheckedIconColor = WalkieTheme.colors.gray300,
             disabledCheckedThumbColor = WalkieTheme.colors.gray300,
@@ -43,7 +43,7 @@ fun WalkieToggle(checked: Boolean, onCheckedChanged: (Boolean) -> Unit) {
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun PreviewWalkieToggle() {
     WalkieTheme {
