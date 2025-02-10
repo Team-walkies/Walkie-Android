@@ -1,5 +1,6 @@
 package com.startup.design_system.widget.checkbox
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -41,7 +42,10 @@ fun WalkieCheckBox(checked: Boolean, onCheckedChanged: (Boolean) -> Unit) {
 @Composable
 fun PreviewWalkieCheckBox() {
     WalkieTheme {
-        Column {
+        Column(
+            modifier = Modifier.padding(10.dp),
+            verticalArrangement = Arrangement.spacedBy(30.dp)
+        ) {
             WalkieCheckBox(checked = true) {
 
             }
