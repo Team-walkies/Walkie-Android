@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.walkie.android.library)
+    alias(libs.plugins.walkie.compose.library)
 }
 
 android {
