@@ -17,7 +17,7 @@ import com.startup.ui.WalkieTheme
 import com.startup.ui.dropCustomShadow
 
 @Composable
-fun WalkieTagSmall(text: String, textColor: Color) {
+fun TagSmall(text: String, textColor: Color) {
     Box(
         modifier = Modifier
             .dropCustomShadow(
@@ -37,7 +37,7 @@ fun WalkieTagSmall(text: String, textColor: Color) {
 
 @Preview(showBackground = false)
 @Composable
-fun PreviewWalkieTagSmall() {
+fun PreviewTagSmall() {
     WalkieTheme {
         Column(
             modifier = Modifier
@@ -45,10 +45,10 @@ fun PreviewWalkieTagSmall() {
                 .padding(30.dp),
             verticalArrangement = Arrangement.spacedBy(30.dp)
         ) {
-            WalkieTagSmall("일반", textColor = WalkieTheme.colors.blue500)
-            WalkieTagSmall("희귀", textColor = WalkieTheme.colors.green300)
-            WalkieTagSmall("에픽", textColor = WalkieTheme.colors.orange300)
-            WalkieTagSmall("전설", textColor = WalkieTheme.colors.purple300)
+            TagSmall("일반", textColor = WalkieTheme.colors.blue500)
+            TagSmall("희귀", textColor = WalkieTheme.colors.green300)
+            TagSmall("에픽", textColor = WalkieTheme.colors.orange300)
+            TagSmall("전설", textColor = WalkieTheme.colors.purple300)
         }
     }
 }

@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.startup.ui.WalkieTheme
 
 @Composable
-fun WalkieTagMedium(text: String, textColor: Color) {
+fun TagMedium(text: String, textColor: Color) {
     Box(
         modifier = Modifier
             .background(WalkieTheme.colors.gray100, shape = RoundedCornerShape(100.dp))
@@ -27,7 +27,7 @@ fun WalkieTagMedium(text: String, textColor: Color) {
 
 @Preview
 @Composable
-fun PreviewWalkieTagMedium() {
+fun PreviewTagMedium() {
     WalkieTheme {
         Column(
             modifier = Modifier
@@ -35,10 +35,10 @@ fun PreviewWalkieTagMedium() {
                 .padding(30.dp),
             verticalArrangement = Arrangement.spacedBy(30.dp)
         ) {
-            WalkieTagMedium("일반", textColor = WalkieTheme.colors.blue500)
-            WalkieTagMedium("희귀", textColor = WalkieTheme.colors.green300)
-            WalkieTagMedium("에픽", textColor = WalkieTheme.colors.orange300)
-            WalkieTagMedium("전설", textColor = WalkieTheme.colors.purple300)
+            TagMedium("일반", textColor = WalkieTheme.colors.blue500)
+            TagMedium("희귀", textColor = WalkieTheme.colors.green300)
+            TagMedium("에픽", textColor = WalkieTheme.colors.orange300)
+            TagMedium("전설", textColor = WalkieTheme.colors.purple300)
         }
     }
 }

@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.startup.ui.WalkieTheme
 
 @Composable
-fun WalkieToggle(checked: Boolean, onCheckedChanged: (Boolean) -> Unit) {
+fun Toggle(checked: Boolean, onCheckedChanged: (Boolean) -> Unit) {
     Switch(
         modifier = Modifier
             .width(51.dp)
@@ -45,7 +45,7 @@ fun WalkieToggle(checked: Boolean, onCheckedChanged: (Boolean) -> Unit) {
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewWalkieToggle() {
+fun PreviewToggle() {
     WalkieTheme {
         Column(
             modifier = Modifier
@@ -53,8 +53,8 @@ fun PreviewWalkieToggle() {
                 .padding(10.dp),
             verticalArrangement = Arrangement.spacedBy(30.dp)
         ) {
-            WalkieToggle(false) { }
-            WalkieToggle(true) { }
+            Toggle(false) { }
+            Toggle(true) { }
         }
     }
 }

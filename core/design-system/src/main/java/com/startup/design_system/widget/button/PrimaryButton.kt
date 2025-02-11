@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.startup.ui.WalkieTheme
 
 @Composable
-fun WalkieDangerButton(text: String, enabled: Boolean = true, onClick: () -> Unit) {
+fun PrimaryButton(text: String, enabled: Boolean = true, onClick: () -> Unit) {
     Button(
         modifier = Modifier
             .fillMaxWidth()
@@ -24,9 +24,9 @@ fun WalkieDangerButton(text: String, enabled: Boolean = true, onClick: () -> Uni
         enabled = enabled,
         colors = ButtonColors(
             contentColor = WalkieTheme.colors.white,
-            containerColor = WalkieTheme.colors.red100,
-            disabledContentColor = WalkieTheme.colors.white,
-            disabledContainerColor = WalkieTheme.colors.red50
+            containerColor = WalkieTheme.colors.blue300,
+            disabledContentColor = WalkieTheme.colors.gray400,
+            disabledContainerColor = WalkieTheme.colors.gray200
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -36,11 +36,11 @@ fun WalkieDangerButton(text: String, enabled: Boolean = true, onClick: () -> Uni
 
 @Composable
 @Preview
-fun PreviewWalkieDangerButton() {
+fun PreviewPrimaryButton() {
     WalkieTheme {
         Column(verticalArrangement = Arrangement.spacedBy(30.dp)) {
-            WalkieDangerButton("버튼", true) {}
-            WalkieDangerButton("버튼", false) {}
+            PrimaryButton("버튼", true) {}
+            PrimaryButton("버튼", false) {}
         }
     }
 }

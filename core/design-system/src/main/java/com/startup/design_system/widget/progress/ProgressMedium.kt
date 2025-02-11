@@ -16,10 +16,10 @@ import com.startup.ui.WalkieTheme
 
 
 @Composable
-fun WalkieProgressSmall(progress: Float) {
+fun ProgressMedium(progress: Float) {
     Box(
         modifier = Modifier
-            .height(4.dp)
+            .height(8.dp)
             .background(color = WalkieTheme.colors.gray200, shape = RoundedCornerShape(100.dp))
             .fillMaxWidth()
     ) {
@@ -34,12 +34,12 @@ fun WalkieProgressSmall(progress: Float) {
 
 @Preview
 @Composable
-fun PreviewWalkieProgressSmall() {
+fun PreviewProgressMedium() {
     WalkieTheme {
         Column(verticalArrangement = Arrangement.spacedBy(30.dp)) {
-            WalkieProgressSmall(1F)
-            WalkieProgressSmall(0.5F)
-            WalkieProgressSmall(0F)
+            ProgressMedium(1F)
+            ProgressMedium(0.5F)
+            ProgressMedium(0F)
         }
     }
 }

@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.startup.ui.WalkieTheme
 
 @Composable
-fun WalkieTextCheckBox(text: String, checked: Boolean, onCheckedChanged: (Boolean) -> Unit) {
+fun TextCheckBox(text: String, checked: Boolean, onCheckedChanged: (Boolean) -> Unit) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         WalkieCheckBox(checked = checked, onCheckedChanged = onCheckedChanged)
         Spacer(modifier = Modifier.width(4.dp))
@@ -32,11 +32,11 @@ fun WalkieTextCheckBox(text: String, checked: Boolean, onCheckedChanged: (Boolea
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewWalkieTextCheckBox() {
+fun PreviewTextCheckBox() {
     WalkieTheme {
         Column {
-            WalkieTextCheckBox("체크 박스 라벨", true) {}
-            WalkieTextCheckBox("체크 박스 라벨", false) {}
+            TextCheckBox("체크 박스 라벨", true) {}
+            TextCheckBox("체크 박스 라벨", false) {}
         }
     }
 }
