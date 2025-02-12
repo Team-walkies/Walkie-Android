@@ -38,6 +38,7 @@ val Blue500 = Color(0xFF00839A) // normal
     Red
     대체로 warning, notification에 쓰이는 컬러
  */
+val Red50 = Color(0xFFF5D0D0)
 val Red100 = Color(0xFFFF6D6D)
 
 /*
@@ -95,6 +96,7 @@ data class WalkieSemanticColor(
     val blue400: Color,
     val blue500: Color,
 
+    val red50: Color,
     val red100: Color,
 
     val orange100: Color,
@@ -137,6 +139,7 @@ val LocalWalkieColors = staticCompositionLocalOf {
         blue400 = Color.Unspecified,
         blue500 = Color.Unspecified,
 
+        red50 = Color.Unspecified,
         red100 = Color.Unspecified,
 
         orange100 = Color.Unspecified,
@@ -179,6 +182,7 @@ val LocalWalkieLightColorScheme = WalkieSemanticColor(
     blue400 = Blue400,
     blue500 = Blue500,
 
+    red50 = Red50,
     red100 = Red100,
 
     orange100 = Orange100,
@@ -220,6 +224,7 @@ val LocalWalkieDarkColorScheme = WalkieSemanticColor(
     blue400 = Blue400,
     blue500 = Blue500,
 
+    red50 = Red50,
     red100 = Red100,
 
     orange100 = Orange100,
