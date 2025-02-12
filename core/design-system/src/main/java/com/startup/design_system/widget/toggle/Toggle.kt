@@ -16,6 +16,7 @@ import com.startup.ui.WalkieTheme
 
 @Composable
 fun Toggle(checked: Boolean, onCheckedChanged: (Boolean) -> Unit) {
+    val disabledColor = WalkieTheme.colors.gray300
     Switch(
         modifier = Modifier
             .width(51.dp)
@@ -31,14 +32,14 @@ fun Toggle(checked: Boolean, onCheckedChanged: (Boolean) -> Unit) {
             uncheckedBorderColor = WalkieTheme.colors.gray400,
             uncheckedIconColor = WalkieTheme.colors.gray200,
             uncheckedTrackColor = WalkieTheme.colors.gray200,
-            disabledUncheckedBorderColor = WalkieTheme.colors.gray300,
-            disabledCheckedIconColor = WalkieTheme.colors.gray300,
-            disabledCheckedThumbColor = WalkieTheme.colors.gray300,
-            disabledCheckedTrackColor = WalkieTheme.colors.gray300,
-            disabledCheckedBorderColor = WalkieTheme.colors.gray300,
-            disabledUncheckedIconColor = WalkieTheme.colors.gray300,
-            disabledUncheckedThumbColor = WalkieTheme.colors.gray300,
-            disabledUncheckedTrackColor = WalkieTheme.colors.gray300
+            disabledUncheckedBorderColor = disabledColor,
+            disabledCheckedIconColor = disabledColor,
+            disabledCheckedThumbColor = disabledColor,
+            disabledCheckedTrackColor = disabledColor,
+            disabledCheckedBorderColor = disabledColor,
+            disabledUncheckedIconColor = disabledColor,
+            disabledUncheckedThumbColor = disabledColor,
+            disabledUncheckedTrackColor = disabledColor
         )
     )
 }

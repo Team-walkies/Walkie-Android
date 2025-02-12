@@ -28,7 +28,7 @@ fun ProgressMedium(progress: Float) {
                 .fillMaxHeight()
                 .fillMaxWidth(progress.coerceIn(0f, 1f))
                 .background(WalkieTheme.colors.blue300, shape = RoundedCornerShape(100.dp))
-        ) {}
+        )
     }
 }
 

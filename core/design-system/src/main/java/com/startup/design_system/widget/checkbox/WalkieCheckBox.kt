@@ -14,6 +14,7 @@ import com.startup.ui.WalkieTheme
 
 @Composable
 fun WalkieCheckBox(checked: Boolean, onCheckedChanged: (Boolean) -> Unit) {
+    val disabledColor =WalkieTheme.colors.gray300
     Checkbox(
         checked = checked,
         onCheckedChange = onCheckedChanged,
@@ -27,13 +28,12 @@ fun WalkieCheckBox(checked: Boolean, onCheckedChanged: (Boolean) -> Unit) {
             uncheckedBoxColor = WalkieTheme.colors.gray200,
             uncheckedBorderColor = WalkieTheme.colors.gray200,
             uncheckedCheckmarkColor = WalkieTheme.colors.gray200,
-            /*이 아래는 의미 없긴함..*/
-            disabledCheckedBoxColor = WalkieTheme.colors.gray200,
-            disabledBorderColor = WalkieTheme.colors.gray200,
-            disabledUncheckedBoxColor = WalkieTheme.colors.gray200,
-            disabledIndeterminateBoxColor = WalkieTheme.colors.gray200,
-            disabledIndeterminateBorderColor = WalkieTheme.colors.gray200,
-            disabledUncheckedBorderColor = WalkieTheme.colors.gray200
+            disabledCheckedBoxColor = disabledColor,
+            disabledBorderColor = disabledColor,
+            disabledUncheckedBoxColor = disabledColor,
+            disabledIndeterminateBoxColor = disabledColor,
+            disabledIndeterminateBorderColor = disabledColor,
+            disabledUncheckedBorderColor = disabledColor
         )
     )
 }
