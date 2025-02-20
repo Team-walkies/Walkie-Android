@@ -23,4 +23,6 @@ dependencies {
     implementation(libs.room.gradlePlugin)
     implementation(libs.hilt.gradlePlugin)
     implementation(libs.ksp.gradlePlugin)
+    implementation(libs.google.services.gradlePlugin)
+    implementation(libs.firebase.crashlytics.gradlePlugin)
 }
