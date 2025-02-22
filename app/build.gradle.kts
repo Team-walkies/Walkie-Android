@@ -24,6 +24,7 @@ android {
 dependencies {
     implementation(project(":feature:home"))
     implementation(project(":feature:login"))
+    implementation(project(":feature:stepcounter"))
     implementation(project(":core:design-system"))
     implementation(project(":core:data"))
 }
