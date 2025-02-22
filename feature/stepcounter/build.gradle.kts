@@ -3,13 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.startup.home"
+    namespace = "com.startup.stepcounter"
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
     }
-
 }
 
 dependencies {
-    implementation(project(":feature:stepcounter")) // 추후 navigation 모듈 활용?
 }

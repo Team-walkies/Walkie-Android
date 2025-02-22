@@ -22,6 +22,8 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.datastore.core.android)
+    implementation(libs.androidx.datastore.preferences)
 }
 
 fun getProperty(propertyKey: String): String {
