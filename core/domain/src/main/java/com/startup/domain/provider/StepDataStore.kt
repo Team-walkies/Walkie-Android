@@ -1,4 +1,4 @@
-package com.startup.domain.repository.local
+package com.startup.domain.provider
 
 import kotlinx.coroutines.flow.Flow
 

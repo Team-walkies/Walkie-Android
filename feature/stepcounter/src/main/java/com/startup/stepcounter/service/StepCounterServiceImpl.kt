@@ -3,7 +3,7 @@ package com.startup.stepcounter.service
 import android.content.Context
 import android.content.Intent
 import com.startup.common.util.OsVersions
-import com.startup.domain.repository.local.StepDataStore
+import com.startup.domain.provider.StepDataStore
 import com.startup.stepcounter.service.ServiceUtil.startForegroundService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow

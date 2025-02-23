@@ -1,0 +1,52 @@
+package com.startup.data.remote.service
+
+import com.startup.data.remote.BaseResponse
+import com.startup.data.remote.dto.response.character.CharacterDto
+import com.startup.data.remote.dto.request.character.CharacterIdRequest
+import com.startup.data.remote.dto.response.egg.EggDto
+import com.startup.data.remote.dto.request.egg.WalkingEggRequest
+import com.startup.data.remote.dto.request.member.MemberNickNameRequest
+import com.startup.data.remote.dto.response.member.GetUserInfoResponse
+import com.startup.data.remote.dto.response.member.IsPublicDto
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.PATCH
+
+internal interface MemberService {
+    /** 내 정보 조회하기 */
+    @GET("/members")
+    suspend fun getUserInfo(): BaseResponse<GetUserInfoResponse>
+
+    /** 내 정보 수정하기 */
+    @PATCH("/members")
+    suspend fun modifyUserInfo(@Body request: MemberNickNameRequest): BaseResponse<Unit>
+
+    /** 회원탈퇴 하기 */
+    @DELETE("/members")
+    suspend fun withdrawalService(): BaseResponse<Unit>
+
+    /** 로그 아웃 하기 */
+    @DELETE("/members/logout")
+    suspend fun logout(): BaseResponse<Unit>
+
+    /** 같이 걷는 알 변경 API */
+    @PATCH("/members/eggs/play")
+    suspend fun updateWalkingEgg(@Body request: WalkingEggRequest): BaseResponse<Unit>
+
+    /** 같이 걷는 알 조회 API */
+    @GET("/members/eggs/play")
+    suspend fun getWalkingEgg(): BaseResponse<EggDto>
+
+    /** 같이 걷는 캐릭터 변경 API */
+    @PATCH("/members/character/play")
+    suspend fun modifyWalkingCharacter(@Body request: CharacterIdRequest): BaseResponse<Unit>
+
+    /** 같이 걷는 캐릭터 조회 API */
+    @GET("/members/character/play")
+    suspend fun getWalkingCharacter(): BaseResponse<CharacterDto>
+
+    /** 내 프로필 공개/비공개 토글 API, 요청하면 값이 반전 됨 */
+    @GET("/members/profile/visibility")
+    suspend fun changeUserProfileVisibility(): BaseResponse<IsPublicDto>
+}

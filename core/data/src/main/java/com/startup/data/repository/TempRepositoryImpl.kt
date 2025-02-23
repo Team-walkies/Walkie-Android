@@ -6,7 +6,7 @@ import com.startup.domain.repository.TempRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class TempRepositoryImpl @Inject constructor(
+internal class TempRepositoryImpl @Inject constructor(
     private val tempDataSource: TempDataSource,
     private val temp2DataSource: Temp2DataSource,
 ) : TempRepository {

@@ -16,7 +16,7 @@ import androidx.core.app.ServiceCompat
 import com.startup.common.util.OsVersions
 import com.startup.common.util.Printer
 import com.startup.common.util.UsePermissionHelper.isGrantedPermissions
-import com.startup.domain.repository.local.StepDataStore
+import com.startup.domain.provider.StepDataStore
 import com.startup.stepcounter.broadcastReciver.RestartServiceReceiver
 import com.startup.stepcounter.notification.NotificationCode.WALKIE_STEP_NOTIFICATION_ID
 import com.startup.stepcounter.notification.buildWalkieNotification
