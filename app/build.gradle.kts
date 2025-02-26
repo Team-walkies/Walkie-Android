@@ -27,4 +27,5 @@ dependencies {
     implementation(project(":feature:stepcounter"))
     implementation(project(":core:design-system"))
     implementation(project(":core:data"))
+    implementation(project(":core:resource"))
 }
