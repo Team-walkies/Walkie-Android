@@ -11,4 +11,5 @@ dependencies {
     add("implementation", project(":core:domain"))
     add("implementation", project(":core:common"))
     add("implementation", project(":core:design-system"))
+    add("implementation", project(":core:resource"))
 }
