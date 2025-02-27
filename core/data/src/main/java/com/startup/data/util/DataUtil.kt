@@ -35,6 +35,11 @@ class NetworkTemporaryException(
     val code: Int? = null
 ) : Exception(message), WalkieException
 
+class KakaoAuthFailException(
+    override val message: String? = null,
+    val code: Int? = null
+) : Exception(message), WalkieException
+
 fun handleException(e: Throwable): Throwable {
     when (e) {
         is JsonParseException -> {
