@@ -31,6 +31,7 @@ workRuntimeKtx = "2.10.0"
 firebase-bom = "33.9.0"
 google-services = "4.4.2"
 firebase-crashlytics-gradle = "3.0.2"
+kakao-sdk = "2.20.3"
 
 
 [libraries]
@@ -100,6 +101,7 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 firebase-config = { group = "com.google.firebase", name = "firebase-config" }
+kakao-login = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao-sdk" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

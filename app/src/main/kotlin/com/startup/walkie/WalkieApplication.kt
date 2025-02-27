@@ -5,7 +5,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.analytics
 import com.google.firebase.crashlytics.crashlytics
-import com.startup.data.BuildConfig
+import com.kakao.sdk.common.KakaoSdk
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
@@ -14,6 +14,7 @@ class WalkieApplication : Application() {
         super.onCreate()
         FirebaseApp.initializeApp(this)
         initializeLogging()
+        KakaoSdk.init(this, BuildConfig.NATIVE_APP_KEY)
     }
 }
 
