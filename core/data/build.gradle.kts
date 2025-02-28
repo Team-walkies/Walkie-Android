@@ -17,6 +17,7 @@ android {
 dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:resource"))
+    implementation(project(":core:common"))
     implementation(libs.retrofit.core)
     implementation(libs.okhttp.logging)
     implementation(libs.okhttp)

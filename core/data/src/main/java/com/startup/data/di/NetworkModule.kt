@@ -5,7 +5,15 @@ import com.startup.data.annotations.AuthHttpClient
 import com.startup.data.annotations.AuthRetrofit
 import com.startup.data.annotations.CommonHttpClient
 import com.startup.data.annotations.CommonRetrofit
+import com.startup.data.remote.service.AuthService
+import com.startup.data.remote.service.CharacterService
+import com.startup.data.remote.service.EggService
+import com.startup.data.remote.service.MemberService
+import com.startup.data.remote.service.NoticeService
+import com.startup.data.remote.service.ReviewService
+import com.startup.data.remote.service.SpotService
 import com.startup.data.remote.service.TempService
+import com.startup.data.util.AuthInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,38 +47,41 @@ internal object NetworkModule {
     @Singleton
     @CommonHttpClient
     fun providesCommonHttpClient(
-        /*headerInterceptor: Interceptor, TODO 나중에 추가 될 예정 */
         loggerInterceptor: HttpLoggingInterceptor,
     ) =
         OkHttpClient.Builder()
             .addInterceptor(loggerInterceptor)
             .build()
-
-
-    @Provides
-    @Singleton
-    @AuthHttpClient
-    fun providesAuthHttpClient(
-        /*headerInterceptor: Interceptor, TODO 나중에 추가 될 예정 */
-        loggerInterceptor: HttpLoggingInterceptor,
-    ) =
-        OkHttpClient.Builder()
-//            .addInterceptor(headerInterceptor)
-            .addInterceptor(loggerInterceptor)
-            .build()
-
 
     @Provides
     @Singleton
     @CommonRetrofit
     fun providesCommonRetrofit(
-        @AuthHttpClient okHttpClient: OkHttpClient,
+        @CommonHttpClient okHttpClient: OkHttpClient,
         converterFactory: GsonConverterFactory,
     ): Retrofit =
         Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(converterFactory)
+            .build()
+
+    @Provides
+    @Singleton
+    fun provideLoginService(
+        @CommonRetrofit retrofit: Retrofit,
+    ): AuthService = retrofit.create(AuthService::class.java)
+
+    @Provides
+    @Singleton
+    @AuthHttpClient
+    fun providesAuthHttpClient(
+        headerInterceptor: AuthInterceptor,
+        loggerInterceptor: HttpLoggingInterceptor,
+    ) =
+        OkHttpClient.Builder()
+            .addInterceptor(headerInterceptor)
+            .addInterceptor(loggerInterceptor)
             .build()
 
     @Provides
@@ -92,4 +103,39 @@ internal object NetworkModule {
         @AuthRetrofit retrofit: Retrofit,
     ): TempService = retrofit.create(TempService::class.java)
 
+    @Provides
+    @Singleton
+    fun provideCharacterService(
+        @AuthRetrofit retrofit: Retrofit,
+    ): CharacterService = retrofit.create(CharacterService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideEggService(
+        @AuthRetrofit retrofit: Retrofit,
+    ): EggService = retrofit.create(EggService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideMemberService(
+        @AuthRetrofit retrofit: Retrofit,
+    ): MemberService = retrofit.create(MemberService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideNoticeService(
+        @AuthRetrofit retrofit: Retrofit,
+    ): NoticeService = retrofit.create(NoticeService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideReviewService(
+        @AuthRetrofit retrofit: Retrofit,
+    ): ReviewService = retrofit.create(ReviewService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideSpotService(
+        @AuthRetrofit retrofit: Retrofit,
+    ): SpotService = retrofit.create(SpotService::class.java)
 }

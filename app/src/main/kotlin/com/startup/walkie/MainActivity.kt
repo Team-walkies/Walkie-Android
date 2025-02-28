@@ -10,11 +10,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.startup.ui.LocalWalkieLightColorScheme
-import com.startup.walkie.ui.theme.Typography
-import com.startup.walkie.ui.theme.WalkieTheme
+import com.startup.ui.WalkieTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +35,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
         text = "Hello $name!",
         modifier = modifier,
-        color = com.startup.ui.WalkieTheme.colors.red100
+        color = WalkieTheme.colors.red100
     )
 }
 

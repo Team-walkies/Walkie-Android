@@ -7,7 +7,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NetworkCheckerImpl @Inject constructor(@ApplicationContext private val context: Context) : NetworkChecker {
+internal class NetworkCheckerImpl @Inject constructor(@ApplicationContext private val context: Context) : NetworkChecker {
     override fun isNetworkAvailable() = context
         .getSystemService(ConnectivityManager::class.java)
         .activeNetwork != null

@@ -3,8 +3,8 @@ package com.startup.data.datasource
 import kotlinx.coroutines.flow.Flow
 
 interface AuthDataSource {
-    suspend fun kakaoLogin(): Flow<String>
-    suspend fun login(): Flow<Unit>
-    suspend fun unLink(): Flow<Unit>
-    suspend fun logOut(): Flow<Unit>
+    fun kakaoLogin(): Flow<String>
+    fun login(): Flow<Unit>
+    fun unLink(): Flow<Unit>
+    fun logOut(): Flow<Unit>
 }
