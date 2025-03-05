@@ -32,10 +32,12 @@ firebase-bom = "33.9.0"
 google-services = "4.4.2"
 firebase-crashlytics-gradle = "3.0.2"
 kakao-sdk = "2.20.3"
+splash = "1.0.1"
 
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splash" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 # android X
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
