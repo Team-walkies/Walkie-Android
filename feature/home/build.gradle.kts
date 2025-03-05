@@ -11,5 +11,5 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:stepcounter")) // 추후 navigation 모듈 활용?
+    implementation(project(":feature:stepcounter"))
 }
