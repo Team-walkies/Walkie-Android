@@ -3,4 +3,17 @@
     <string name="navigation_home">홈</string>
     <string name="navigation_spot">스팟</string>
     <string name="navigation_mypage">마이</string>
+    <string name="clazz_normal">일반</string>
+    <string name="clazz_rare">희귀</string>
+    <string name="clazz_epic">에픽</string>
+    <string name="clazz_legend">전설</string>
+    <string name="empty_gain_egg">아직 얻은 알이 없어요.\n스팟 탐험을 통해 수집해 보세요!</string>
+    <string name="current_gain_egg">보유한 알</string>
+    <string name="current_gain_egg_choice">같이 걷고 싶은 알을 선택해 주세요</string>
+    <string name="right_title_egg_info">안내</string>
+
+
+    <string name="desc_egg">알</string>
+    <string name="desc_egg_empty">빈 알</string>
+    <string name="desc_egg_play_icon">같이 걷는 알</string>
 </resources>
