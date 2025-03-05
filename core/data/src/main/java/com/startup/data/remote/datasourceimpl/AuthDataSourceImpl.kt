@@ -11,7 +11,7 @@ import com.startup.data.remote.service.MemberService
 import com.startup.data.util.ACCESS_TOKEN_KEY_NAME
 import com.startup.data.util.KaKaoLoginClient
 import com.startup.data.util.REFRESH_ACCESS_TOKEN_KEY_NAME
-import com.startup.data.util.TokenDataStoreProvider
+import com.startup.data.local.provider.TokenDataStoreProvider
 import com.startup.data.util.handleExceptionIfNeed
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
