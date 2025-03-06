@@ -49,7 +49,7 @@ internal class AuthInterceptor @Inject constructor(
             val refreshResponse =
                 runCatching { authService.refreshTokenUpdate(BEARER + refreshToken) }.getOrNull()
             val data = refreshResponse?.data
-            if (refreshResponse?.success != true || data == null) {
+            if (refreshResponse?.status != 200 || data == null) {
                 throw SessionExpireException("세션 만료")
             } else {
                 tokenDataStoreProvider.putValue(accessTokenKey, data.accessToken.orEmpty())

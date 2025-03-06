@@ -45,7 +45,7 @@ internal class AuthDataSourceImpl @Inject constructor(
     override fun login(): Flow<Unit> = callbackFlow {
         kakaoLogin().map {
             val item = authService.login(it)
-            if (item.success != true) {
+            if (item.status != 200) {
                 throw ResponseErrorException(item.message.orEmpty())
             }
             item.data.requireNotNull()

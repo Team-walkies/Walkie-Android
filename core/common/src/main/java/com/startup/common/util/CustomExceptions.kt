@@ -24,6 +24,7 @@ class NetworkTemporaryException(
 
 class ResponseErrorException(
     override val message: String,
+    val code: Int? = null
 ) : Exception(message), WalkieException
 
 class KakaoAuthFailException(

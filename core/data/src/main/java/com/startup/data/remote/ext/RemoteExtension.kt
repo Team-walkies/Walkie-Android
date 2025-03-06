@@ -4,9 +4,15 @@ import com.startup.common.util.ResponseErrorException
 import com.startup.data.remote.BaseResponse
 import kotlinx.coroutines.flow.FlowCollector
 
-internal suspend fun <T : BaseResponse<R>, R> FlowCollector<R>.emitRemote(item: T) {
-    if (item.success != true) {
-        throw ResponseErrorException(item.message.orEmpty())
+internal suspend fun <T : BaseResponse<R>, R> FlowCollector<R>.emitRemote(
+    item: T,
+    specificErrorCode: Int? = null
+) {
+    if (specificErrorCode != null && item.status == specificErrorCode) {
+        throw ResponseErrorException(item.message.orEmpty(), item.status)
+    }
+    if (item.status !in 200..299) {
+        throw ResponseErrorException(item.message.orEmpty(), (item.status ?: -1))
     }
     emit(item.data.requireNotNull())
 }
