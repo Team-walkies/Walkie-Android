@@ -9,3 +9,7 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 }
+
+dependencies {
+    implementation(libs.androidx.core.splashscreen)
+}
