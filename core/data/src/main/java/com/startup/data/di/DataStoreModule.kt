@@ -1,8 +1,12 @@
 package com.startup.data.di
 
 import com.startup.data.local.datasourceimpl.StepDataStoreImpl
-import com.startup.data.util.TokenDataStoreProvider
-import com.startup.data.util.TokenDataStoreProviderImpl
+import com.startup.data.local.provider.NotificationDataStoreProvider
+import com.startup.data.local.provider.NotificationDataStoreProviderImpl
+import com.startup.data.local.provider.TokenDataStoreProvider
+import com.startup.data.local.provider.TokenDataStoreProviderImpl
+import com.startup.data.local.provider.UserSettingDataStoreProvider
+import com.startup.data.local.provider.UserSettingDataStoreProviderImpl
 import com.startup.domain.provider.StepDataStore
 import dagger.Binds
 import dagger.Module
@@ -21,4 +25,12 @@ internal abstract class DataStoreModule {
     @Singleton
     @Binds
     abstract fun bindSettingPreferenceDataStoreProvider(tokenDataStoreProvider: TokenDataStoreProviderImpl): TokenDataStoreProvider
+
+    @Singleton
+    @Binds
+    abstract fun bindNotificationPreferenceDataStoreProvider(notificationDataStoreProvider: NotificationDataStoreProviderImpl): NotificationDataStoreProvider
+
+    @Singleton
+    @Binds
+    abstract fun bindUserSettingPreferenceDataStoreProvider(userSettingDataStoreProvider: UserSettingDataStoreProviderImpl): UserSettingDataStoreProvider
 }

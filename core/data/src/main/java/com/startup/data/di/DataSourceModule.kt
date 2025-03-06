@@ -9,7 +9,9 @@ import com.startup.data.datasource.ReviewDataSource
 import com.startup.data.datasource.SpotDataSource
 import com.startup.data.datasource.Temp2DataSource
 import com.startup.data.datasource.TempDataSource
+import com.startup.data.datasource.UserDataSource
 import com.startup.data.local.datasourceimpl.Temp2DataSourceImpl
+import com.startup.data.local.datasourceimpl.UserDataSourceImpl
 import com.startup.data.remote.datasourceimpl.AuthDataSourceImpl
 import com.startup.data.remote.datasourceimpl.CharacterDataSourceImpl
 import com.startup.data.remote.datasourceimpl.EggDataSourceImpl
@@ -65,6 +67,10 @@ internal abstract class DataSourceModule {
     @Singleton
     @Binds
     abstract fun bindsAuthDataSource(dataSource: AuthDataSourceImpl): AuthDataSource
+
+    @Singleton
+    @Binds
+    abstract fun bindsUserDataSource(dataSource: UserDataSourceImpl): UserDataSource
 
     @Singleton
     @Binds
