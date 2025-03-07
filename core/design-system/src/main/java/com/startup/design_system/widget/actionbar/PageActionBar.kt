@@ -50,7 +50,7 @@ fun PageActionBar(pageActionBarType: PageActionBarType) {
                 )
                 Text(
                     modifier = Modifier
-                        .padding(end = 10.dp)
+                        .padding(end = 16.dp)
                         .align(Alignment.CenterEnd)
                         .noRippleClickable {
                             if (pageActionBarType.enabled) {
@@ -72,7 +72,7 @@ fun PageActionBar(pageActionBarType: PageActionBarType) {
                 )
                 Text(
                     modifier = Modifier
-                        .padding(end = 10.dp)
+                        .padding(end = 16.dp)
                         .align(Alignment.CenterEnd)
                         .noRippleClickable {
                             pageActionBarType.rightActionClicked.invoke()
@@ -123,6 +123,7 @@ fun PreviewPageActionBar() {
                     {})
             )
             PageActionBar(PageActionBarType.TitleAndRightActionBarType({}, "제목", "버튼", {}))
+            PageActionBar(PageActionBarType.TitleAndRightActionBarType({}, "", "버튼", {}))
         }
     }
 }
