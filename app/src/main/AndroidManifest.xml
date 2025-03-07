@@ -52,7 +52,7 @@
         </activity>
 
         <activity
-            android:name=".SplashActivity"
+            android:name=".splash.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.Walkie.Splash">
             <intent-filter>

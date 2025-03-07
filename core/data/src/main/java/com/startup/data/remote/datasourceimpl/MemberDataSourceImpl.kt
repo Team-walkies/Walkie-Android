@@ -19,7 +19,7 @@ internal class MemberDataSourceImpl @Inject constructor(private val memberServic
     MemberDataSource {
     override fun getUserInfo(): Flow<GetUserInfoResponse> = flow {
         handleExceptionIfNeed {
-            emitRemote(memberService.getUserInfo())
+            emitRemote(memberService.getUserInfo(), specificErrorCode = 204)
         }
     }
 

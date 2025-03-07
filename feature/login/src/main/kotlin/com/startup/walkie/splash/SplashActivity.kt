@@ -1,13 +1,12 @@
-package com.startup.walkie
+package com.startup.walkie.splash
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -16,35 +15,53 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import com.startup.common.base.BaseActivity
+import com.startup.common.util.Printer
 import com.startup.login.R
 import com.startup.ui.WalkieTheme
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
-class SplashActivity : ComponentActivity() {
+@AndroidEntryPoint
+class SplashActivity : BaseActivity<SplashUiEvent, SplashNavigationEvent>() {
+    override val viewModel: SplashViewModel by viewModels<SplashViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             SplashScreenCompose()
         }
-        checkUserLogin()
+        handleNavigationEvent(viewModel.event.filterIsInstance())
     }
 
-    private fun checkUserLogin() {
-        lifecycleScope.launch {
-            delay(2000)
-            // TODO 자동 로그인 여부 확인
-            // TODO 첫 사용자 인지 확인
-        }
+    override fun handleNavigationEvent(navigationEventFlow: Flow<SplashNavigationEvent>) {
+        navigationEventFlow.onEach {
+            Printer.e("LMH", "EVENT $it")
+            when(it) {
+                SplashNavigationEvent.MoveToMainActivity -> {
+                    // TODO 이동
+                }
+                SplashNavigationEvent.MoveToOnBoarding -> {
+                    // TODO 이동
+                }
+                SplashNavigationEvent.MoveToOnBoardingAndNickNameSet -> {
+                    // TODO 이동
+                }
+            }
+        }.launchIn(lifecycleScope)
     }
+
+    override fun handleUiEvent(uiEvent: SplashUiEvent) {}
 }
 
 @Composable
-fun SplashScreenCompose() {
+private fun SplashScreenCompose() {
     Box(
         modifier = Modifier
             .fillMaxSize()
