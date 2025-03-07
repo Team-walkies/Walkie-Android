@@ -23,17 +23,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.startup.common.util.DateUtil
 import com.startup.design_system.widget.progress.ProgressSmall
 import com.startup.design_system.widget.tag.TagSmall
 import com.startup.home.R
+import com.startup.home.egg.model.MyEggModel
 import com.startup.ui.WalkieTheme
+import com.startup.ui.noRippleClickable
+import com.startup.home.egg.model.EggKind
 import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
 internal fun EggGridItemComponent(
     modifier: Modifier = Modifier,
-    egg: MyEggModel
+    egg: MyEggModel,
+    onClickEgg: (MyEggModel) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -51,6 +56,9 @@ internal fun EggGridItemComponent(
                 color = WalkieTheme.colors.gray100,
                 shape = RoundedCornerShape(20.dp)
             )
+            .noRippleClickable {
+                onClickEgg.invoke(egg)
+            }
             .padding(bottom = 16.dp, top = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -79,7 +87,7 @@ internal fun EggGridItemComponent(
             )
         }
         TagSmall(
-            text = stringResource(egg.eggKind.displayStrResId),
+            text = stringResource(egg.eggKind.rankStrResId),
             textColor = egg.eggKind.getTextColor()
         )
         ProgressSmall(
@@ -122,9 +130,11 @@ private fun PreviewEggGridItemComponent() {
                     needStep = 10000,
                     play = false,
                     characterId = -1,
-                    eggKind = EggKind.Epic
+                    eggKind = EggKind.Epic,
+                    obtainedPosition = "대전시 유성구",
+                    obtainedDate = DateUtil.convertDateFormat("2024-01-12 12:20:10")
                 )
-            )
+            ) {}
             EggGridItemComponent(
                 modifier = Modifier
                     .width(150.dp)
@@ -135,9 +145,11 @@ private fun PreviewEggGridItemComponent() {
                     needStep = 10000,
                     play = true,
                     characterId = -1,
-                    eggKind = EggKind.Legend
+                    eggKind = EggKind.Legend,
+                    obtainedPosition = "대전시 유성구",
+                    obtainedDate = DateUtil.convertDateFormat("2024-01-12 12:20:10")
                 )
-            )
+            ) {}
         }
     }
 }

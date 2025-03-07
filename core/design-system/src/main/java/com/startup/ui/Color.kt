@@ -21,6 +21,7 @@ val Gray800 = Color(0xFF2B2E36)
 val Gray900 = Color(0xFF1E2127)
 val Gray900Opacity70 = Color(0xB21E2127)
 val Black = Color(0xFF000000)
+val BlackOpacity60 = Color(0x99000000)
 
 /*
     Blue
@@ -88,7 +89,6 @@ data class WalkieSemanticColor(
     val gray900: Color,
     val gray900Opacity70: Color,
     val black: Color,
-
     val blue30: Color,
     val blue50: Color,
     val blue100: Color,
@@ -115,6 +115,7 @@ data class WalkieSemanticColor(
     val purple100: Color,
     val purple200: Color,
     val purple300: Color,
+    val blackOpacity60: Color,
 )
 
 val LocalWalkieColors = staticCompositionLocalOf {
@@ -132,6 +133,7 @@ val LocalWalkieColors = staticCompositionLocalOf {
         gray900 = Color.Unspecified,
         gray900Opacity70 = Color.Unspecified,
         black = Color.Unspecified,
+        blackOpacity60 = Color.Unspecified,
 
         blue30 = Color.Unspecified,
         blue50 = Color.Unspecified,
@@ -176,6 +178,7 @@ val LocalWalkieLightColorScheme = WalkieSemanticColor(
     gray900 = Gray900,
     gray900Opacity70 = Gray900Opacity70,
     black = Black,
+    blackOpacity60 = BlackOpacity60,
 
     blue30 = Blue30,
     blue50 = Blue50,
@@ -219,6 +222,7 @@ val LocalWalkieDarkColorScheme = WalkieSemanticColor(
     gray900 = Gray50,
     gray900Opacity70 = Gray900Opacity70,
     black = White, // 다크 테마에서는 반전
+    blackOpacity60 = BlackOpacity60,
 
     blue30 = Blue30,
     blue50 = Blue50,

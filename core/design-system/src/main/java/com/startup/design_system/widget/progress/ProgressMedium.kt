@@ -16,9 +16,9 @@ import com.startup.ui.WalkieTheme
 
 
 @Composable
-fun ProgressMedium(progress: Float) {
+fun ProgressMedium(modifier: Modifier = Modifier, progress: Float) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .height(8.dp)
             .background(color = WalkieTheme.colors.gray200, shape = RoundedCornerShape(100.dp))
             .fillMaxWidth()
@@ -37,9 +37,9 @@ fun ProgressMedium(progress: Float) {
 fun PreviewProgressMedium() {
     WalkieTheme {
         Column(verticalArrangement = Arrangement.spacedBy(30.dp)) {
-            ProgressMedium(1F)
-            ProgressMedium(0.5F)
-            ProgressMedium(0F)
+            ProgressMedium(progress = 1F)
+            ProgressMedium(progress = 0.5F)
+            ProgressMedium(progress = 0F)
         }
     }
 }

@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.startup.common.base.NavigationEvent
 import com.startup.design_system.widget.actionbar.PageActionBar
 import com.startup.design_system.widget.actionbar.PageActionBarType
 import com.startup.home.R
@@ -39,7 +40,7 @@ private data class NotificationListScreenState(
 
 @Composable
 fun NotificationListScreen(
-    onNavigationEvent: (NotificationNavigationEvent)-> Unit
+    onNavigationEvent: (NavigationEvent)-> Unit
 ) {
     // 상태 정의
     val screenState = rememberNotificationListScreenState()
@@ -50,7 +51,7 @@ fun NotificationListScreen(
                 if (screenState.isDeleteMode) {
                     screenState.setDeleteMode(false)
                 } else {
-                    onNavigationEvent.invoke(NotificationNavigationEvent.Back)
+                    onNavigationEvent.invoke(NavigationEvent.Back)
                 }
             })
         },

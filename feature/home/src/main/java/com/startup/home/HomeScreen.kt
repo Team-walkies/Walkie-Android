@@ -41,9 +41,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.startup.common.util.formatWithLocale
 import com.startup.design_system.widget.actionbar.MainLogoActionBar
 import com.startup.design_system.widget.speechbubble.SpeechBubble
-import com.startup.home.egg.EggKind
 import com.startup.home.egg.EggLayoutModel
 import com.startup.home.egg.getEggLayoutModel
+import com.startup.home.egg.model.EggKind
 import com.startup.home.menu.HistoryItemModel
 import com.startup.ui.WalkieTheme
 import com.startup.ui.noRippleClickable
