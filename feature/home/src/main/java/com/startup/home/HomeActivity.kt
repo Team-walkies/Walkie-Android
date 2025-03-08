@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -25,6 +26,7 @@ import com.startup.common.base.NavigationEvent
 import com.startup.common.base.UiEvent
 import com.startup.common.util.OsVersions
 import com.startup.home.mypage.MyPageScreen
+import com.startup.home.notification.NotificationListScreen
 import com.startup.navigation.BottomNavItem
 import com.startup.navigation.WalkieBottomNavigation
 import com.startup.ui.WalkieTheme
@@ -108,19 +110,41 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
     fun MainScreen() {
         val navController = rememberNavController()
 
+        NavHost(
+            navController = navController,
+            startDestination = "main_content",
+            modifier = Modifier.fillMaxSize()
+        ) {
+            composable("main_content") {
+                MainContent(navController)
+            }
+
+            composable("notification_list") {
+                NotificationListScreen(
+                    onBackPressed = { navController.navigateUp() }
+                )
+            }
+        }
+    }
+
+
+    @Composable
+    fun MainContent(navController: NavHostController) {
+        val bottomNavController = rememberNavController()
+
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             bottomBar = {
-                WalkieBottomNavigation(navController = navController)
+                WalkieBottomNavigation(navController = bottomNavController)
             }
         ) { innerPadding ->
             NavHost(
-                navController = navController,
+                navController = bottomNavController,
                 startDestination = BottomNavItem.Home.route,
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable(BottomNavItem.Home.route) {
-                    HomeScreen()
+                    HomeScreen(mainNavController = navController)
                 }
                 composable(BottomNavItem.Spot.route) {
                     //todo feature spot 모듈에서 접근
