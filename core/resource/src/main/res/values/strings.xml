@@ -3,6 +3,25 @@
     <string name="navigation_home">홈</string>
     <string name="navigation_spot">스팟</string>
     <string name="navigation_mypage">마이</string>
+
+    <string name="home_step">걸음</string>
+    <string name="home_kilometer">%.2fkm</string>
+    <string name="home_movement">이동</string>
+    <string name="home_my_history">나의 히스토리</string>
+    <string name="home_gain_eggs">보유한 알</string>
+    <string name="home_hatching_characters">부화한 캐릭터</string>
+    <string name="home_spot_history">스팟 기록</string>
+    <string name="home_choice_egg">알을 선택해 주세요</string>
+    <string name="home_walking_with">%s와 함께 걷는중..</string>
+    <string name="home_until_hatching_step">부화까지</string>
+    <string name="current_step">\u0020%s걸음</string>
+
+
+    <string name="quantity_string">%d개</string>
+    <string name="group_characters_string">%d마리</string>
+
+    <string name="desc_partner">같이 걷는 캐릭터</string>
+    <string name="desc_empty_egg">알이 없는 경우</string>
     <string name="clazz_normal">일반</string>
     <string name="clazz_rare">희귀</string>
     <string name="clazz_epic">에픽</string>

@@ -11,7 +11,6 @@ import android.provider.Settings
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +29,8 @@ import com.startup.common.base.BaseActivity
 import com.startup.common.base.NavigationEvent
 import com.startup.common.base.UiEvent
 import com.startup.common.util.OsVersions
+import com.startup.home.StepCounterState
+import com.startup.home.HomeViewModel
 import com.startup.ui.WalkieTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
@@ -37,7 +38,7 @@ import kotlinx.coroutines.flow.Flow
 
 @AndroidEntryPoint
 class StepCounterActivity : BaseActivity<UiEvent, NavigationEvent>() {
-    override val viewModel: StepCounterViewModel by viewModels()
+    override val viewModel: HomeViewModel by viewModels()
 
     private val requiredPermissions = if (OsVersions.isGreaterThanOrEqualsTIRAMISU()) {
         arrayOf(
