@@ -1,0 +1,64 @@
+package com.startup.home.navigation
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.startup.home.character.GainCharacterScreen
+import com.startup.home.notification.NotificationListScreen
+import com.startup.home.notification.NotificationNavigationEvent
+import com.startup.ui.WalkieTheme
+
+@Composable
+fun HomeNavigationGraph(destinationRoute: String, parentNavController: NavHostController) {
+    val navController = rememberNavController()
+    val snackBarHostState = SnackbarHostState()
+    // 홈화면(각각의 NavGraph), 지도화면(각각의 NavGraph), 마이페이지 화면(각각의 NavGraph)
+    Scaffold(
+        snackbarHost = {
+//            SnackBar(snackBarHostState = snackBarHostState)
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(WalkieTheme.colors.white)
+                .windowInsetsPadding( // 내비게이션 바 인셋을 처리
+                    WindowInsets.systemBars.only(WindowInsetsSides.Vertical)
+                ),
+        ) {
+            NavHost(
+                navController = navController,
+                startDestination = destinationRoute
+            ) {
+                composable(HomeScreenNav.GainEgg.route) { GainEggNavigationGraph() }
+                composable(HomeScreenNav.GainCharacter.route) { GainCharacterScreen() }
+                composable(HomeScreenNav.SpotArchive.route) { SpotArchiveNavigationGraph() }
+                composable(HomeScreenNav.Notification.route) {
+                    NotificationListScreen(onNavigationEvent = {
+                        when (it) {
+                            NotificationNavigationEvent.Back -> {
+                                val isBackStackExist = navController.navigateUp()
+                                if (!isBackStackExist) {
+                                    parentNavController.navigateUp()
+                                }
+                            }
+                        }
+                    })
+                }
+            }
+        }
+    }
+}

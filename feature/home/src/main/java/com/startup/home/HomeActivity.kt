@@ -11,26 +11,38 @@ import android.provider.Settings
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
-import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.startup.common.base.BaseActivity
 import com.startup.common.base.NavigationEvent
 import com.startup.common.base.UiEvent
 import com.startup.common.util.OsVersions
-import com.startup.home.mypage.MyPageScreen
-import com.startup.home.notification.NotificationListScreen
-import com.startup.navigation.BottomNavItem
-import com.startup.navigation.WalkieBottomNavigation
+import com.startup.home.navigation.HomeNavigationGraph
+import com.startup.home.navigation.MainScreenNav
+import com.startup.home.navigation.MyPageNavigationGraph
+import com.startup.navigation.HomeFeatureNavigator
 import com.startup.ui.WalkieTheme
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 
 @AndroidEntryPoint
@@ -48,6 +60,13 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
         arrayOf()
     }
 
+    // KSP 는 필드 주입이 안 됨
+    private val homeFeatureNavigator: HomeFeatureNavigator by lazy {
+        EntryPointAccessors.fromApplication(
+            applicationContext,
+            HomeFeatureNavigatorEntryPoint::class.java
+        ).homeFeatureNavigator()
+    }
 
     override fun handleNavigationEvent(navigationEventFlow: Flow<NavigationEvent>) {
     }
@@ -108,52 +127,74 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
 
     @Composable
     fun MainScreen() {
-        val navController = rememberNavController()
-
-        NavHost(
-            navController = navController,
-            startDestination = "main_content",
-            modifier = Modifier.fillMaxSize()
-        ) {
-            composable("main_content") {
-                MainContent(navController)
-            }
-
-            composable("notification_list") {
-                NotificationListScreen(
-                    onBackPressed = { navController.navigateUp() }
-                )
-            }
-        }
+        MainContent()
     }
 
 
     @Composable
-    fun MainContent(navController: NavHostController) {
-        val bottomNavController = rememberNavController()
-
+    fun MainContent() {
+        val navController = rememberNavController()
+        val snackBarHostState = SnackbarHostState()
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            bottomBar = {
-                WalkieBottomNavigation(navController = bottomNavController)
+            snackbarHost = {
+
             }
         ) { innerPadding ->
-            NavHost(
-                navController = bottomNavController,
-                startDestination = BottomNavItem.Home.route,
-                modifier = Modifier.padding(innerPadding)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(WalkieTheme.colors.white)
+                    .windowInsetsPadding( // 내비게이션 바 인셋을 처리
+                        WindowInsets.systemBars.only(WindowInsetsSides.Vertical)
+                    ),
             ) {
-                composable(BottomNavItem.Home.route) {
-                    HomeScreen(mainNavController = navController)
-                }
-                composable(BottomNavItem.Spot.route) {
-                    //todo feature spot 모듈에서 접근
-                }
-                composable(BottomNavItem.MyPage.route) {
-                    MyPageScreen()
+                NavHost(
+                    navController = navController,
+                    startDestination = MainScreenNav.BottomNavigation.route
+                ) {
+                    composable(MainScreenNav.BottomNavigation.route) {
+                        MainBottomNavigationScreen(
+                            navController,
+                            onNavigationEvent = {
+                                when (it) {
+                                    MainScreenNavigationEvent.MoveToLoginActivity -> {
+                                        homeFeatureNavigator.navigateLoginView(context = this@HomeActivity)
+                                    }
+
+                                    MainScreenNavigationEvent.MoveToSpotActivity -> {
+                                        homeFeatureNavigator.navigateSpotView(context = this@HomeActivity)
+                                    }
+                                }
+                            },
+                        )
+                    }
+                    composable(
+                        route = MainScreenNav.HomeGraph.route + "/{destination}",
+                        arguments = listOf(
+                            navArgument("destination") { type = NavType.StringType },
+                        )
+                    ) { navBackStackEntry ->
+                        HomeNavigationGraph(
+                            destinationRoute = navBackStackEntry.arguments?.getString("destination")
+                                .orEmpty(),
+                            navController
+                        )
+                    }
+                    composable(MainScreenNav.MyPageGraph.route) { navBackStackEntry ->
+                        MyPageNavigationGraph(
+                            destinationRoute = navBackStackEntry.arguments?.getString("destination")
+                                .orEmpty()
+                        )
+                    }
                 }
             }
         }
+    }
+
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface HomeFeatureNavigatorEntryPoint {
+        fun homeFeatureNavigator(): HomeFeatureNavigator
     }
 
 }

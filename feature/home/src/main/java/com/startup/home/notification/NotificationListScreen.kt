@@ -39,7 +39,7 @@ private data class NotificationListScreenState(
 
 @Composable
 fun NotificationListScreen(
-    onBackPressed: () -> Unit
+    onNavigationEvent: (NotificationNavigationEvent)-> Unit
 ) {
     // 상태 정의
     val screenState = rememberNotificationListScreenState()
@@ -50,7 +50,7 @@ fun NotificationListScreen(
                 if (screenState.isDeleteMode) {
                     screenState.setDeleteMode(false)
                 } else {
-                    onBackPressed()
+                    onNavigationEvent.invoke(NotificationNavigationEvent.Back)
                 }
             })
         },

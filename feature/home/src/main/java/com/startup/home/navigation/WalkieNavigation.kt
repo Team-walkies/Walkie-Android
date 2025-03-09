@@ -1,4 +1,4 @@
-package com.startup.navigation
+package com.startup.home.navigation
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -65,7 +65,8 @@ fun WalkieBottomNavigation(
             launchSingleTop = true
             restoreState = true
         }
-    }
+    },
+    onCenterItemClick: () -> Unit
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -130,7 +131,7 @@ fun WalkieBottomNavigation(
                         modifier = Modifier
                             .size(49.dp)
                             .background(WalkieTheme.colors.blue300, CircleShape)
-                            .noRippleClickable { onItemClick(centerItem) },
+                            .noRippleClickable { onCenterItemClick.invoke() },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
