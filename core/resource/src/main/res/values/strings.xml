@@ -16,4 +16,8 @@
     <string name="desc_egg">알</string>
     <string name="desc_egg_empty">빈 알</string>
     <string name="desc_egg_play_icon">같이 걷는 알</string>
+
+    <string name="hatching_wait">잠깐,</string>
+    <string name="hatching_coming_soon">알이 부화하려고 해요!</string>
+    <string name="hatching_result">두둥!\n%s가 태어났어!</string>
 </resources>
