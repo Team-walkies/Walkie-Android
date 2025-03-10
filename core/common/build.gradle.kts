@@ -15,4 +15,5 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:design-system"))
     implementation(project(":core:resource"))
+    implementation(libs.lottie)
 }
