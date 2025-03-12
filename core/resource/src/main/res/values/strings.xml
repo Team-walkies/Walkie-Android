@@ -39,4 +39,7 @@
     <string name="hatching_wait">잠깐,</string>
     <string name="hatching_coming_soon">알이 부화하려고 해요!</string>
     <string name="hatching_result">두둥!\n%s가 태어났어!</string>
+
+    <string name="delete">삭제</string>
+    <string name="cancel">취소</string>
 </resources>

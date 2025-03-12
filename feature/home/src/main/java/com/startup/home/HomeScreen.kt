@@ -38,28 +38,31 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.startup.common.util.formatWithLocale
 import com.startup.design_system.widget.actionbar.MainLogoActionBar
 import com.startup.design_system.widget.speechbubble.SpeechBubble
+import com.startup.home.egg.EggKind
 import com.startup.home.egg.EggLayoutModel
-import com.startup.home.egg.EggTier
 import com.startup.home.egg.getEggLayoutModel
 import com.startup.home.menu.HistoryItemModel
-import com.startup.home.menu.getDefaultHistoryMenu
 import com.startup.ui.WalkieTheme
 import withBold
 import withUnderline
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    mainNavController: NavHostController
 ) {
     val state = viewModel.state as StepCounterState
     val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
-            MainLogoActionBar(isExistAlarm = false) {}
+            MainLogoActionBar(isExistAlarm = false) {
+                mainNavController.navigate("notification_list")
+            }
         },
         containerColor = WalkieTheme.colors.white
     ) { paddingValues ->
@@ -106,7 +109,7 @@ private fun EggAndPartnerSection(stepCount: Int) {
                     .height(371.dp)
                     .clip(RoundedCornerShape(20.dp)),
                 step = stepCount,
-                eggTier = EggTier.EMPTY
+                eggTier = EggKind.Empty
             )
             Spacer(modifier = Modifier.height(8.dp))
             PartnerInfoBox()
@@ -134,6 +137,7 @@ private fun PartnerInfoBox() {
         contentAlignment = Alignment.CenterStart,
     ) {
         val partner = "해파리"
+        val text = stringResource(R.string.home_walking_with, partner) // "%s와 함께 걷는중.."
         Text(
             text = stringResource(R.string.home_walking_with, partner).withBold(partner),
             modifier = Modifier.padding(start = 16.dp),
@@ -169,6 +173,26 @@ private fun HistoryItems() {
     }
 }
 
+fun getDefaultHistoryMenu(): List<HistoryItemModel> {
+    return listOf(
+        HistoryItemModel(
+            thumbnailDrawable = R.drawable.img_gain_eggs,
+            titleString = R.string.home_gain_eggs,
+            unitString = R.string.quantity_string
+        ),
+        HistoryItemModel(
+            thumbnailDrawable = R.drawable.img_hatching_characters,
+            titleString = R.string.home_hatching_characters,
+            unitString = R.string.group_characters_string
+        ),
+        HistoryItemModel(
+            thumbnailDrawable = R.drawable.img_spot_history,
+            titleString = R.string.home_spot_history,
+            unitString = R.string.quantity_string
+        )
+    )
+}
+
 @Composable
 private fun HistoryItem(
     item: HistoryItemModel,
@@ -191,11 +215,13 @@ private fun HistoryItem(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
+            modifier = Modifier.height(20.dp),
             text = stringResource(item.titleString),
             style = WalkieTheme.typography.head6,
             color = WalkieTheme.colors.gray700
         )
         Text(
+            modifier = Modifier.height(20.dp),
             text = stringResource(item.unitString, 3),
             style = WalkieTheme.typography.body2,
             color = WalkieTheme.colors.gray500
@@ -207,7 +233,7 @@ private fun HistoryItem(
 fun EggLayout(
     modifier: Modifier = Modifier,
     step: Int,
-    eggTier: EggTier = EggTier.EMPTY
+    eggTier: EggKind = EggKind.Empty
 ) {
     val eggAttribute = getEggLayoutModel(eggTier)
 
@@ -230,13 +256,13 @@ fun EggLayout(
 @Composable
 private fun EggContent(
     step: Int,
-    eggTier: EggTier,
+    eggTier: EggKind,
     eggAttribute: EggLayoutModel
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         StepInformation(step = step)
 
-        if (eggTier != EggTier.EMPTY) {
+        if (eggTier != EggKind.Empty) {
             eggAttribute.effectDrawable?.let { drawableRes ->
                 Image(
                     modifier = Modifier
@@ -264,7 +290,7 @@ private fun EggContent(
                 .offset(y = 85.dp)
                 .align(Alignment.BottomCenter),
             painter = painterResource(eggAttribute.eggDrawable),
-            colorFilter = if (eggTier == EggTier.EMPTY) {
+            colorFilter = if (eggTier == EggKind.Empty) {
                 ColorFilter.tint(
                     WalkieTheme.colors.blue300,
                     blendMode = BlendMode.SrcIn
@@ -273,7 +299,7 @@ private fun EggContent(
             contentDescription = stringResource(R.string.desc_empty_egg),
         )
 
-        if (eggTier == EggTier.EMPTY) {
+        if (eggTier == EggKind.Empty) {
             Text(
                 text = stringResource(R.string.home_choice_egg).withUnderline(),
                 style = WalkieTheme.typography.head5,
