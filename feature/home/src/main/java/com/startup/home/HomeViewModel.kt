@@ -1,4 +1,4 @@
-package com.startup.home.step
+package com.startup.home
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class StepCounterViewModel @Inject constructor(
+class HomeViewModel @Inject constructor(
     private val stepCounter: StepCounterService,
 ) : BaseViewModel() {
     private val _state = mutableStateOf(StepCounterState())
