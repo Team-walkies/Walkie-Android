@@ -87,7 +87,7 @@ fun PageActionBar(pageActionBarType: PageActionBarType) {
             modifier = Modifier
                 .padding(start = 16.dp)
                 .size(24.dp)
-                .noRippleClickable { pageActionBarType.onBackClicked },
+                .noRippleClickable { pageActionBarType.onBackClicked.invoke() },
             painter = painterResource(R.drawable.ic_back),
             tint = WalkieTheme.colors.gray700,
             contentDescription = null

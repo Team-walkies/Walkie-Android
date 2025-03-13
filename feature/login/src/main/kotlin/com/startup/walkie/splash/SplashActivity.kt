@@ -1,5 +1,6 @@
 package com.startup.walkie.splash
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -19,10 +20,16 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.startup.common.base.BaseActivity
-import com.startup.common.util.Printer
+import com.startup.common.util.EXTRA_NEED_TO_NICKNAME_SETTING
 import com.startup.login.R
+import com.startup.navigation.LoginFeatureNavigator
 import com.startup.ui.WalkieTheme
+import com.startup.walkie.login.LoginActivity
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
@@ -31,6 +38,15 @@ import kotlinx.coroutines.flow.onEach
 @AndroidEntryPoint
 class SplashActivity : BaseActivity<SplashUiEvent, SplashNavigationEvent>() {
     override val viewModel: SplashViewModel by viewModels<SplashViewModel>()
+
+
+    // KSP 는 필드 주입이 안 됨
+    private val loginFeatureNavigator: LoginFeatureNavigator by lazy {
+        EntryPointAccessors.fromApplication(
+            applicationContext,
+            LoginFeatureNavigatorEntryPoint::class.java
+        ).loginFeatureNavigator()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,22 +58,35 @@ class SplashActivity : BaseActivity<SplashUiEvent, SplashNavigationEvent>() {
 
     override fun handleNavigationEvent(navigationEventFlow: Flow<SplashNavigationEvent>) {
         navigationEventFlow.onEach {
-            Printer.e("LMH", "EVENT $it")
-            when(it) {
+            when (it) {
                 SplashNavigationEvent.MoveToMainActivity -> {
-                    // TODO 이동
+                    loginFeatureNavigator.moveToHomeActivity(this)
+                    finish()
                 }
+
                 SplashNavigationEvent.MoveToOnBoarding -> {
-                    // TODO 이동
+                    startActivity(Intent(this, LoginActivity::class.java))
+                    finish()
                 }
+
                 SplashNavigationEvent.MoveToOnBoardingAndNickNameSet -> {
-                    // TODO 이동
+                    startActivity(Intent(this, LoginActivity::class.java).apply {
+                        putExtra(EXTRA_NEED_TO_NICKNAME_SETTING, true)
+                    })
+                    finish()
                 }
             }
         }.launchIn(lifecycleScope)
     }
 
     override fun handleUiEvent(uiEvent: SplashUiEvent) {}
+
+
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface LoginFeatureNavigatorEntryPoint {
+        fun loginFeatureNavigator(): LoginFeatureNavigator
+    }
 }
 
 @Composable
@@ -81,7 +110,7 @@ private fun SplashScreenCompose() {
 
 @PreviewScreenSizes
 @Composable
-fun PreviewSplashScreenCompose() {
+private fun PreviewSplashScreenCompose() {
     WalkieTheme {
         SplashScreenCompose()
     }

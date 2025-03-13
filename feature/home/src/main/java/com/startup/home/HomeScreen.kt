@@ -38,7 +38,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.startup.common.util.formatWithLocale
 import com.startup.design_system.widget.actionbar.MainLogoActionBar
 import com.startup.design_system.widget.speechbubble.SpeechBubble
@@ -47,13 +46,14 @@ import com.startup.home.egg.EggLayoutModel
 import com.startup.home.egg.getEggLayoutModel
 import com.startup.home.menu.HistoryItemModel
 import com.startup.ui.WalkieTheme
+import com.startup.ui.noRippleClickable
 import withBold
 import withUnderline
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    mainNavController: NavHostController
+    onNavigationEvent: (HomeScreenNavigationEvent) -> Unit
 ) {
     val state = viewModel.state as StepCounterState
     val scrollState = rememberScrollState()
@@ -61,7 +61,7 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             MainLogoActionBar(isExistAlarm = false) {
-                mainNavController.navigate("notification_list")
+                onNavigationEvent.invoke(HomeScreenNavigationEvent.MoveToNotification)
             }
         },
         containerColor = WalkieTheme.colors.white
@@ -69,7 +69,8 @@ fun HomeScreen(
         HomeContent(
             paddingValues = paddingValues,
             scrollState = scrollState,
-            stepCount = state.steps
+            stepCount = state.steps,
+            onNavigationEvent = onNavigationEvent
         )
     }
 }
@@ -78,7 +79,8 @@ fun HomeScreen(
 private fun HomeContent(
     paddingValues: PaddingValues,
     scrollState: ScrollState,
-    stepCount: Int
+    stepCount: Int,
+    onNavigationEvent: (HomeScreenNavigationEvent) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -93,14 +95,17 @@ private fun HomeContent(
             .verticalScroll(scrollState)
     ) {
         Spacer(modifier = Modifier.height(8.dp))
-        EggAndPartnerSection(stepCount = stepCount)
+        EggAndPartnerSection(stepCount = stepCount, onNavigationEvent = onNavigationEvent)
         Spacer(modifier = Modifier.height(18.dp))
-        MyHistorySection()
+        MyHistorySection(onNavigationEvent)
     }
 }
 
 @Composable
-private fun EggAndPartnerSection(stepCount: Int) {
+private fun EggAndPartnerSection(
+    stepCount: Int,
+    onNavigationEvent: (HomeScreenNavigationEvent) -> Unit
+) {
     Box {
         Column {
             EggLayout(
@@ -109,7 +114,8 @@ private fun EggAndPartnerSection(stepCount: Int) {
                     .height(371.dp)
                     .clip(RoundedCornerShape(20.dp)),
                 step = stepCount,
-                eggTier = EggKind.Empty
+                eggKind = EggKind.Empty,
+                onNavigationEvent
             )
             Spacer(modifier = Modifier.height(8.dp))
             PartnerInfoBox()
@@ -148,18 +154,18 @@ private fun PartnerInfoBox() {
 }
 
 @Composable
-private fun MyHistorySection() {
+private fun MyHistorySection(onNavigationEvent: (HomeScreenNavigationEvent) -> Unit) {
     Text(
         text = stringResource(R.string.home_my_history),
         style = WalkieTheme.typography.head4,
         color = WalkieTheme.colors.gray700
     )
     Spacer(modifier = Modifier.height(8.dp))
-    HistoryItems()
+    HistoryItems(onNavigationEvent)
 }
 
 @Composable
-private fun HistoryItems() {
+private fun HistoryItems(onNavigationEvent: (HomeScreenNavigationEvent) -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -167,8 +173,22 @@ private fun HistoryItems() {
         getDefaultHistoryMenu().take(3).forEach { item ->
             HistoryItem(
                 item = item,
-                modifier = Modifier.weight(1f)
-            )
+                modifier = Modifier.weight(1f),
+            ) { myHistoryKind ->
+                when (myHistoryKind) {
+                    HistoryItemModel.MyHistoryKind.GainEgg -> {
+                        onNavigationEvent.invoke(HomeScreenNavigationEvent.MoveToGainEgg)
+                    }
+
+                    HistoryItemModel.MyHistoryKind.SpotArchive -> {
+                        onNavigationEvent.invoke(HomeScreenNavigationEvent.MoveToSpotArchive)
+                    }
+
+                    HistoryItemModel.MyHistoryKind.GainCharacter -> {
+                        onNavigationEvent.invoke(HomeScreenNavigationEvent.MoveToGainCharacter)
+                    }
+                }
+            }
         }
     }
 }
@@ -176,16 +196,19 @@ private fun HistoryItems() {
 fun getDefaultHistoryMenu(): List<HistoryItemModel> {
     return listOf(
         HistoryItemModel(
+            myHistoryKind = HistoryItemModel.MyHistoryKind.GainEgg,
             thumbnailDrawable = R.drawable.img_gain_eggs,
             titleString = R.string.home_gain_eggs,
             unitString = R.string.quantity_string
         ),
         HistoryItemModel(
+            myHistoryKind = HistoryItemModel.MyHistoryKind.GainCharacter,
             thumbnailDrawable = R.drawable.img_hatching_characters,
             titleString = R.string.home_hatching_characters,
             unitString = R.string.group_characters_string
         ),
         HistoryItemModel(
+            myHistoryKind = HistoryItemModel.MyHistoryKind.SpotArchive,
             thumbnailDrawable = R.drawable.img_spot_history,
             titleString = R.string.home_spot_history,
             unitString = R.string.quantity_string
@@ -196,10 +219,15 @@ fun getDefaultHistoryMenu(): List<HistoryItemModel> {
 @Composable
 private fun HistoryItem(
     item: HistoryItemModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClickItem: (HistoryItemModel.MyHistoryKind) -> Unit
 ) {
     Column(
-        modifier = modifier.padding(horizontal = 4.dp),
+        modifier = modifier
+            .padding(horizontal = 4.dp)
+            .noRippleClickable {
+                onClickItem.invoke(item.myHistoryKind)
+            },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // 비율을 유지하면서 너비에 맞춰 이미지 표시
@@ -233,9 +261,10 @@ private fun HistoryItem(
 fun EggLayout(
     modifier: Modifier = Modifier,
     step: Int,
-    eggTier: EggKind = EggKind.Empty
+    eggKind: EggKind = EggKind.Empty,
+    onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
 ) {
-    val eggAttribute = getEggLayoutModel(eggTier)
+    val eggAttribute = getEggLayoutModel(eggKind)
 
     Box(
         modifier = modifier
@@ -249,20 +278,26 @@ fun EggLayout(
             ),
         contentAlignment = Alignment.Center
     ) {
-        EggContent(step = step, eggTier = eggTier, eggAttribute = eggAttribute)
+        EggContent(
+            step = step,
+            eggKind = eggKind,
+            eggAttribute = eggAttribute,
+            onNavigationEvent = onNavigationEvent
+        )
     }
 }
 
 @Composable
 private fun EggContent(
     step: Int,
-    eggTier: EggKind,
-    eggAttribute: EggLayoutModel
+    eggKind: EggKind,
+    eggAttribute: EggLayoutModel,
+    onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         StepInformation(step = step)
 
-        if (eggTier != EggKind.Empty) {
+        if (eggKind != EggKind.Empty) {
             eggAttribute.effectDrawable?.let { drawableRes ->
                 Image(
                     modifier = Modifier
@@ -290,7 +325,7 @@ private fun EggContent(
                 .offset(y = 85.dp)
                 .align(Alignment.BottomCenter),
             painter = painterResource(eggAttribute.eggDrawable),
-            colorFilter = if (eggTier == EggKind.Empty) {
+            colorFilter = if (eggKind == EggKind.Empty) {
                 ColorFilter.tint(
                     WalkieTheme.colors.blue300,
                     blendMode = BlendMode.SrcIn
@@ -299,13 +334,16 @@ private fun EggContent(
             contentDescription = stringResource(R.string.desc_empty_egg),
         )
 
-        if (eggTier == EggKind.Empty) {
+        if (eggKind == EggKind.Empty) {
             Text(
                 text = stringResource(R.string.home_choice_egg).withUnderline(),
                 style = WalkieTheme.typography.head5,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .offset(y = (-66).dp),
+                    .offset(y = (-66).dp)
+                    .noRippleClickable {
+                        onNavigationEvent.invoke(HomeScreenNavigationEvent.MoveToGainEgg)
+                    },
                 color = WalkieTheme.colors.blue50
             )
         }

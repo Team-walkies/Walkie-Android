@@ -31,12 +31,13 @@ android {
 }
 
 dependencies {
+    implementation(project(":navigation"))
     implementation(project(":feature:home"))
     implementation(project(":feature:login"))
+    implementation(project(":feature:spot"))
     implementation(project(":feature:stepcounter"))
     implementation(project(":core:design-system"))
     implementation(project(":core:data"))
     implementation(project(":core:resource"))
-    implementation(project(":navigation"))
     implementation(libs.kakao.login)
 }
