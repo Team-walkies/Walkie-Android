@@ -30,9 +30,24 @@
     <string name="current_gain_egg">보유한 알</string>
     <string name="current_gain_egg_choice">같이 걷고 싶은 알을 선택해 주세요</string>
     <string name="right_title_egg_info">안내</string>
+    <string name="obtained_position_label">획득 장소</string>
+    <string name="obtained_date_label">획득 날짜</string>
+    <string name="play_this_egg">이 알과 같이 걷기</string>
+    <string name="playing_this_egg">같이 걷는 중…</string>
 
 
+    <string name="egg">알</string>
+    <string name="normal_egg_info">자주 얻을 수 있는 알</string>
+    <string name="rare_egg_info">평소보다 더 희귀한 알</string>
+    <string name="epic_egg_info">보기 드문 비범한 알</string>
+    <string name="legend_egg_info">전설로만 듣던 알</string>
+    <string name="egg_probability_title">알 얻을 확률</string>
+    <string name="egg_probability_sub_title">스팟 탐험 시 알을 얻을 확률이에요</string>
+    <string name="egg_of_character_probability_title">캐릭터 얻을 확률</string>
+    <string name="egg_of_character_probability_sub_title">얻기 어려운 알일수록 희귀한 캐릭터가 부화해요</string>
+    <string name="character">캐릭터</string>
     <string name="desc_egg">알</string>
+    <string name="desc_character">캐릭터</string>
     <string name="desc_egg_empty">빈 알</string>
     <string name="desc_egg_play_icon">같이 걷는 알</string>
 

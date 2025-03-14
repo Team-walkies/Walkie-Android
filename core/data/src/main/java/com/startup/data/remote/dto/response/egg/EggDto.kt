@@ -18,6 +18,10 @@ data class EggDto(
     val play: Boolean?,
     @SerializedName("rank")
     val rank: Int?,
+    @SerializedName("obtainedDate")
+    val obtainedDate: String?,
+    @SerializedName("obtainedPosition")
+    val obtainedPosition: String?,
 ) {
     fun toDomain() = MyEgg(
         characterId = characterId.orZero(),
@@ -26,5 +30,7 @@ data class EggDto(
         needStep = needStep.orZero(),
         nowStep = nowStep.orZero(),
         play = play.orFalse(),
+        obtainedDate = obtainedDate.orEmpty(),
+        obtainedPosition = obtainedPosition.orEmpty()
     )
 }

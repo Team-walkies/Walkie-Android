@@ -42,7 +42,7 @@
 
         <activity
             android:name="com.startup.home.HomeActivity"
-            android:exported="true"
+            android:exported="false"
             android:theme="@style/Theme.Walkie" />
 
         <activity
@@ -66,13 +66,11 @@
         <activity
             android:name=".login.LoginActivity"
             android:exported="false"
-            android:theme="@style/Theme.Walkie"></activity>
-
-
+            android:theme="@style/Theme.Walkie" />
         <activity
             android:name="com.startup.spot.SpotActivity"
             android:exported="false"
-            android:theme="@style/Theme.Walkie"></activity>
+            android:theme="@style/Theme.Walkie" />
 
     </application>
 

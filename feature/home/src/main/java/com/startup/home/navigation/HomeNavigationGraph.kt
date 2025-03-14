@@ -16,9 +16,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.startup.common.base.NavigationEvent
 import com.startup.home.character.GainCharacterScreen
 import com.startup.home.notification.NotificationListScreen
-import com.startup.home.notification.NotificationNavigationEvent
 import com.startup.ui.WalkieTheme
 
 @Composable
@@ -43,13 +43,13 @@ fun HomeNavigationGraph(destinationRoute: String, parentNavController: NavHostCo
                 navController = navController,
                 startDestination = destinationRoute
             ) {
-                composable(HomeScreenNav.GainEgg.route) { GainEggNavigationGraph() }
+                composable(HomeScreenNav.GainEgg.route) { GainEggNavigationGraph(parentNavController = parentNavController) }
                 composable(HomeScreenNav.GainCharacter.route) { GainCharacterScreen() }
                 composable(HomeScreenNav.SpotArchive.route) { SpotArchiveNavigationGraph() }
                 composable(HomeScreenNav.Notification.route) {
                     NotificationListScreen(onNavigationEvent = {
                         when (it) {
-                            NotificationNavigationEvent.Back -> {
+                            NavigationEvent.Back -> {
                                 val isBackStackExist = navController.navigateUp()
                                 if (!isBackStackExist) {
                                     parentNavController.navigateUp()
