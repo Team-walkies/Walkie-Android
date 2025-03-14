@@ -64,6 +64,16 @@
     <string name="hatching_coming_soon">알이 부화하려고 해요!</string>
     <string name="hatching_result">두둥!\n%s가 태어났어!</string>
 
+    <string name="calendar_date_select">이동하기</string>
+    <string name="week_mon">월</string>
+    <string name="week_the">화</string>
+    <string name="week_wen">수</string>
+    <string name="week_thu">목</string>
+    <string name="week_fri">금</string>
+    <string name="week_sat">토</string>
+    <string name="week_sun">일</string>
     <string name="delete">삭제</string>
     <string name="cancel">취소</string>
+    <string name="desc_calendar_previous">이전 달</string>
+    <string name="desc_calendar_after">이후 달</string>
 </resources>
