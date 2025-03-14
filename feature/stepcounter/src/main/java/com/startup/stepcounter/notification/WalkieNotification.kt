@@ -1,15 +1,19 @@
 package com.startup.stepcounter.notification
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
-import androidx.core.text.HtmlCompat
 import com.startup.common.util.OsVersions
 import com.startup.common.util.Printer
+import com.startup.common.util.formatWithLocale
+import com.startup.stepcounter.R
 import com.startup.stepcounter.notification.NotificationCode.ACTIVITY_PERMISSION_NOTIFICATION_CHANNEL_ID
 import com.startup.stepcounter.notification.NotificationCode.ACTIVITY_PERMISSION_NOTIFICATION_CHANNEL_NAME
 import com.startup.stepcounter.notification.NotificationCode.ACTIVITY_PERMISSION_NOTIFICATION_DESCRIPTION
@@ -19,22 +23,50 @@ import com.startup.stepcounter.notification.NotificationCode.WALKIE_STEP_NOTIFIC
 
 
 //todo 토스처럼 알림 취소 한 후 걸음수 측정될때마다 살아나게 할지 아님 취소하자마자 살아나게 할지 기획측 문의
-fun buildWalkieNotification(context: Context, step: Int): Notification {
+@SuppressLint("RemoteViewLayout")
+fun buildWalkieNotification(context: Context, step: Int, target: Int = 10000): Notification {
     createNotificationChannel(context)
 
     val pendingIntent = createPendingIntent(context)
 
-    val styledText = HtmlCompat.fromHtml(
-        "<b>${step}</b> 걸음",
-        HtmlCompat.FROM_HTML_MODE_LEGACY
-    )
+    // 남은 걸음 수 계산
+    val remainingSteps = maxOf(0, target - step)
+
+    // 진행률 계산 (최대 100%)
+    val progressPercent = minOf(100, (step.toFloat() / target.toFloat() * 100).toInt())
+
+    // 걸음 수 포맷팅 (천 단위 콤마)
+    val formattedSteps = remainingSteps.formatWithLocale()
+    val customLayout = RemoteViews(context.packageName, R.layout.walkie_notification)
+
+    // 다크 모드 감지
+    val isNightMode = (context.resources.configuration.uiMode and
+            Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
+    with(context) {
+        val mainTextColor = if (isNightMode) getColor(R.color.white) else getColor(R.color.gray_700)
+        val secondaryTextColor =
+            if (isNightMode) getColor(R.color.gray_300) else getColor(R.color.gray_700)
+        val progressTextColor =
+            if (isNightMode) getColor(R.color.gray_300) else getColor(R.color.gray_500)
+
+        customLayout.setTextColor(R.id.steps_info, mainTextColor)
+        customLayout.setTextColor(R.id.target_step, secondaryTextColor)
+        customLayout.setTextColor(R.id.progress_percent, progressTextColor)
+    }
+
+    customLayout.setTextViewText(R.id.steps_info, formattedSteps)
+    customLayout.setTextViewText(R.id.progress_percent, "$progressPercent%")
+
+    customLayout.setProgressBar(R.id.progress_bar, 100, progressPercent, false)
+
 
     return NotificationCompat.Builder(context, WALKIE_STEP_NOTIFICATION_CHANNEL_ID)
-        .setSmallIcon(com.startup.design_system.R.mipmap.ic_launcher_round)
+        .setSmallIcon(R.drawable.ic_walkie_artwork)
+        .setCustomContentView(customLayout)
         .setContentIntent(pendingIntent)
         .setOngoing(true)
-        .setContentTitle("걸음 수")
-        .setContentText(styledText)
+        .setStyle(NotificationCompat.DecoratedCustomViewStyle())
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
         .setCategory(NotificationCompat.CATEGORY_SERVICE)
@@ -70,13 +102,13 @@ private fun createPendingIntent(context: Context): PendingIntent {
     )
 }
 
-fun updateStepNotification(context: Context, steps: Int) {
+fun updateStepNotification(context: Context, steps: Int, target: Int) {
     try {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(
             WALKIE_STEP_NOTIFICATION_ID,
-            buildWalkieNotification(context, steps)
+            buildWalkieNotification(context, steps, target)
         )
     } catch (e: Exception) {
         Printer.e("UpdateNotification", e.toString())
@@ -84,10 +116,9 @@ fun updateStepNotification(context: Context, steps: Int) {
 }
 
 private fun createDefaultNotification(context: Context): Notification {
-    createNotificationChannel(context)
 
     return NotificationCompat.Builder(context, WALKIE_STEP_NOTIFICATION_CHANNEL_ID)
-        .setSmallIcon(com.startup.design_system.R.mipmap.ic_launcher)
+        .setSmallIcon(R.drawable.ic_walkie_artwork)
         .setContentTitle("Walkie")
         .setContentText("워키!")
         .setOngoing(true)
@@ -97,18 +128,46 @@ private fun createDefaultNotification(context: Context): Notification {
         .build()
 }
 
-fun buildNotificationWithPermission(context: Context): Notification {
+fun buildPermissionInductionNotification(context: Context): Notification {
     createPermissionNotificationChannel(context)
+    return NotificationCompat.Builder(context, ACTIVITY_PERMISSION_NOTIFICATION_CHANNEL_ID)
+        .setSmallIcon(R.drawable.ic_walkie_artwork)
+        .setContentTitle(context.getString(R.string.notification_permission_title))
+        .setContentText(context.getString(R.string.notification_permission_message))
+        .setAutoCancel(true)
+        .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
+        .build()
+}
+
+/**
+ * 스팟 도착시 생성할 알림
+ */
+fun buildArriveNotification(context: Context): Notification {
 
     return NotificationCompat.Builder(context, ACTIVITY_PERMISSION_NOTIFICATION_CHANNEL_ID)
-        .setSmallIcon(com.startup.design_system.R.mipmap.ic_launcher_round)
-        .setContentTitle("걸음수 측정이 중지 되었어요.")
-        .setContentText("걸음수 측정을 위해 신체권한 활동 권한을 허용해주세요")
+        .setSmallIcon(R.drawable.ic_walkie_artwork)
+        .setContentTitle(context.getString(R.string.notification_arrive_title))
+        .setContentText(context.getString(R.string.notification_arrive_message))
+        .setAutoCancel(true)
+        .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
+        .build()
+}
+
+/**
+ * 부화 완료시 생성할 알림
+ */
+fun buildHatchingNotification(context: Context): Notification {
+
+    return NotificationCompat.Builder(context, ACTIVITY_PERMISSION_NOTIFICATION_CHANNEL_ID)
+        .setSmallIcon(R.drawable.ic_walkie_artwork)
+        .setContentTitle(context.getString(R.string.notification_hatching_title))
+        .setContentText(context.getString(R.string.notification_hatching_message))
         .setAutoCancel(true)
         .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
         .setColor(0xFF0DAEFF.toInt())
         .build()
 }
+
 
 private fun createPermissionNotificationChannel(context: Context) {
     if (OsVersions.isGreaterThanOrEqualsO()) {
@@ -130,6 +189,6 @@ private fun createPermissionNotificationChannel(context: Context) {
 fun showPermissionNotification(context: Context) {
     val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    val notification = buildNotificationWithPermission(context)
+    val notification = buildPermissionInductionNotification(context)
     notificationManager.notify(ACTIVITY_PERMISSION_NOTIFICATION_ID, notification)
 }
