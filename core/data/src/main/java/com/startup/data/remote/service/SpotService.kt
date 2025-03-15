@@ -13,22 +13,22 @@ import retrofit2.http.Path
 
 internal interface SpotService {
     /** 스팟 검색하기 */
-    @GET("/spots")
+    @GET("api/v1/spots")
     suspend fun searchSpots(): BaseResponse<SpotInfoResponse>
 
     /** 스팟으로 이동 시작하기 */
-    @POST("/spots")
+    @POST("api/v1/spots")
     suspend fun startMoveToSpot(@Body request: StartMoveToSpotRequest): BaseResponse<CurrentSpotIdResponse>
 
     /** 스팟으로 이동 완료하기 */
-    @PATCH("/spots/{spotId}")
+    @PATCH("api/v1/spots/{spotId}")
     suspend fun completeMoveToSpot(@Path("spotId") spotId: Long): BaseResponse<CurrentSpotIdResponse>
 
     /** 스팟으로 이동 중지하기 */
-    @PATCH("/spots/pause")
+    @PATCH("api/v1/spots/pause")
     suspend fun stopMoveToSpot(): BaseResponse<CurrentSpotIdResponse>
 
     /** 스팟별 방문자 조회하기 */
-    @PATCH("/spots/curVisitant/{spotId}")
+    @PATCH("api/v1/spots/curVisitant/{spotId}")
     suspend fun getSpotOfVisitor(@Path("spotId") spotId: Long): BaseResponse<CurrentVisitantResponse>
 }

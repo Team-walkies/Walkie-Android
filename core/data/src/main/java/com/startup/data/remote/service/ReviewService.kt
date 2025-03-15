@@ -14,29 +14,29 @@ import retrofit2.http.Query
 internal interface ReviewService {
 
     /** 리뷰 작성 API */
-    @POST("/reviews")
+    @POST("api/v1/reviews")
     suspend fun writeReview(@Body request: WriteReviewRequest): BaseResponse<Unit>
 
     /** 리뷰 수정 API */
-    @POST("/reviews/{reviewId}")
+    @POST("api/v1/reviews/{reviewId}")
     suspend fun modifyReview(
         @Path("reviewId") reviewId: Long,
         @Body request: ModifyReviewRequest
     ): BaseResponse<Unit>
 
     /** 리뷰 삭제 API */
-    @POST("/reviews/{reviewId}")
+    @POST("api/v1/reviews/{reviewId}")
     suspend fun deleteReview(@Path("reviewId") reviewId: Long): BaseResponse<Unit>
 
     /** 스팟 별 리뷰수 조회 API */
-    @GET("/reviews/count/{spotId}")
+    @GET("api/v1/reviews/count/{spotId}")
     suspend fun getSpotOfReviews(@Path("spotId") spotId: Long): BaseResponse<SpotCountResponse>
 
     /** 캘린더 리뷰 리스트 조회 API */
-    @GET("/reviews/calendar")
+    @GET("api/v1/reviews/calendar")
     suspend fun getCalendarReviewList(@Query("date") date: String): BaseResponse<ReviewResponse>
 
     /** 스팟의 리뷰 리스트 조회 API */
-    @GET("/reviews/spots")
+    @GET("api/v1/reviews/spots")
     suspend fun getSpotOfReviewList(@Query("spotId") spotId: Long): BaseResponse<ReviewResponse>
 }

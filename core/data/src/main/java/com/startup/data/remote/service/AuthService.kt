@@ -6,9 +6,9 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 
 internal interface AuthService {
-    @POST("/auth")
+    @POST("api/v1/auth")
     suspend fun login(@Header("[Token]]") authorization: String): BaseResponse<TokenDto>
 
-    @POST("/auth")
+    @POST("api/v1/auth")
     suspend fun refreshTokenUpdate(@Header("Authorization") authorization: String): BaseResponse<TokenDto>
 }

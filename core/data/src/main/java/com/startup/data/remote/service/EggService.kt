@@ -12,19 +12,19 @@ import retrofit2.http.Path
 
 internal interface EggService {
     /** 알 상세정보 조회 API */
-    @GET("/eggs/{eggId}")
+    @GET("eggs/{eggId}")
     suspend fun getEggDetailInfo(@Path("eggId") eggId: Long): BaseResponse<EggDetailDto>
 
     /** 알의 걸은 걸음수 업데이트 API */
-    @PATCH("/eggs/steps")
+    @PATCH("api/v1/eggs/steps")
     suspend fun updateEggOfStepCount(@Body request: UpdateEggOfStepCountRequest): BaseResponse<Unit>
 
     /** 보유한 알 리스트 조회 API */
-    @GET("/eggs")
+    @GET("api/v1/eggs")
     suspend fun getMyEggList(): BaseResponse<MyEggResponse>
 
     /** 보유한 알 갯수 조회 API */
-    @GET("/eggs/count")
+    @GET("api/v1/eggs/count")
     suspend fun getMyEggCount(): BaseResponse<EggCountResponse>
 
 }

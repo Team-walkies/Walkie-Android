@@ -15,38 +15,38 @@ import retrofit2.http.PATCH
 
 internal interface MemberService {
     /** 내 정보 조회하기 */
-    @GET("/members")
+    @GET("api/v1/members")
     suspend fun getUserInfo(): BaseResponse<GetUserInfoResponse>
 
     /** 내 정보 수정하기 */
-    @PATCH("/members")
+    @PATCH("api/v1/members")
     suspend fun modifyUserInfo(@Body request: MemberNickNameRequest): BaseResponse<Unit>
 
     /** 회원탈퇴 하기 */
-    @DELETE("/members")
+    @DELETE("api/v1/members")
     suspend fun withdrawalService(): BaseResponse<Unit>
 
     /** 로그 아웃 하기 */
-    @DELETE("/members/logout")
+    @DELETE("api/v1/members/logout")
     suspend fun logout(): BaseResponse<Unit>
 
     /** 같이 걷는 알 변경 API */
-    @PATCH("/members/eggs/play")
+    @PATCH("api/v1/members/eggs/play")
     suspend fun updateWalkingEgg(@Body request: WalkingEggRequest): BaseResponse<Unit>
 
     /** 같이 걷는 알 조회 API */
-    @GET("/members/eggs/play")
+    @GET("api/v1/members/eggs/play")
     suspend fun getWalkingEgg(): BaseResponse<EggDto>
 
     /** 같이 걷는 캐릭터 변경 API */
-    @PATCH("/members/character/play")
+    @PATCH("api/v1/members/character/play")
     suspend fun modifyWalkingCharacter(@Body request: CharacterIdRequest): BaseResponse<Unit>
 
     /** 같이 걷는 캐릭터 조회 API */
-    @GET("/members/character/play")
+    @GET("api/v1/members/character/play")
     suspend fun getWalkingCharacter(): BaseResponse<CharacterDto>
 
     /** 내 프로필 공개/비공개 토글 API, 요청하면 값이 반전 됨 */
-    @GET("/members/profile/visibility")
+    @GET("api/v1/members/profile/visibility")
     suspend fun changeUserProfileVisibility(): BaseResponse<IsPublicDto>
 }

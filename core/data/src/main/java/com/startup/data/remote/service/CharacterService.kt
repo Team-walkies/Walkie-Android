@@ -10,14 +10,14 @@ import retrofit2.http.Query
 
 internal interface CharacterService {
     /** 캐릭터 획득 정보 상세 조회 API */
-    @GET("/characters/details/{characterId}")
+    @GET("api/v1/characters/details/{characterId}")
     suspend fun getCharacterAcquisitionDetail(@Path("characterId") characterId: Long): BaseResponse<AcquisitionCharacterInfoResponse>
 
     /** 보유한 캐릭터 리스트 조회 API */
-    @GET("/characters")
+    @GET("api/v1/characters")
     suspend fun getOwnedCharacterList(@Query("type") type: Int): BaseResponse<AcquisitionCharacterResponse>
 
     /** 보유한 캐릭터 갯수 조회 API */
-    @GET("/characters/count")
+    @GET("api/v1/characters/count")
     suspend fun getOwnedCharacterCount(): BaseResponse<CharacterCountDto>
 }

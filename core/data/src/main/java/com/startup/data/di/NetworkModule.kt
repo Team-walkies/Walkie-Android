@@ -12,7 +12,6 @@ import com.startup.data.remote.service.MemberService
 import com.startup.data.remote.service.NoticeService
 import com.startup.data.remote.service.ReviewService
 import com.startup.data.remote.service.SpotService
-import com.startup.data.remote.service.TempService
 import com.startup.data.util.AuthInterceptor
 import dagger.Module
 import dagger.Provides
@@ -96,12 +95,6 @@ internal object NetworkModule {
             .client(okHttpClient)
             .addConverterFactory(converterFactory)
             .build()
-
-    @Provides
-    @Singleton
-    fun provideTempService(
-        @AuthRetrofit retrofit: Retrofit,
-    ): TempService = retrofit.create(TempService::class.java)
 
     @Provides
     @Singleton

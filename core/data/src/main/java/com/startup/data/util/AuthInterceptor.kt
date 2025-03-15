@@ -23,7 +23,8 @@ internal class AuthInterceptor @Inject constructor(
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val accessToken = runBlocking {
-            tokenDataStoreProvider.getValue(accessTokenKey, "")
+            // TODO defaultValue 제거
+            tokenDataStoreProvider.getValue(accessTokenKey, "eyJhbGciOiJIUzI1NiJ9.eyJwcm92aWRlcklkIjoiMzk1ODI1NjA0MCIsIm1lbWJlcklkIjo2LCJpYXQiOjE3NDE2OTcyODYsImV4cCI6MTc0MjA1NzI4Nn0.VSk7X7G1iR79gUlYxoEN93Mz9llHzMPq939PugsaZpI")
         }
 
         val request = chain.request()

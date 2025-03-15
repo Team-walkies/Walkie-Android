@@ -6,14 +6,12 @@ import com.startup.data.repository.EggRepositoryImpl
 import com.startup.data.repository.MemberRepositoryImpl
 import com.startup.data.repository.NoticeRepositoryImpl
 import com.startup.data.repository.SpotRepositoryImpl
-import com.startup.data.repository.TempRepositoryImpl
 import com.startup.domain.repository.AuthRepository
 import com.startup.domain.repository.CharacterRepository
 import com.startup.domain.repository.EggRepository
 import com.startup.domain.repository.MemberRepository
 import com.startup.domain.repository.NoticeRepository
 import com.startup.domain.repository.SpotRepository
-import com.startup.domain.repository.TempRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -23,10 +21,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 internal abstract class RepositoryModule {
-    @Binds
-    @Singleton
-    abstract fun bindsTempRepository(tempRepository: TempRepositoryImpl): TempRepository
-
     @Binds
     @Singleton
     abstract fun bindsAuthRepository(repository: AuthRepositoryImpl): AuthRepository

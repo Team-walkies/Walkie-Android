@@ -6,6 +6,6 @@ import retrofit2.http.GET
 
 internal interface NoticeService {
     /** 공지사항 리스트 조회 API */
-    @GET("/notices")
+    @GET("api/v1/notices")
     suspend fun getNoticeList(): BaseResponse<NoticeResponse>
 }

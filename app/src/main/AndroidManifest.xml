@@ -46,13 +46,6 @@
             android:theme="@style/Theme.Walkie" />
 
         <activity
-            android:name="com.startup.home.TestActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Walkie">
-
-        </activity>
-
-        <activity
             android:name=".splash.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.Walkie.Splash">
