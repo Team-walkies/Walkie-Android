@@ -46,13 +46,13 @@ fun SpeechBubble(
                 // "부화까지" 부분
                 Text(
                     text = stringResource(R.string.home_until_hatching_step),
-                    style = WalkieTheme.typography.body2,
+                    style = WalkieTheme.typography.body1,
                     color = WalkieTheme.colors.gray400
                 )
                 // "N걸음" 부분
                 Text(
                     text = stringResource(R.string.current_step, steps),
-                    style = WalkieTheme.typography.body2,
+                    style = WalkieTheme.typography.body1,
                     color = WalkieTheme.colors.white
                 )
             }
