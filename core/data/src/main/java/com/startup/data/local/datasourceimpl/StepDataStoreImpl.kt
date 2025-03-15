@@ -22,6 +22,7 @@ class StepDataStoreImpl @Inject constructor(
 
     private companion object {
         private val CURRENT_STEPS = intPreferencesKey("current_steps")
+        private val TARGET_STEP = intPreferencesKey("target_step")
     }
 
     override suspend fun getCurrentSteps(): Int {
@@ -31,6 +32,16 @@ class StepDataStoreImpl @Inject constructor(
     override suspend fun saveCurrentSteps(steps: Int) {
         context.dataStore.edit { preferences ->
             preferences[CURRENT_STEPS] = steps
+        }
+    }
+
+    override suspend fun getTargetStep(): Int {
+        return context.dataStore.data.first()[TARGET_STEP] ?: 10000
+    }
+
+    override suspend fun setTargetStep(target: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[TARGET_STEP] = target
         }
     }
 

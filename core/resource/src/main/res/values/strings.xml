@@ -4,6 +4,15 @@
     <string name="navigation_spot">스팟</string>
     <string name="navigation_mypage">마이</string>
 
+    <string name="notification_until_target_step">더 걸으면 부화!</string>
+    <string name="notification_percent">%d%%</string>
+    <string name="notification_hatching_title">알이 부화하려고 해요!</string>
+    <string name="notification_hatching_message">어서 가서 깨워주세요</string>
+    <string name="notification_arrive_title">도착 완료! 어떤 알을 발견했을까요?</string>
+    <string name="notification_arrive_message">지금 바로 접속해 알을 확인해보세요</string>
+    <string name="notification_permission_title">걸음수 측정이 중지 되었어요.</string>
+    <string name="notification_permission_message">걸음수 측정을 위해 신체권한 활동 권한을 허용해주세요</string>
+
     <string name="home_step">걸음</string>
     <string name="home_kilometer">%.2fkm</string>
     <string name="home_movement">이동</string>

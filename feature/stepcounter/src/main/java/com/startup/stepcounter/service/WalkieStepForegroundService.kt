@@ -2,6 +2,7 @@ package com.startup.stepcounter.service
 
 import android.Manifest
 import android.app.AlarmManager
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
@@ -18,7 +19,11 @@ import com.startup.common.util.Printer
 import com.startup.common.util.UsePermissionHelper.isGrantedPermissions
 import com.startup.domain.provider.StepDataStore
 import com.startup.stepcounter.broadcastReciver.RestartServiceReceiver
+import com.startup.stepcounter.notification.NotificationCode.ARRIVE_NOTIFICATION_ID
+import com.startup.stepcounter.notification.NotificationCode.HATCHING_NOTIFICATION_ID
 import com.startup.stepcounter.notification.NotificationCode.WALKIE_STEP_NOTIFICATION_ID
+import com.startup.stepcounter.notification.buildArriveNotification
+import com.startup.stepcounter.notification.buildHatchingNotification
 import com.startup.stepcounter.notification.buildWalkieNotification
 import com.startup.stepcounter.notification.showPermissionNotification
 import com.startup.stepcounter.notification.updateStepNotification
@@ -97,11 +102,16 @@ internal class WalkieStepForegroundService @Inject constructor() : Service(), Se
 
             serviceScope.launch {
                 val currentSteps = stepDataStore.getCurrentSteps()
+                val targetStep = stepDataStore.getTargetStep()
 
                 ServiceCompat.startForeground(
                     this@WalkieStepForegroundService,
                     WALKIE_STEP_NOTIFICATION_ID,
-                    buildWalkieNotification(this@WalkieStepForegroundService, currentSteps),
+                    buildWalkieNotification(
+                        this@WalkieStepForegroundService,
+                        currentSteps,
+                        targetStep
+                    ),
                     getCustomForegroundServiceType()
                 )
             }
@@ -115,7 +125,8 @@ internal class WalkieStepForegroundService @Inject constructor() : Service(), Se
         serviceScope.launch {
             buildWalkieNotification(
                 this@WalkieStepForegroundService,
-                stepDataStore.getCurrentSteps()
+                stepDataStore.getCurrentSteps(),
+                stepDataStore.getTargetStep()
             )
         }
     }
@@ -153,7 +164,8 @@ internal class WalkieStepForegroundService @Inject constructor() : Service(), Se
     private fun handleSteps(context: Context, totalSteps: Int) {
         serviceScope.launch {
             stepDataStore.saveCurrentSteps(totalSteps)
-            updateStepNotification(context, totalSteps)
+            val targetSteps = stepDataStore.getTargetStep()
+            updateStepNotification(context, totalSteps, targetSteps)
         }
     }
 
@@ -168,7 +180,7 @@ internal class WalkieStepForegroundService @Inject constructor() : Service(), Se
                 return
             }
 
-            // curretSensorValue의 값과 이전 저장시점 걸음스의 증가분만 계산
+            // curretSensorValue의 값과 이전 저장시점 걸음수의 증가분만 계산
             val stepGap = currentSensorValue - lastSensorValue
             if (stepGap > 0) {
                 serviceScope.launch {
