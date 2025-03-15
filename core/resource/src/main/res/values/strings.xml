@@ -70,6 +70,15 @@
     <string name="hatching_result">두둥!\n%s가 태어났어!</string>
 
     <string name="calendar_date_select">이동하기</string>
+    <string name="calendar_review_title">기록</string>
+    <string name="calendar_review_walk_together">와 함께 걸었어요</string>
+    <string name="calendar_review_empty">해당 날짜에 기록이 없어요</string>
+    <string name="calendar_review_step_title">이동 거리</string>
+    <string name="calendar_review_step_count">걸음 수</string>
+    <string name="calendar_review_step_duration">이동 시간</string>
+    <string name="desc_calendar_review_option">리뷰 수정, 삭제 선택 버튼</string>
+    <string name="desc_calendar_review_map_kind">리뷰 스팟 위치 종류</string>
+    <string name="date_today">오늘</string>
     <string name="get_character_introduce">%s님,\n환영해요</string>
     <string name="get_character_introduce_sub_title">%s를 선물로 드릴게요</string>
     <string name="get_character_action_button">함께 시작하자!</string>
@@ -84,4 +93,5 @@
     <string name="cancel">취소</string>
     <string name="desc_calendar_previous">이전 달</string>
     <string name="desc_calendar_after">이후 달</string>
+    <string name="desc_calendar_select">캘린더로 일자 선택</string>
 </resources>
