@@ -1,15 +1,7 @@
 package com.startup.home
 
-import android.Manifest
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.os.PowerManager
-import android.provider.Settings
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,11 +11,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.core.content.ContextCompat
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,10 +31,15 @@ import androidx.navigation.navArgument
 import com.startup.common.base.BaseActivity
 import com.startup.common.base.NavigationEvent
 import com.startup.common.base.UiEvent
+import com.startup.common.util.BatteryOptimizationHelper
 import com.startup.common.util.OsVersions
+import com.startup.common.util.UsePermissionHelper
+import com.startup.design_system.widget.bottom_sheet.WalkieDragHandle
 import com.startup.home.navigation.HomeNavigationGraph
 import com.startup.home.navigation.MainScreenNav
 import com.startup.home.navigation.MyPageNavigationGraph
+import com.startup.home.permission.PermissionBottomSheet
+import com.startup.home.permission.PermissionState
 import com.startup.navigation.HomeFeatureNavigator
 import com.startup.ui.WalkieTheme
 import dagger.hilt.EntryPoint
@@ -44,21 +48,17 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
     override val viewModel: HomeViewModel by viewModels<HomeViewModel>()
 
-    private val requiredPermissions = if (OsVersions.isGreaterThanOrEqualsTIRAMISU()) {
-        arrayOf(
-            Manifest.permission.POST_NOTIFICATIONS,
-            Manifest.permission.ACTIVITY_RECOGNITION
-        )
-    } else if (OsVersions.isGreaterThanOrEqualsQ()) {
-        arrayOf(Manifest.permission.ACTIVITY_RECOGNITION)
-    } else {
-        arrayOf()
-    }
+    // 권한 바텀시트 표시 여부 상태
+    private var shouldShowPermissionBottomSheet by mutableStateOf(false)
+
+    // 권한 상태 리스트
+    private var permissionStates by mutableStateOf<List<PermissionState>>(emptyList())
 
     // KSP 는 필드 주입이 안 됨
     private val homeFeatureNavigator: HomeFeatureNavigator by lazy {
@@ -77,44 +77,114 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        checkBatteryOptimization()
-        checkAndRequestPermissions()
+        checkPermission()
 
         setContent {
             WalkieTheme {
-                MainScreen()
+                MainScreenWithPermissionBottomSheet()
             }
         }
     }
 
-    private fun checkBatteryOptimization() {
-        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
-            Intent().apply {
-                action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-                data = Uri.parse("package:$packageName")
-                startActivity(this)
-            }
-        }
-    }
+    private fun checkPermission() {
+        initPermissionStates()
+        val allPermissionsGranted = areAllPermissionsGranted()
 
-    private fun checkAndRequestPermissions() {
-        if (!hasRequiredPermissions()) {
-            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-                if (permissions.all { it.value }) {
-                    startStepCounterService()
-                }
-            }.launch(requiredPermissions)
-        } else {
+        if (allPermissionsGranted) {
             startStepCounterService()
+            shouldShowPermissionBottomSheet = false
+        } else {
+            shouldShowPermissionBottomSheet = true
         }
     }
 
-    private fun hasRequiredPermissions(): Boolean {
-        return requiredPermissions.all { permission ->
-            ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun MainScreenWithPermissionBottomSheet() {
+        val sheetState = rememberModalBottomSheetState()
+        val coroutineScope = rememberCoroutineScope()
+
+        Box(modifier = Modifier.fillMaxSize()) {
+            MainScreen()
+
+            if (shouldShowPermissionBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = {
+                        shouldShowPermissionBottomSheet = false
+                        if (!areAllPermissionsGranted()) {
+                            // 권한 미허용시 앱종료 추후 기획에 따라 조건 변동
+                            finish()
+                        }
+                    },
+                    sheetState = sheetState,
+                    tonalElevation = 24.dp,
+                    dragHandle = {
+                        WalkieDragHandle()
+                    },
+                    containerColor = WalkieTheme.colors.white,
+                    contentColor = WalkieTheme.colors.white,
+                    scrimColor = WalkieTheme.colors.blackOpacity60,
+                ) {
+                    PermissionBottomSheet(
+                        permissions = permissionStates,
+                        onAllPermissionsGranted = {
+                            startStepCounterService()
+                            coroutineScope.launch {
+                                sheetState.hide()
+                                shouldShowPermissionBottomSheet = false
+                            }
+                        }
+                    )
+                }
+            }
         }
+    }
+
+
+    private fun initPermissionStates() {
+        val states = mutableListOf<PermissionState>()
+
+        if (OsVersions.isGreaterThanOrEqualsTIRAMISU()) {
+            states.add(
+                PermissionState(
+                    type = UsePermissionHelper.Permission.POST_NOTIFICATIONS,
+                    isGranted = isGranted(UsePermissionHelper.Permission.POST_NOTIFICATIONS),
+                    title = "알림 권한",
+                    description = "알림을 받기 위해 필요합니다."
+                )
+            )
+        }
+
+        if (OsVersions.isGreaterThanOrEqualsQ()) {
+            states.add(
+                PermissionState(
+                    type = UsePermissionHelper.Permission.ACTIVITY_RECOGNITION,
+                    isGranted = isGranted(UsePermissionHelper.Permission.ACTIVITY_RECOGNITION),
+                    title = "신체 활동 권한",
+                    description = "걸음 수 측정을 위해 필요합니다."
+                )
+            )
+        }
+
+        states.add(
+            PermissionState(
+                type = UsePermissionHelper.Permission.BATTERY_OPTIMIZATION,
+                isGranted = BatteryOptimizationHelper.isBatteryOptimizationIgnored(this),
+                title = "배터리 최적화 제외",
+                description = "앱이 백그라운드에서도 정확하게 동작하기 위해 필요합니다."
+            )
+        )
+
+        permissionStates = states
+    }
+
+    private fun areAllPermissionsGranted(): Boolean {
+        return permissionStates.all { it.isGranted }
+    }
+
+    private fun isGranted(permission: UsePermissionHelper.Permission): Boolean {
+        val permissions = UsePermissionHelper.getTypeOfPermission(permission)
+        return UsePermissionHelper.isGrantedPermissions(this, *permissions)
     }
 
     private fun startStepCounterService() {
@@ -129,7 +199,6 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
     fun MainScreen() {
         MainContent()
     }
-
 
     @Composable
     fun MainContent() {
