@@ -49,6 +49,7 @@ sealed class BottomNavItem(
 
 @Composable
 fun WalkieBottomNavigation(
+    modifier: Modifier = Modifier,
     navController: NavController,
     items: List<BottomNavItem> = listOf(
         BottomNavItem.Home,
@@ -72,7 +73,7 @@ fun WalkieBottomNavigation(
     val currentRoute = navBackStackEntry?.destination?.route
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(62.5.dp)
     ) {

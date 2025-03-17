@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,6 +34,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -82,6 +85,15 @@ private fun HomeContent(
     stepCount: Int,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit
 ) {
+    // 스크롤 필요 여부 계산
+    val configuration = LocalConfiguration.current
+    val screenHeightDp = configuration.screenHeightDp.dp
+    val topPadding = paddingValues.calculateTopPadding()
+    val availableHeight = screenHeightDp - topPadding - 50.dp
+    val minRequiredHeight = 431.dp + 18.dp + 180.dp
+    val needsScroll = minRequiredHeight > availableHeight
+
+
     Column(
         modifier = Modifier
             .background(color = WalkieTheme.colors.white)
@@ -89,13 +101,34 @@ private fun HomeContent(
                 top = paddingValues.calculateTopPadding(),
                 start = 16.dp,
                 end = 16.dp,
-                bottom = 8.dp
+                bottom = 50.dp // 하단에 50dp 여백 추가
             )
-            .fillMaxSize()
-            .verticalScroll(scrollState)
+            .then(if (needsScroll) Modifier.verticalScroll(scrollState) else Modifier)
+
     ) {
         Spacer(modifier = Modifier.height(8.dp))
-        EggAndPartnerSection(stepCount = stepCount, onNavigationEvent = onNavigationEvent)
+        if (!needsScroll) {
+            // 충분히 큰 화면: 남은 공간을 모두 차지
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                EggAndPartnerSection(
+                    stepCount = stepCount,
+                    onNavigationEvent = onNavigationEvent,
+                    useFixedHeight = false
+                )
+            }
+        } else {
+            // 작은 화면: 고정 높이 사용 (스크롤 필요)
+            EggAndPartnerSection(
+                stepCount = stepCount,
+                onNavigationEvent = onNavigationEvent,
+                useFixedHeight = true
+            )
+        }
+
         Spacer(modifier = Modifier.height(18.dp))
         MyHistorySection(onNavigationEvent)
     }
@@ -104,23 +137,43 @@ private fun HomeContent(
 @Composable
 private fun EggAndPartnerSection(
     stepCount: Int,
-    onNavigationEvent: (HomeScreenNavigationEvent) -> Unit
+    onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
+    useFixedHeight: Boolean
 ) {
-    Box {
-        Column {
-            EggLayout(
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(
+                if (useFixedHeight) Modifier.height(431.dp)
+                else Modifier.fillMaxHeight()
+            )
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(371.dp)
-                    .clip(RoundedCornerShape(20.dp)),
-                step = stepCount,
-                eggKind = EggKind.Empty,
-                onNavigationEvent
-            )
+                    .then(
+                        if (useFixedHeight) Modifier.height(371.dp)
+                        else Modifier
+                            .weight(1f)
+                            .heightIn(min = 371.dp)
+                    )
+                    .clip(RoundedCornerShape(20.dp))
+            ) {
+                EggLayout(
+                    modifier = Modifier.fillMaxSize(),
+                    step = stepCount,
+                    eggKind = EggKind.Rare,
+                    onNavigationEvent = onNavigationEvent
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
             PartnerInfoBox()
         }
-        //todo 파트너 캐릭터별 교체 필요
+        //todo 파트너 캐릭터 교체
         Image(
             modifier = Modifier
                 .size(120.dp)
@@ -143,7 +196,6 @@ private fun PartnerInfoBox() {
         contentAlignment = Alignment.CenterStart,
     ) {
         val partner = "해파리"
-        val text = stringResource(R.string.home_walking_with, partner) // "%s와 함께 걷는중.."
         Text(
             text = stringResource(R.string.home_walking_with, partner).withBold(partner),
             modifier = Modifier.padding(start = 16.dp),
@@ -297,55 +349,72 @@ private fun EggContent(
     Box(modifier = Modifier.fillMaxSize()) {
         StepInformation(step = step)
 
+        // 화면 너비에 맞게 크기 조정
+        val maxEggSize = 360.dp
+        val configuration = LocalConfiguration.current
+        val screenWidth = configuration.screenWidthDp.dp
+        val eggSize = minOf(screenWidth - 12.dp, maxEggSize) // 좌우 패딩 6dp씩 고려
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = 78.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+        ) {
+            if (eggKind != EggKind.Empty) {
+                SpeechBubble(
+                    steps = step.formatWithLocale(),
+                    modifier = Modifier
+                        .offset(y = 30.dp)
+                        .zIndex(5f),
+                )
+            }
+
+            // 알 이미지
+            Box {
+                Image(
+                    modifier = Modifier.size(eggSize),
+                    painter = painterResource(eggAttribute.eggDrawable),
+                    colorFilter = if (eggKind == EggKind.Empty) {
+                        ColorFilter.tint(
+                            WalkieTheme.colors.blue300,
+                            blendMode = BlendMode.SrcIn
+                        )
+                    } else null,
+                    contentDescription = stringResource(R.string.desc_empty_egg),
+                )
+
+                // 알 선택 텍스트
+                if (eggKind == EggKind.Empty) {
+                    Text(
+                        text = stringResource(R.string.home_choice_egg).withUnderline(),
+                        style = WalkieTheme.typography.head5,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .offset(y = (-151).dp)
+                            .noRippleClickable {
+                                onNavigationEvent.invoke(HomeScreenNavigationEvent.MoveToGainEgg)
+                            },
+                        color = WalkieTheme.colors.blue50
+                    )
+                }
+            }
+        }
+
+        // 이펙트 이미지
         if (eggKind != EggKind.Empty) {
             eggAttribute.effectDrawable?.let { drawableRes ->
                 Image(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .offset(y = 85.dp)
+                        .offset(y = 78.dp)
                         .align(Alignment.BottomCenter),
                     painter = painterResource(drawableRes),
                     contentDescription = stringResource(R.string.desc_empty_egg),
                     contentScale = ContentScale.FillWidth
                 )
             }
-
-            SpeechBubble(
-                steps = step.formatWithLocale(),
-                modifier = Modifier
-                    .offset(y = (-193).dp)
-                    .align(Alignment.BottomCenter)
-                    .zIndex(5f),
-            )
-        }
-
-        Image(
-            modifier = Modifier
-                .size(296.dp)
-                .offset(y = 85.dp)
-                .align(Alignment.BottomCenter),
-            painter = painterResource(eggAttribute.eggDrawable),
-            colorFilter = if (eggKind == EggKind.Empty) {
-                ColorFilter.tint(
-                    WalkieTheme.colors.blue300,
-                    blendMode = BlendMode.SrcIn
-                )
-            } else null,
-            contentDescription = stringResource(R.string.desc_empty_egg),
-        )
-
-        if (eggKind == EggKind.Empty) {
-            Text(
-                text = stringResource(R.string.home_choice_egg).withUnderline(),
-                style = WalkieTheme.typography.head5,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .offset(y = (-66).dp)
-                    .noRippleClickable {
-                        onNavigationEvent.invoke(HomeScreenNavigationEvent.MoveToGainEgg)
-                    },
-                color = WalkieTheme.colors.blue50
-            )
         }
     }
 }
