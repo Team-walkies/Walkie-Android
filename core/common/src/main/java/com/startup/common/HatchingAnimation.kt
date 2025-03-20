@@ -2,6 +2,8 @@ package com.startup.common
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.VibrationEffect
+import android.os.Vibrator
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.RepeatMode
@@ -43,8 +45,6 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
-import android.os.VibrationEffect
-import android.os.Vibrator
 import com.startup.common.util.OsVersions
 import com.startup.ui.WalkieTheme
 import kotlinx.coroutines.CoroutineScope
@@ -76,12 +76,12 @@ fun EggHatchingAnimation(
 
 
     val eggCrackingComposition by rememberLottieComposition(
-        LottieCompositionSpec.Asset("walkie_Confetti.json")
+        LottieCompositionSpec.Asset("walkie_EggBlue.json")
     )
 
     //todo 로티 교체 캐릭터 등급 마다 로티 변경
     val explosionComposition by rememberLottieComposition(
-        LottieCompositionSpec.Asset("walkie_EggBlue.json")
+        LottieCompositionSpec.Asset("walkie_Confetti.json")
     )
 
     // 애니메이션 상태
@@ -144,6 +144,22 @@ fun EggHatchingAnimation(
                 yOffset = (-132).dp
             )
 
+            // 글로우 이미지 (전체)
+            AnimatedGlowImage(
+                visible = showGlowImage,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(32.dp)
+            )
+
+            // 결과 영역 - 캐릭터와 텍스트
+            if (showCharacterImage) {
+                AnimatedResultSection(
+                    character = character,
+                    visible = showCharacterImage
+                )
+            }
+
             // 로티 영역 - 정중앙
             Box(
                 modifier = Modifier
@@ -167,22 +183,6 @@ fun EggHatchingAnimation(
                     size = 250.dp
                 )
             }
-
-            // 결과 영역 - 캐릭터와 텍스트
-            if (showCharacterImage) {
-                AnimatedResultSection(
-                    character = character,
-                    visible = showCharacterImage
-                )
-            }
-
-            // 글로우 이미지 (전체)
-            AnimatedGlowImage(
-                visible = showGlowImage,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(32.dp)
-            )
         }
     }
 }
@@ -389,14 +389,12 @@ fun AnimatedResultSection(
                 .alpha(alpha),
             contentAlignment = Alignment.Center
         ) {
-            //todo 이미지 캐릭터 이미지
-            /*
+            //todo 이미지 캐릭터 이미지 fetch
             Image(
-                painter = painterResource(id = R.drawable.character_jellyfish),
+                painter = painterResource(id = R.drawable.jelly_1),
                 contentDescription = "Character",
                 modifier = Modifier.fillMaxSize()
             )
-            */
         }
     }
 }
