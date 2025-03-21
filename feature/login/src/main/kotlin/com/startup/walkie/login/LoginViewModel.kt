@@ -17,4 +17,8 @@ class LoginViewModel @Inject constructor() : BaseViewModel() {
     fun onNickNameChanged(textFieldValue: TextFieldValue) {
         _state.nickName.update { textFieldValue }
     }
+
+    fun onLogin() {
+
+    }
 }

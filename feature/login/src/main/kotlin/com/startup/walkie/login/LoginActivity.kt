@@ -25,6 +25,7 @@ import com.startup.navigation.LoginFeatureNavigator
 import com.startup.ui.WalkieTheme
 import com.startup.walkie.login.model.GetCharacterNavigationEvent
 import com.startup.walkie.login.model.LoginNavigationEvent
+import com.startup.walkie.login.model.LoginUiEvent
 import com.startup.walkie.login.model.NickNameSettingEvent
 import com.startup.walkie.navigation.LoginScreenNav
 import com.startup.walkie.splash.SplashActivity.LoginFeatureNavigatorEntryPoint
@@ -33,8 +34,9 @@ import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.Flow
 
 @AndroidEntryPoint
-class LoginActivity : BaseActivity<NickNameSettingEvent, LoginNavigationEvent>() {
+class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
     override val viewModel: LoginViewModel by viewModels()
+
     // KSP 는 필드 주입이 안 됨
     private val loginFeatureNavigator: LoginFeatureNavigator by lazy {
         EntryPointAccessors.fromApplication(
@@ -42,6 +44,7 @@ class LoginActivity : BaseActivity<NickNameSettingEvent, LoginNavigationEvent>()
             LoginFeatureNavigatorEntryPoint::class.java
         ).loginFeatureNavigator()
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -55,14 +58,10 @@ class LoginActivity : BaseActivity<NickNameSettingEvent, LoginNavigationEvent>()
 
     }
 
-    override fun handleUiEvent(uiEvent: NickNameSettingEvent) {
+    override fun handleUiEvent(uiEvent: LoginUiEvent) {
         when (uiEvent) {
-            is NickNameSettingEvent.OnNickNameChanged -> {
-                viewModel.onNickNameChanged(uiEvent.nickNameTextFieldValue)
-            }
-
-            else -> {
-
+            LoginUiEvent.OnClickLoginButton -> {
+                viewModel.onLogin()
             }
         }
     }
@@ -100,10 +99,10 @@ class LoginActivity : BaseActivity<NickNameSettingEvent, LoginNavigationEvent>()
                 ) {
                     NavHost(
                         navController = navController,
-                        startDestination = LoginScreenNav.NickNameSetting.route
+                        startDestination = LoginScreenNav.Onboarding.route
                     ) {
                         composable(LoginScreenNav.Onboarding.route) {
-                            OnBoardingScreen()
+                            LoginScreen(uiEventSender = ::handleUiEvent)
                         }
                         composable(LoginScreenNav.NickNameSetting.route) {
                             NickNameSettingScreen(
@@ -117,8 +116,10 @@ class LoginActivity : BaseActivity<NickNameSettingEvent, LoginNavigationEvent>()
                                 navArgument("nickName") { type = NavType.StringType },
                             )
                         ) { navBackStackEntry ->
-                            GetCharacterScreen(navBackStackEntry.arguments?.getString("nickName").orEmpty()) {
-                                when(it) {
+                            GetCharacterScreen(
+                                navBackStackEntry.arguments?.getString("nickName").orEmpty()
+                            ) {
+                                when (it) {
                                     GetCharacterNavigationEvent.MoveToMainActivity -> {
                                         loginFeatureNavigator.moveToHomeActivity(this@LoginActivity)
                                     }
