@@ -5,12 +5,16 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.startup.domain.provider.StepDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,6 +27,9 @@ class StepDataStoreImpl @Inject constructor(
     private companion object {
         private val CURRENT_STEPS = intPreferencesKey("current_steps")
         private val TARGET_STEP = intPreferencesKey("target_step")
+
+        private val LAST_RESET_DATE = stringPreferencesKey("last_reset_date")
+        private val YESTERDAY_STEPS = intPreferencesKey("yesterday_steps")
     }
 
     override suspend fun getCurrentSteps(): Int {
@@ -55,4 +62,27 @@ class StepDataStoreImpl @Inject constructor(
         .map { preferences ->
             preferences[CURRENT_STEPS] ?: 0
         }
+
+    override suspend fun isLastResetToday(): Boolean {
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val lastResetDate = context.dataStore.data.first()[LAST_RESET_DATE] ?: ""
+        return today == lastResetDate
+    }
+
+    override suspend fun saveLastResetDate() {
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        context.dataStore.edit { preferences ->
+            preferences[LAST_RESET_DATE] = today
+        }
+    }
+
+    override suspend fun saveYesterdaySteps(steps: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[YESTERDAY_STEPS] = steps
+        }
+    }
+
+    override suspend fun getYesterdaySteps(): Int {
+        return context.dataStore.data.first()[YESTERDAY_STEPS] ?: 0
+    }
 }

@@ -12,7 +12,7 @@ import javax.inject.Inject
  * 앱 업데이트를 감지하여 서비스를 재시작하는 브로드캐스트 리시버
  */
 @AndroidEntryPoint
-class PackageChangedReceiver @Inject constructor() : BroadcastReceiver(){
+internal class PackageChangedReceiver @Inject constructor() : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (Objects.equals(intent?.action, Intent.ACTION_MY_PACKAGE_REPLACED)) {
