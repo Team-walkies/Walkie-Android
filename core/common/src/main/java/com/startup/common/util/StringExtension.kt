@@ -169,3 +169,8 @@ fun String.toAnnotatedString(): AnnotatedString {
             }
     }
 }
+
+fun String.hasSpecialCharacters(): Boolean {
+    // 알파벳, 숫자만 허용. 그 외는 특수문자로 간주
+    return this.any { !it.isLetterOrDigit() } && isNotEmpty()
+}

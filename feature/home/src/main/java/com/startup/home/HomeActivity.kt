@@ -249,7 +249,12 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
                             navController
                         )
                     }
-                    composable(MainScreenNav.MyPageGraph.route) { navBackStackEntry ->
+                    composable(
+                        MainScreenNav.MyPageGraph.route + "/{destination}",
+                        arguments = listOf(
+                            navArgument("destination") { type = NavType.StringType },
+                        )
+                    ) { navBackStackEntry ->
                         MyPageNavigationGraph(
                             destinationRoute = navBackStackEntry.arguments?.getString("destination")
                                 .orEmpty()
