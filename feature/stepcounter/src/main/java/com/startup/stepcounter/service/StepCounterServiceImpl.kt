@@ -14,6 +14,7 @@ interface StepCounterService {
     suspend fun resetSteps()
     fun startCounting()
     fun stopCounting()
+    suspend fun checkAndResetForNewDay(): Int?  // null이면 오늘 이미 초기화됨, 아니면 이전 걸음 수 반환
 }
 
 class StepCounterServiceImpl @Inject constructor(
@@ -36,5 +37,22 @@ class StepCounterServiceImpl @Inject constructor(
 
     override fun stopCounting() {
         context.stopService(Intent(context, WalkieStepForegroundService::class.java))
+    }
+
+    override suspend fun checkAndResetForNewDay(): Int? {
+        // 이미 오늘 초기화했는지 확인
+        if (stepDataStore.isLastResetToday()) {
+            return null  // 이미 초기화됨
+        }
+        // 현재 걸음 수 가져오기
+        val currentSteps = stepDataStore.getCurrentSteps()
+        // 이전 걸음 수 저장
+        stepDataStore.saveYesterdaySteps(currentSteps)
+        // 걸음 수 초기화
+        stepDataStore.resetSteps()
+        // 마지막 초기화 날짜 업데이트
+        stepDataStore.saveLastResetDate()
+        // 이전 걸음 수 반환
+        return currentSteps
     }
 }

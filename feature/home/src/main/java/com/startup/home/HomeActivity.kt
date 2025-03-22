@@ -1,5 +1,7 @@
 package com.startup.home
 
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -41,6 +43,7 @@ import com.startup.home.navigation.MyPageNavigationGraph
 import com.startup.home.permission.PermissionBottomSheet
 import com.startup.home.permission.PermissionState
 import com.startup.navigation.HomeFeatureNavigator
+import com.startup.stepcounter.broadcastReciver.DailyResetReceiver
 import com.startup.ui.WalkieTheme
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -51,7 +54,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
+class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
+    DailyResetReceiver.OnDateChangedListener {
     override val viewModel: HomeViewModel by viewModels<HomeViewModel>()
 
     // 권한 바텀시트 표시 여부 상태
@@ -59,6 +63,8 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
 
     // 권한 상태 리스트
     private var permissionStates by mutableStateOf<List<PermissionState>>(emptyList())
+    private val dailyResetReceiver = DailyResetReceiver()
+
 
     // KSP 는 필드 주입이 안 됨
     private val homeFeatureNavigator: HomeFeatureNavigator by lazy {
@@ -78,12 +84,29 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         checkPermission()
+        dailyResetReceiver.setOnDateChangedListener(this)
+        registerDailyResetReceiver()
+        viewModel.initTodayStep()
 
         setContent {
             WalkieTheme {
                 MainScreenWithPermissionBottomSheet()
             }
         }
+    }
+
+    // DailyResetReceiver 등록
+    private fun registerDailyResetReceiver() {
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_DATE_CHANGED)
+        }
+        registerReceiver(dailyResetReceiver, filter)
+    }
+
+    override fun onDateChanged() {
+        viewModel.resetStepCount()
+        // todo 기획에 따라 필요하다면
+        viewModel.initTodayStep()
     }
 
     private fun checkPermission() {
@@ -271,4 +294,9 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
         fun homeFeatureNavigator(): HomeFeatureNavigator
     }
 
+    override fun onDestroy() {
+        unregisterReceiver(dailyResetReceiver)
+        dailyResetReceiver.removeOnDateChangedListener()
+        super.onDestroy()
+    }
 }

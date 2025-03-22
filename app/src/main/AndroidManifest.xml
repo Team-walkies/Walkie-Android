@@ -10,6 +10,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
     <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
@@ -68,7 +70,9 @@
         <activity
             android:name="com.startup.home.HomeActivity"
             android:exported="false"
-            android:theme="@style/Theme.Walkie" />
+            android:theme="@style/Theme.Walkie">
+
+        </activity>
 
         <activity
             android:name=".splash.SplashActivity"
@@ -84,7 +88,9 @@
         <activity
             android:name=".login.LoginActivity"
             android:exported="false"
-            android:theme="@style/Theme.Walkie" />
+            android:theme="@style/Theme.Walkie">
+
+        </activity>
         <activity
             android:name="com.startup.spot.SpotActivity"
             android:exported="false"
