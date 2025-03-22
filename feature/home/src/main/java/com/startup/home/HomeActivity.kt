@@ -25,11 +25,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.startup.common.EggHatchingAnimation
 import com.startup.common.base.BaseActivity
 import com.startup.common.base.NavigationEvent
 import com.startup.common.base.UiEvent
@@ -227,6 +229,9 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
     fun MainContent() {
         val navController = rememberNavController()
         val snackBarHostState = SnackbarHostState()
+
+        val hatchingInfo by viewModel.hatchingInfo.collectAsStateWithLifecycle()
+
         Scaffold(
             snackbarHost = {
 
@@ -283,6 +288,16 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                                 .orEmpty()
                         )
                     }
+                }
+            }
+
+            hatchingInfo?.let { trigger ->
+                //todo viewmodel or datastore등을 통해서 해당 UI에 캐릭터 정보 / 알등을 전달
+                if (trigger) {
+                    EggHatchingAnimation(
+                        character = "해파리",
+                        onDismiss = { viewModel.onHatchingAnimationDismissed() }
+                    )
                 }
             }
         }

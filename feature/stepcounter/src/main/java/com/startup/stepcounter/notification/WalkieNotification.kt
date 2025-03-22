@@ -115,42 +115,51 @@ fun updateStepNotification(context: Context, steps: Int, target: Int) {
     }
 }
 
-private fun createDefaultNotification(context: Context): Notification {
-
-    return NotificationCompat.Builder(context, WALKIE_STEP_NOTIFICATION_CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_walkie_artwork)
-        .setContentTitle("Walkie")
-        .setContentText("워키!")
-        .setOngoing(true)
-        .setPriority(NotificationCompat.PRIORITY_MAX)
-        .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
-        .setCategory(NotificationCompat.CATEGORY_SERVICE)
-        .build()
-}
-
-fun buildPermissionInductionNotification(context: Context): Notification {
-    createPermissionNotificationChannel(context)
-    return NotificationCompat.Builder(context, ACTIVITY_PERMISSION_NOTIFICATION_CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_walkie_artwork)
-        .setContentTitle(context.getString(R.string.notification_permission_title))
-        .setContentText(context.getString(R.string.notification_permission_message))
-        .setAutoCancel(true)
-        .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
-        .build()
-}
 
 /**
  * 스팟 도착시 생성할 알림
  */
 fun buildArriveNotification(context: Context): Notification {
-
-    return NotificationCompat.Builder(context, ACTIVITY_PERMISSION_NOTIFICATION_CHANNEL_ID)
+    return NotificationCompat.Builder(context, NotificationCode.ARRIVE_NOTIFICATION_CHANNEL_ID)
         .setSmallIcon(R.drawable.ic_walkie_artwork)
         .setContentTitle(context.getString(R.string.notification_arrive_title))
         .setContentText(context.getString(R.string.notification_arrive_message))
         .setAutoCancel(true)
         .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
         .build()
+}
+
+/**
+ * 도착 알림 채널 생성
+ */
+private fun createArriveNotificationChannel(context: Context) {
+    val channel = NotificationChannel(
+        NotificationCode.ARRIVE_NOTIFICATION_CHANNEL_ID,
+        NotificationCode.ARRIVE_NOTIFICATION_CHANNEL_NAME,
+        NotificationManager.IMPORTANCE_HIGH
+    ).apply {
+        description = NotificationCode.ARRIVE_NOTIFICATION_DESCRIPTION
+        enableVibration(true)
+        vibrationPattern = longArrayOf(1000, 1000, 1000, 1000, 1000)
+    }
+
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.createNotificationChannel(channel)
+}
+
+/**
+ * 도착 알림을 발송하는 함수
+ */
+fun sendArriveNotification(context: Context) {
+    createArriveNotificationChannel(context)
+
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.notify(
+        NotificationCode.ARRIVE_NOTIFICATION_ID,
+        buildArriveNotification(context)
+    )
 }
 
 /**
@@ -164,8 +173,40 @@ fun buildHatchingNotification(context: Context): Notification {
         .setContentText(context.getString(R.string.notification_hatching_message))
         .setAutoCancel(true)
         .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
-        .setColor(0xFF0DAEFF.toInt())
         .build()
+}
+
+/**
+ * 부화 알림 채널 생성
+ */
+private fun createHatchingNotificationChannel(context: Context) {
+    val channel = NotificationChannel(
+        NotificationCode.HATCHING_NOTIFICATION_CHANNEL_ID,
+        NotificationCode.HATCHING_NOTIFICATION_CHANNEL_NAME,
+        NotificationManager.IMPORTANCE_HIGH
+    ).apply {
+        description = NotificationCode.HATCHING_NOTIFICATION_DESCRIPTION
+        enableVibration(true)
+        vibrationPattern = longArrayOf(1000, 1000, 1000, 1000, 1000)
+    }
+
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.createNotificationChannel(channel)
+}
+
+/**
+ * 부화 완료 알림을 발송하는 함수
+ */
+fun sendHatchingNotification(context: Context) {
+    createHatchingNotificationChannel(context)
+
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.notify(
+        NotificationCode.HATCHING_NOTIFICATION_ID,
+        buildHatchingNotification(context)
+    )
 }
 
 
@@ -184,6 +225,17 @@ private fun createPermissionNotificationChannel(context: Context) {
         }
         notificationManager.createNotificationChannel(channel)
     }
+}
+
+private fun buildPermissionInductionNotification(context: Context): Notification {
+    createPermissionNotificationChannel(context)
+    return NotificationCompat.Builder(context, ACTIVITY_PERMISSION_NOTIFICATION_CHANNEL_ID)
+        .setSmallIcon(R.drawable.ic_walkie_artwork)
+        .setContentTitle(context.getString(R.string.notification_permission_title))
+        .setContentText(context.getString(R.string.notification_permission_message))
+        .setAutoCancel(true)
+        .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
+        .build()
 }
 
 fun showPermissionNotification(context: Context) {
