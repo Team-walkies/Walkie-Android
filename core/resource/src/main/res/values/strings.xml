@@ -68,7 +68,17 @@
     <string name="hatching_wait">잠깐,</string>
     <string name="hatching_coming_soon">알이 부화하려고 해요!</string>
     <string name="hatching_result">두둥!\n%s가 태어났어!</string>
+    <string name="login_action_button">카카오 계정으로 계속하기</string>
+    <string name="desc_login_kakao">카카오 계정으로 계속하기</string>
 
+    <string name="onboarding_1_title">내 주변 스팟에서 알 획득</string>
+    <string name="onboarding_1_sub_title">스팟에 도착하면, 랜덤하게\n네 가지 알 중 하나를 획득할 수 있어요.</string>
+    <string name="onboarding_2_title">걷다보면 알 부화</string>
+    <string name="onboarding_2_sub_title">걸으며 알을 부화시켜보세요.\n어떤 캐릭터가 부화할까요?</string>
+    <string name="onboarding_3_title">캐릭터와 함께 떠나는 모험</string>
+    <string name="onboarding_3_sub_title">스팟까지 안내해 줄 캐릭터를 선택하고\n함께 모험을 떠나 보세요.</string>
+    <string name="onboarding_4_title">나만의 모험 기록</string>
+    <string name="onboarding_4_sub_title">스팟을 모험하며 얻은\n경험을 모아보세요</string>
     <string name="calendar_date_select">이동하기</string>
     <string name="calendar_review_title">기록</string>
     <string name="calendar_review_walk_together">와 함께 걸었어요</string>

@@ -23,6 +23,10 @@ sealed interface GetCharacterNavigationEvent : ScreenNavigationEvent {
     data object MoveToMainActivity : GetCharacterNavigationEvent
 }
 
+sealed interface LoginUiEvent : UiEvent {
+    data object OnClickLoginButton : LoginUiEvent
+}
+
 sealed interface NickNameSettingEvent : UiEvent {
     data class OnNickNameChanged(val nickNameTextFieldValue: TextFieldValue) :
         NickNameSettingEvent
