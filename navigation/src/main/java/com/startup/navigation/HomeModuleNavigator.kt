@@ -2,6 +2,6 @@ package com.startup.navigation
 
 import android.content.Context
 
-interface LoginFeatureNavigator {
+interface HomeModuleNavigator {
     fun moveToHomeActivity(context: Context)
 }

@@ -22,7 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import com.startup.common.base.BaseActivity
 import com.startup.common.util.EXTRA_NEED_TO_NICKNAME_SETTING
 import com.startup.login.R
-import com.startup.navigation.LoginFeatureNavigator
+import com.startup.navigation.HomeModuleNavigator
 import com.startup.ui.WalkieTheme
 import com.startup.walkie.login.LoginActivity
 import dagger.hilt.EntryPoint
@@ -41,11 +41,11 @@ class SplashActivity : BaseActivity<SplashUiEvent, SplashNavigationEvent>() {
 
 
     // KSP 는 필드 주입이 안 됨
-    private val loginFeatureNavigator: LoginFeatureNavigator by lazy {
+    private val homeModuleNavigator: HomeModuleNavigator by lazy {
         EntryPointAccessors.fromApplication(
             applicationContext,
-            LoginFeatureNavigatorEntryPoint::class.java
-        ).loginFeatureNavigator()
+            HomeModuleNavigatorEntryPoint::class.java
+        ).homeModuleNavigator()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +60,7 @@ class SplashActivity : BaseActivity<SplashUiEvent, SplashNavigationEvent>() {
         navigationEventFlow.onEach {
             when (it) {
                 SplashNavigationEvent.MoveToMainActivity -> {
-                    loginFeatureNavigator.moveToHomeActivity(this)
+                    homeModuleNavigator.moveToHomeActivity(this)
                     finish()
                 }
 
@@ -84,8 +84,8 @@ class SplashActivity : BaseActivity<SplashUiEvent, SplashNavigationEvent>() {
 
     @EntryPoint
     @InstallIn(SingletonComponent::class)
-    interface LoginFeatureNavigatorEntryPoint {
-        fun loginFeatureNavigator(): LoginFeatureNavigator
+    interface HomeModuleNavigatorEntryPoint {
+        fun homeModuleNavigator(): HomeModuleNavigator
     }
 }
 
