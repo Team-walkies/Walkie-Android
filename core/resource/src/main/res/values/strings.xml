@@ -26,6 +26,9 @@
     <string name="current_step">\u0020%s걸음</string>
 
 
+    <string name="format_int">%d</string>
+    <string name="format_string">%s</string>
+    <string name="format_float">%f</string>
     <string name="quantity_string">%d개</string>
     <string name="group_characters_string">%d마리</string>
 
@@ -79,6 +82,42 @@
     <string name="onboarding_3_sub_title">스팟까지 안내해 줄 캐릭터를 선택하고\n함께 모험을 떠나 보세요.</string>
     <string name="onboarding_4_title">나만의 모험 기록</string>
     <string name="onboarding_4_sub_title">스팟을 모험하며 얻은\n경험을 모아보세요</string>
+    <string name="hatching_characters">부화한 캐릭터</string>
+    <string name="character_jellyfish">해파리</string>
+    <string name="character_jellyfish_description">육지에서 뛰고 싶은 꿈을 가진 낭만적인 해파리들</string>
+    <string name="character_dino_description">사람들과 뛰어놀고 싶어서 먼 과거에서 돌아온 다이노들</string>
+    <string name="character_dino">다이노</string>
+    <string name="character_detail_wise_saying">무엇이든 시작에는 큰 용기가 필요해.\n나와 함께 첫걸음을 내딛어보자.</string>
+    <string name="character_count">마리</string>
+    <string name="character_gain_count">마리 보유</string>
+    <string name="character_not_gain">미획득</string>
+    <string name="character_gain_induction">알을 부화시켜 얻어요</string>
+    <string name="character_partner_select">이 캐릭터와 같이 걷기</string>
+    <string name="character_already_selected">같이 걷는 중…</string>
+
+
+    <string name="jellyfish_basic">해파리</string>
+    <string name="jellyfish_red">빨간 해파리</string>
+    <string name="jellyfish_green">초록 해파리</string>
+    <string name="jellyfish_purple">보라 해파리</string>
+    <string name="jellyfish_pink">분홍 해파리</string>
+    <string name="jellyfish_rabbit">토끼 해파리</string>
+    <string name="jellyfish_starfish">불가사리 해파리</string>
+    <string name="jellyfish_electric_shock">빠직 해파리</string>
+    <string name="jellyfish_strawberry_ricecake">딸기모찌 해파리</string>
+    <string name="jellyfish_space">우주 해파리</string>
+
+    <string name="dino_basic">다이노</string>
+    <string name="dino_red">빨간 다이노</string>
+    <string name="dino_mint">민트 다이노</string>
+    <string name="dino_purple">보라 다이노</string>
+    <string name="dino_pink">분홍 다이노</string>
+    <string name="dino_reindeer">순록 다이노</string>
+    <string name="dino_ness">네시 다이노</string>
+    <string name="dino_pancake">팬케이크 다이노</string>
+    <string name="dino_melon_soda">메론소다 다이노</string>
+    <string name="dino_dragon">드래곤 다이노</string>
+
     <string name="calendar_date_select">이동하기</string>
     <string name="calendar_review_title">기록</string>
     <string name="calendar_review_walk_together">와 함께 걸었어요</string>
