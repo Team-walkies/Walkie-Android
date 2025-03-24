@@ -20,28 +20,28 @@ internal class UserDataSourceImpl @Inject constructor(
     @Named(NOTIFICATION_EGG_HATCH_KEY_NAME) private val notificationEggHatchKey: Preferences.Key<Boolean>,
     @Named(PROFILE_ACCESS_KEY_NAME) private val profileAccessKey: Preferences.Key<Boolean>,
 ) : UserDataSource {
-    override suspend fun getNotificationTodayStepEnabled(): Flow<Boolean> =
+    override fun getNotificationTodayStepEnabled(): Flow<Boolean> =
         notificationDataStoreProvider.getFlowValue(notificationTodayStepKey)
 
     override suspend fun updateNotificationTodayStepEnabled(enabled: Boolean) {
         notificationDataStoreProvider.putValue(notificationTodayStepKey, enabled)
     }
 
-    override suspend fun getNotificationSpotArriveEnabled(): Flow<Boolean> =
+    override fun getNotificationSpotArriveEnabled(): Flow<Boolean> =
         notificationDataStoreProvider.getFlowValue(notificationSpotArriveKey)
 
     override suspend fun updateNotificationSpotArriveEnabled(enabled: Boolean) {
         notificationDataStoreProvider.putValue(notificationSpotArriveKey, enabled)
     }
 
-    override suspend fun getNotificationEggHatchEnabled(): Flow<Boolean> =
+    override fun getNotificationEggHatchEnabled(): Flow<Boolean> =
         notificationDataStoreProvider.getFlowValue(notificationEggHatchKey)
 
     override suspend fun updateNotificationEggHatchEnabled(enabled: Boolean) {
         notificationDataStoreProvider.putValue(notificationEggHatchKey, enabled)
     }
 
-    override suspend fun getProfileAccessEnabled(): Flow<Boolean> =
+    override fun getProfileAccessEnabled(): Flow<Boolean> =
         userSettingDataStoreProvider.getFlowValue(profileAccessKey)
 
     override suspend fun updateProfileAccessEnabled(enabled: Boolean) {

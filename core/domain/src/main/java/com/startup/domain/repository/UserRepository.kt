@@ -1,8 +1,8 @@
-package com.startup.data.datasource
+package com.startup.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 
-interface UserDataSource {
+interface UserRepository {
     fun getNotificationTodayStepEnabled(): Flow<Boolean>
     suspend fun updateNotificationTodayStepEnabled(enabled: Boolean)
     fun getNotificationSpotArriveEnabled(): Flow<Boolean>

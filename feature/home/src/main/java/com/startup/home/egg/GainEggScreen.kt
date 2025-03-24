@@ -323,7 +323,7 @@ private fun PreviewBottomModal() {
                 characterId = -1,
                 eggKind = EggKind.Epic,
                 obtainedPosition = "대전시 유성구",
-                obtainedDate = DateUtil.convertDateFormat("2024-01-12 12:20:10"),
+                obtainedDate = DateUtil.convertDateTimeFormat("2024-01-12 12:20:10"),
             )
         )
     }
@@ -343,7 +343,7 @@ private fun PreviewGainEggScreen() {
                     characterId = -1,
                     eggKind = EggKind.Legend,
                     obtainedPosition = "대전시 유성구",
-                    obtainedDate = DateUtil.convertDateFormat("2024-01-12 12:20:10"),
+                    obtainedDate = DateUtil.convertDateTimeFormat("2024-01-12 12:20:10"),
                 ), MyEggModel(
                     eggId = 3,
                     nowStep = 8334,
@@ -352,7 +352,7 @@ private fun PreviewGainEggScreen() {
                     characterId = -1,
                     eggKind = EggKind.Legend,
                     obtainedPosition = "대전시 유성구",
-                    obtainedDate = DateUtil.convertDateFormat("2024-01-12 12:20:10"),
+                    obtainedDate = DateUtil.convertDateTimeFormat("2024-01-12 12:20:10"),
                 ), MyEggModel(
                     eggId = 2,
                     nowStep = 8334,
@@ -361,7 +361,7 @@ private fun PreviewGainEggScreen() {
                     characterId = -1,
                     eggKind = EggKind.Epic,
                     obtainedPosition = "대전시 유성구",
-                    obtainedDate = DateUtil.convertDateFormat("2024-01-12 12:20:10"),
+                    obtainedDate = DateUtil.convertDateTimeFormat("2024-01-12 12:20:10"),
                 )
             ), {}
         )

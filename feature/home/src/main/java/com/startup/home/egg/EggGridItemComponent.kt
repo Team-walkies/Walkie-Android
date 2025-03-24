@@ -132,7 +132,7 @@ private fun PreviewEggGridItemComponent() {
                     characterId = -1,
                     eggKind = EggKind.Epic,
                     obtainedPosition = "대전시 유성구",
-                    obtainedDate = DateUtil.convertDateFormat("2024-01-12 12:20:10")
+                    obtainedDate = DateUtil.convertDateTimeFormat("2024-01-12 12:20:10")
                 )
             ) {}
             EggGridItemComponent(
@@ -147,7 +147,7 @@ private fun PreviewEggGridItemComponent() {
                     characterId = -1,
                     eggKind = EggKind.Legend,
                     obtainedPosition = "대전시 유성구",
-                    obtainedDate = DateUtil.convertDateFormat("2024-01-12 12:20:10")
+                    obtainedDate = DateUtil.convertDateTimeFormat("2024-01-12 12:20:10")
                 )
             ) {}
         }

@@ -79,14 +79,14 @@ fun ErrorTwoButtonModal(
                             )
                             .weight(1F)
                             .padding(vertical = 13.dp)
+                            .noRippleClickable {
+                                onClickNegative.invoke()
+                            }
                     ) {
                         Text(
                             modifier = Modifier
                                 .wrapContentSize()
-                                .align(Alignment.Center)
-                                .noRippleClickable {
-                                    onClickNegative.invoke()
-                                },
+                                .align(Alignment.Center),
                             text = negativeText,
                             style = WalkieTheme.typography.body1,
                             textAlign = TextAlign.Center,
@@ -102,14 +102,14 @@ fun ErrorTwoButtonModal(
                             )
                             .weight(1F)
                             .padding(vertical = 13.dp)
+                            .noRippleClickable {
+                                onClickPositive.invoke()
+                            }
                     ) {
                         Text(
                             modifier = Modifier
                                 .wrapContentSize()
-                                .align(Alignment.Center)
-                                .noRippleClickable {
-                                    onClickPositive.invoke()
-                                },
+                                .align(Alignment.Center),
                             text = positiveText,
                             style = WalkieTheme.typography.body1,
                             textAlign = TextAlign.Center,

@@ -18,7 +18,7 @@ data class EggDetailModel(
             nowStep = nowStep,
             eggKind = EggKind.rankOfEggKind(rank),
             obtainedPosition = obtainedPosition,
-            obtainedDate = DateUtil.convertDateFormat(obtainedDate)
+            obtainedDate = DateUtil.convertDateTimeFormat(obtainedDate)
         )
     }
 }

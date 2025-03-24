@@ -3,7 +3,7 @@ package com.startup.walkie.login.model
 import androidx.compose.ui.text.input.TextFieldValue
 import com.startup.common.base.NavigationEvent
 import com.startup.common.base.ScreenNavigationEvent
-import com.startup.common.base.State
+import com.startup.common.base.BaseState
 import com.startup.common.base.UiEvent
 import hasSpecialCharacters
 import kotlinx.coroutines.CoroutineScope
@@ -36,7 +36,7 @@ sealed interface NickNameNavigationEvent : NavigationEvent {
 
 }
 
-interface NickNameViewState : State {
+interface NickNameViewState : BaseState {
     val nickName: StateFlow<TextFieldValue>
     val placeHolder: StateFlow<String>
     val nickNameContainedSpecialCharacters: StateFlow<Boolean>
