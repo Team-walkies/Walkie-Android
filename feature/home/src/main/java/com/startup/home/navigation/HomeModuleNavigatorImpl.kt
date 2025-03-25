@@ -1,12 +1,12 @@
-package com.startup.walkie.navigationimpl
+package com.startup.home.navigation
 
 import android.content.Context
 import android.content.Intent
 import com.startup.home.HomeActivity
-import com.startup.navigation.LoginFeatureNavigator
+import com.startup.navigation.HomeModuleNavigator
 import javax.inject.Inject
 
-class LoginFeatureNavigatorImpl @Inject constructor(): LoginFeatureNavigator {
+class HomeModuleNavigatorImpl @Inject constructor(): HomeModuleNavigator{
     override fun moveToHomeActivity(context: Context) {
         context.startActivity(Intent(context, HomeActivity::class.java))
     }

@@ -44,7 +44,8 @@ import com.startup.home.navigation.MainScreenNav
 import com.startup.home.navigation.MyPageNavigationGraph
 import com.startup.home.permission.PermissionBottomSheet
 import com.startup.home.permission.PermissionState
-import com.startup.navigation.HomeFeatureNavigator
+import com.startup.navigation.LoginModuleNavigator
+import com.startup.navigation.SpotModuleNavigator
 import com.startup.stepcounter.broadcastReciver.DailyResetReceiver
 import com.startup.ui.WalkieTheme
 import dagger.hilt.EntryPoint
@@ -69,11 +70,18 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
 
 
     // KSP 는 필드 주입이 안 됨
-    private val homeFeatureNavigator: HomeFeatureNavigator by lazy {
+    private val loginModuleNavigator: LoginModuleNavigator by lazy {
         EntryPointAccessors.fromApplication(
             applicationContext,
-            HomeFeatureNavigatorEntryPoint::class.java
-        ).homeFeatureNavigator()
+            LoginNavigatorEntryPoint::class.java
+        ).loginNavigatorNavigator()
+    }
+
+    private val spotModuleNavigator: SpotModuleNavigator by lazy {
+        EntryPointAccessors.fromApplication(
+            applicationContext,
+            SpotNavigatorEntryPoint::class.java
+        ).spotNavigatorNavigator()
     }
 
     override fun handleNavigationEvent(navigationEventFlow: Flow<NavigationEvent>) {
@@ -255,11 +263,11 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                             onNavigationEvent = {
                                 when (it) {
                                     MainScreenNavigationEvent.MoveToLoginActivity -> {
-                                        homeFeatureNavigator.navigateLoginView(context = this@HomeActivity)
+                                        loginModuleNavigator.navigateLoginView(context = this@HomeActivity)
                                     }
 
                                     MainScreenNavigationEvent.MoveToSpotActivity -> {
-                                        homeFeatureNavigator.navigateSpotView(context = this@HomeActivity)
+                                        spotModuleNavigator.navigateSpotView(context = this@HomeActivity)
                                     }
                                 }
                             },
@@ -302,11 +310,16 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
             }
         }
     }
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface SpotNavigatorEntryPoint {
+        fun spotNavigatorNavigator(): SpotModuleNavigator
+    }
 
     @EntryPoint
     @InstallIn(SingletonComponent::class)
-    interface HomeFeatureNavigatorEntryPoint {
-        fun homeFeatureNavigator(): HomeFeatureNavigator
+    interface LoginNavigatorEntryPoint {
+        fun loginNavigatorNavigator(): LoginModuleNavigator
     }
 
     override fun onDestroy() {

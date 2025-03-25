@@ -1,4 +1,4 @@
-package com.startup.walkie.navigationimpl
+package com.startup.stepcounter.navigation
 
 import com.startup.navigation.StepCounterController
 import com.startup.stepcounter.service.StepCounterService

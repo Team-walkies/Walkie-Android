@@ -21,14 +21,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.startup.common.base.BaseActivity
-import com.startup.navigation.LoginFeatureNavigator
+import com.startup.navigation.HomeModuleNavigator
 import com.startup.ui.WalkieTheme
 import com.startup.walkie.login.model.GetCharacterNavigationEvent
 import com.startup.walkie.login.model.LoginNavigationEvent
 import com.startup.walkie.login.model.LoginUiEvent
 import com.startup.walkie.login.model.NickNameSettingEvent
 import com.startup.walkie.navigation.LoginScreenNav
-import com.startup.walkie.splash.SplashActivity.LoginFeatureNavigatorEntryPoint
+import com.startup.walkie.splash.SplashActivity
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.Flow
@@ -38,11 +38,11 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
     override val viewModel: LoginViewModel by viewModels()
 
     // KSP 는 필드 주입이 안 됨
-    private val loginFeatureNavigator: LoginFeatureNavigator by lazy {
+    private val homeModuleNavigator: HomeModuleNavigator by lazy {
         EntryPointAccessors.fromApplication(
             applicationContext,
-            LoginFeatureNavigatorEntryPoint::class.java
-        ).loginFeatureNavigator()
+            SplashActivity.HomeModuleNavigatorEntryPoint::class.java
+        ).homeModuleNavigator()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,7 +121,7 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
                             ) {
                                 when (it) {
                                     GetCharacterNavigationEvent.MoveToMainActivity -> {
-                                        loginFeatureNavigator.moveToHomeActivity(this@LoginActivity)
+                                        homeModuleNavigator.moveToHomeActivity(this@LoginActivity)
                                     }
                                 }
                             }
