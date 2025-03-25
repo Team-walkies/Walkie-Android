@@ -101,9 +101,9 @@ private fun HomeContent(
                 top = paddingValues.calculateTopPadding(),
                 start = 16.dp,
                 end = 16.dp,
-                bottom = 50.dp // 하단에 50dp 여백 추가
             )
             .then(if (needsScroll) Modifier.verticalScroll(scrollState) else Modifier)
+            .padding(bottom = 50.dp)
 
     ) {
         Spacer(modifier = Modifier.height(8.dp))

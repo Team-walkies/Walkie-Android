@@ -81,7 +81,7 @@ fun MainBottomNavigationScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 62.5.dp)
+                .padding(bottom = 50.dp)
         ) {
             NavHost(
                 navController = navHostController,
