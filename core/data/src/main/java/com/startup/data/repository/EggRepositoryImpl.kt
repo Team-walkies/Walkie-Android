@@ -30,5 +30,5 @@ internal class EggRepositoryImpl @Inject constructor(private val eggDataSource: 
         eggDataSource.getMyEggList().map { it.eggs?.map { it.toDomain() } ?: emptyList() }
 
     override fun getMyEggCount(): Flow<Int> =
-        eggDataSource.getMyEggCount().map { it.eggsCount.orZero() }
+        eggDataSource.getMyEggCount().map { it.eggCount.orZero() }
 }

@@ -1,4 +1,4 @@
-package com.startup.home
+package com.startup.home.main
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -26,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,15 +42,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.startup.common.util.Printer
 import com.startup.common.util.formatWithLocale
 import com.startup.design_system.widget.actionbar.MainLogoActionBar
 import com.startup.design_system.widget.speechbubble.SpeechBubble
+import com.startup.home.HomeScreenNavigationEvent
+import com.startup.home.R
 import com.startup.home.egg.EggLayoutModel
 import com.startup.home.egg.getEggLayoutModel
 import com.startup.home.egg.model.EggKind
 import com.startup.home.menu.HistoryItemModel
 import com.startup.ui.WalkieTheme
 import com.startup.ui.noRippleClickable
+import kotlinx.coroutines.flow.map
 import withBold
 import withUnderline
 
@@ -58,9 +64,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit
 ) {
-    val state = viewModel.state as StepCounterState
     val scrollState = rememberScrollState()
-
     Scaffold(
         topBar = {
             MainLogoActionBar(isExistAlarm = false) {
@@ -72,7 +76,7 @@ fun HomeScreen(
         HomeContent(
             paddingValues = paddingValues,
             scrollState = scrollState,
-            stepCount = state.steps,
+            viewState = viewModel.state,
             onNavigationEvent = onNavigationEvent
         )
     }
@@ -80,9 +84,9 @@ fun HomeScreen(
 
 @Composable
 private fun HomeContent(
+    viewState: HomeViewState,
     paddingValues: PaddingValues,
     scrollState: ScrollState,
-    stepCount: Int,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit
 ) {
     // 스크롤 필요 여부 계산
@@ -92,8 +96,7 @@ private fun HomeContent(
     val availableHeight = screenHeightDp - topPadding - 50.dp
     val minRequiredHeight = 431.dp + 18.dp + 180.dp
     val needsScroll = minRequiredHeight > availableHeight
-
-
+    val stepCount by viewState.steps.collectAsStateWithLifecycle()
     Column(
         modifier = Modifier
             .background(color = WalkieTheme.colors.white)
@@ -130,7 +133,10 @@ private fun HomeContent(
         }
 
         Spacer(modifier = Modifier.height(18.dp))
-        MyHistorySection(onNavigationEvent)
+        MyHistorySection(
+            viewState = viewState,
+            onNavigationEvent = onNavigationEvent
+        )
     }
 }
 
@@ -206,23 +212,46 @@ private fun PartnerInfoBox() {
 }
 
 @Composable
-private fun MyHistorySection(onNavigationEvent: (HomeScreenNavigationEvent) -> Unit) {
+private fun MyHistorySection(
+    viewState: HomeViewState,
+    onNavigationEvent: (HomeScreenNavigationEvent) -> Unit
+) {
+    val eggCount by viewState.currentGainEggCount.collectAsStateWithLifecycle()
+    val characterCount by viewState.currentHatchedCharacterCount.collectAsStateWithLifecycle()
+    val recordedSpotCount by viewState.userInfo.map { it?.recordedSpot ?: 0 }
+        .collectAsStateWithLifecycle(0)
+    Printer.e("LMH", "MyHistorySection $eggCount, $characterCount, $recordedSpotCount")
     Text(
         text = stringResource(R.string.home_my_history),
         style = WalkieTheme.typography.head4,
         color = WalkieTheme.colors.gray700
     )
     Spacer(modifier = Modifier.height(8.dp))
-    HistoryItems(onNavigationEvent)
+    HistoryItems(
+        eggCount = eggCount,
+        characterCount = characterCount,
+        spotCount = recordedSpotCount,
+        onNavigationEvent
+    )
 }
 
 @Composable
-private fun HistoryItems(onNavigationEvent: (HomeScreenNavigationEvent) -> Unit) {
+private fun HistoryItems(
+    eggCount: Int,
+    characterCount: Int,
+    spotCount: Int,
+    onNavigationEvent: (HomeScreenNavigationEvent) -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        getDefaultHistoryMenu().take(3).forEach { item ->
+        Printer.e("LMH", "HistoryItems $eggCount, $characterCount, $spotCount")
+        getDefaultHistoryMenu(
+            eggCount = eggCount,
+            characterCount = characterCount,
+            spotCount = spotCount
+        ).take(3).forEach { item ->
             HistoryItem(
                 item = item,
                 modifier = Modifier.weight(1f),
@@ -245,25 +274,32 @@ private fun HistoryItems(onNavigationEvent: (HomeScreenNavigationEvent) -> Unit)
     }
 }
 
-fun getDefaultHistoryMenu(): List<HistoryItemModel> {
+fun getDefaultHistoryMenu(
+    eggCount: Int,
+    characterCount: Int,
+    spotCount: Int
+): List<HistoryItemModel> {
     return listOf(
         HistoryItemModel(
             myHistoryKind = HistoryItemModel.MyHistoryKind.GainEgg,
             thumbnailDrawable = R.drawable.img_gain_eggs,
             titleString = R.string.home_gain_eggs,
-            unitString = R.string.quantity_string
+            unitString = R.string.quantity_string,
+            count = eggCount
         ),
         HistoryItemModel(
             myHistoryKind = HistoryItemModel.MyHistoryKind.GainCharacter,
             thumbnailDrawable = R.drawable.img_hatching_characters,
             titleString = R.string.home_hatching_characters,
-            unitString = R.string.group_characters_string
+            unitString = R.string.group_characters_string,
+            count = characterCount
         ),
         HistoryItemModel(
             myHistoryKind = HistoryItemModel.MyHistoryKind.SpotArchive,
             thumbnailDrawable = R.drawable.img_spot_history,
             titleString = R.string.home_spot_history,
-            unitString = R.string.quantity_string
+            unitString = R.string.quantity_string,
+            count = spotCount
         )
     )
 }
@@ -302,7 +338,7 @@ private fun HistoryItem(
         )
         Text(
             modifier = Modifier.height(20.dp),
-            text = stringResource(item.unitString, 3),
+            text = stringResource(item.unitString, item.count),
             style = WalkieTheme.typography.body2,
             color = WalkieTheme.colors.gray500
         )

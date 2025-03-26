@@ -99,7 +99,7 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
                 ) {
                     NavHost(
                         navController = navController,
-                        startDestination = LoginScreenNav.Onboarding.route
+                        startDestination = LoginScreenNav.NickNameSetting.route
                     ) {
                         composable(LoginScreenNav.Onboarding.route) {
                             LoginScreen(uiEventSender = ::handleUiEvent)

@@ -82,8 +82,8 @@ fun MyPageScreen(userInfo: UserInfo, onNavigationEvent: (MyPageScreenNavigationE
             Text(
                 stringResource(
                     R.string.current_explored_spot_count_desc,
-                    userInfo.exploredSpotCount
-                ).withColor(userInfo.exploredSpotCount.toString(), WalkieTheme.colors.blue400),
+                    userInfo.exploredSpot
+                ).withColor(userInfo.exploredSpot.toString(), WalkieTheme.colors.blue400),
                 style = WalkieTheme.typography.head5.copy(color = WalkieTheme.colors.gray500)
             )
             Spacer(modifier = Modifier.height(20.dp))
@@ -321,7 +321,12 @@ private fun PreviewMyPageScreen() {
             userInfo = UserInfo(
                 memberId = 1,
                 isPublic = true,
-                exploredSpotCount = 5,
+                exploredSpot = 5,
+                recordedSpot = 2,
+                provider = "",
+                userCharacterId = 1,
+                providerId = "",
+                eggId = 1,
                 memberNickName = "승빈짱짱",
                 memberTier = "초보워키",
                 memberEmail = ""

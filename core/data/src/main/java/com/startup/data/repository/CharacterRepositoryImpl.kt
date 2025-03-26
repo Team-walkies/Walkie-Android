@@ -20,5 +20,5 @@ internal class CharacterRepositoryImpl @Inject constructor(private val character
             .map { it.characters?.map { it.toDomain() } ?: emptyList() }
 
     override fun getOwnedCharacterCount(): Flow<Int> =
-        characterDataSource.getOwnedCharacterCount().map { it.characterCount.orZero() }
+        characterDataSource.getOwnedCharacterCount().map { it.charactersCount.orZero() }
 }

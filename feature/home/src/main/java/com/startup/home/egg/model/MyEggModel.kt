@@ -14,7 +14,8 @@ data class MyEggModel(
     val obtainedPosition: String,
 ) {
     companion object {
-        fun MyEgg.toUiModel(): MyEggModel = MyEggModel(
+        fun List<MyEgg>.toUiModel(): List<MyEggModel> = map { it.toUiModel() }
+        private fun MyEgg.toUiModel(): MyEggModel = MyEggModel(
             characterId = characterId,
             eggId = eggId,
             needStep = needStep,
@@ -24,6 +25,7 @@ data class MyEggModel(
             obtainedDate = DateUtil.convertDateTimeFormat(obtainedDate),
             obtainedPosition = obtainedPosition
         )
+
         fun List<MyEggModel>.currentPlayEgg(): MyEggModel? = find { it.play }
     }
 
