@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 
 abstract class BaseViewModel : ViewModel(), DefaultLifecycleObserver {
 
-    abstract val state: State
+    abstract val state: BaseState
 
     private val _event = MutableSharedFlow<BaseEvent>(
         extraBufferCapacity = Int.MAX_VALUE,

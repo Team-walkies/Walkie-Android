@@ -13,6 +13,7 @@ sealed class MyPageScreenNav(val route: String) {
     data object Notice : MyPageScreenNav("notice")
     data object PersonalInfoPolicy : MyPageScreenNav("personalInfoPolicy")
     data object RequestUserOpinion : MyPageScreenNav("requestUserOpinion")
+    data object Notification : MyPageScreenNav("notification")
     data object Unlink : MyPageScreenNav("unlink")
 }
 
@@ -29,4 +30,8 @@ sealed class GainEggScreenNav(val route: String) {
 sealed class SpotArchiveScreenNav(val route: String) {
     data object SpotArchive : SpotArchiveScreenNav("spotArchive")
     data object SpotReviewModify : SpotArchiveScreenNav("spotReviewModify")
+}
+sealed class NoticeScreenNav(val route: String) {
+    data object NoticeList : NoticeScreenNav("noticeList")
+    data object NoticeDetail : NoticeScreenNav("noticeDetail")
 }

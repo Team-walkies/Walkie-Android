@@ -1,6 +1,5 @@
 package com.startup.home.spot
 
-import android.text.Layout
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,10 +20,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -41,7 +38,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,7 +57,6 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import kotlin.math.ceil
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,7 +96,7 @@ internal fun SpotArchiveScreen(
         ) {
             Text(
                 modifier = Modifier.padding(vertical = 1.dp),
-                text = DateUtil.convertDateFormat(displayDateWeekFirstDay),
+                text = DateUtil.convertDateTimeFormat(displayDateWeekFirstDay),
                 style = WalkieTheme.typography.head2.copy(color = WalkieTheme.colors.gray700)
             )
             Spacer(modifier = Modifier.width(8.dp))

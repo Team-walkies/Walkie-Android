@@ -1,6 +1,7 @@
 package com.startup.home
 
 import com.startup.common.base.ScreenNavigationEvent
+import com.startup.common.base.UiEvent
 
 sealed interface MainScreenNavigationEvent : ScreenNavigationEvent {
     data object MoveToLoginActivity : MainScreenNavigationEvent
@@ -20,6 +21,12 @@ sealed interface MyPageScreenNavigationEvent : ScreenNavigationEvent {
     data object MoveToNotice : MyPageScreenNavigationEvent
     data object MoveToPersonalInfoPolicy : MyPageScreenNavigationEvent
     data object MoveToRequestUserOpinion : MyPageScreenNavigationEvent
-    data object MoveToUnlink : MyPageScreenNavigationEvent
-    data object MoveToLoginActivity : MyPageScreenNavigationEvent
+    data class MoveToUnlink(val nickName : String) : MyPageScreenNavigationEvent
+    data object MoveToLoginActivityWithLogout : MyPageScreenNavigationEvent
+    data object MoveToNotification : MyPageScreenNavigationEvent
+}
+
+
+sealed interface MyPageUiEvent : UiEvent {
+    data object OnClickLogout: MyPageUiEvent
 }

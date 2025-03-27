@@ -15,9 +15,14 @@ import androidx.compose.ui.unit.dp
 import com.startup.ui.WalkieTheme
 
 @Composable
-fun DangerButton(text: String, enabled: Boolean = true, onClick: () -> Unit) {
+fun DangerButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    enabled: Boolean = true,
+    onClick: () -> Unit
+) {
     Button(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(54.dp),
         onClick = onClick,
@@ -39,8 +44,8 @@ fun DangerButton(text: String, enabled: Boolean = true, onClick: () -> Unit) {
 fun PreviewDangerButton() {
     WalkieTheme {
         Column(verticalArrangement = Arrangement.spacedBy(30.dp)) {
-            DangerButton("버튼", true) {}
-            DangerButton("버튼", false) {}
+            DangerButton(text = "버튼", enabled = true) {}
+            DangerButton(text = "버튼", enabled = false) {}
         }
     }
 }

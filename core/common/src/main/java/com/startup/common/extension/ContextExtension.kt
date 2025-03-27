@@ -2,6 +2,7 @@ package com.startup.common.extension
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import android.util.Log
@@ -23,5 +24,16 @@ fun Context.openBrowser(url: String) {
         startActivity(webIntent)
     } catch (e: Exception) {
         Log.e("LMH", "url 이 유효하지 않음")
+    }
+}
+
+fun Context.getAppVersion(): String {
+    return try {
+        val packageInfo = packageManager.getPackageInfo(packageName, 0)
+        packageInfo.versionName ?: "1.0.0"
+    } catch (e: PackageManager.NameNotFoundException) {
+        "1.0.0"
+    } catch (e : Exception) {
+        "1.0.0"
     }
 }

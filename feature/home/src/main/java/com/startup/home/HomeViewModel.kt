@@ -3,7 +3,7 @@ package com.startup.home
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel
-import com.startup.common.base.State
+import com.startup.common.base.BaseState
 import com.startup.common.event.EggHatchingEvent
 import com.startup.domain.provider.StepDataStore
 import com.startup.domain.repository.SpotRepository
@@ -22,7 +22,7 @@ class HomeViewModel @Inject constructor(
     private val spotRepository: SpotRepository
 ) : BaseViewModel() {
     private val _state = mutableStateOf(StepCounterState())
-    override val state: State
+    override val state: BaseState
         get() = _state.value
 
 
@@ -97,4 +97,4 @@ class HomeViewModel @Inject constructor(
 
 data class StepCounterState(
     val steps: Int = 0
-) : State
+) : BaseState

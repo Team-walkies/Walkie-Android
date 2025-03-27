@@ -9,6 +9,13 @@ import java.util.Locale
 
 object DateUtil {
     fun convertDateFormat(dateStr: String): String = kotlin.runCatching {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("yyyy년 M월 d일", Locale.getDefault())
+        val date = inputFormat.parse(dateStr) ?: return ""
+        outputFormat.format(date)
+    }.getOrNull().orEmpty()
+
+    fun convertDateTimeFormat(dateStr: String): String = kotlin.runCatching {
         val inputFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault())
         val outputFormat = SimpleDateFormat("yyyy년 M월 d일", Locale.getDefault())
         val date = inputFormat.parse(dateStr) ?: return ""
@@ -26,7 +33,7 @@ object DateUtil {
     }.getOrNull() ?: LocalTime.now()
 
     /** yyyy년 MM월 */
-    fun convertDateFormat(date: LocalDate): String = kotlin.runCatching {
+    fun convertDateTimeFormat(date: LocalDate): String = kotlin.runCatching {
         val formatter = DateTimeFormatter.ofPattern("yyyy년 MM월")
         date.format(formatter)
     }.getOrNull().orEmpty()

@@ -2,7 +2,7 @@ package com.startup.walkie.splash
 
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel
-import com.startup.common.base.State
+import com.startup.common.base.BaseState
 import com.startup.domain.usecase.GetMyData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(getMyData: GetMyData) : BaseViewModel() {
-    override val state: State = object : State {}
+    override val state: BaseState = object : BaseState {}
 
     init {
         getMyData.invoke(Unit).onEach {

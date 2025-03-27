@@ -21,7 +21,7 @@ data class MyEggModel(
             nowStep = nowStep,
             play = play,
             eggKind = EggKind.rankOfEggKind(rank),
-            obtainedDate = DateUtil.convertDateFormat(obtainedDate),
+            obtainedDate = DateUtil.convertDateTimeFormat(obtainedDate),
             obtainedPosition = obtainedPosition
         )
         fun List<MyEggModel>.currentPlayEgg(): MyEggModel? = find { it.play }

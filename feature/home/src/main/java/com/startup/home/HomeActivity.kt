@@ -264,6 +264,7 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                                 when (it) {
                                     MainScreenNavigationEvent.MoveToLoginActivity -> {
                                         loginModuleNavigator.navigateLoginView(context = this@HomeActivity)
+                                        finish()
                                     }
 
                                     MainScreenNavigationEvent.MoveToSpotActivity -> {
@@ -286,14 +287,27 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                         )
                     }
                     composable(
-                        MainScreenNav.MyPageGraph.route + "/{destination}",
+                        MainScreenNav.MyPageGraph.route + "/{destination}?argument={argument}",
                         arguments = listOf(
                             navArgument("destination") { type = NavType.StringType },
+                            navArgument("argument") {
+                                type = NavType.StringType
+                                nullable = true
+                                defaultValue = null
+                            },
                         )
                     ) { navBackStackEntry ->
+                        val arguments = navBackStackEntry.arguments?.getString("argument")
                         MyPageNavigationGraph(
                             destinationRoute = navBackStackEntry.arguments?.getString("destination")
-                                .orEmpty()
+                                .orEmpty().run {
+                                    if (arguments != null) {
+                                        "$this/${arguments}"
+                                    } else {
+                                        this
+                                    }
+                                },
+                            parentNavController = navController
                         )
                     }
                 }
@@ -310,6 +324,7 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
             }
         }
     }
+
     @EntryPoint
     @InstallIn(SingletonComponent::class)
     interface SpotNavigatorEntryPoint {

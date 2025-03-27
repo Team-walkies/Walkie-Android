@@ -11,6 +11,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.startup.domain.model.member.UserInfo
 import com.startup.home.mypage.MyPageScreen
 import com.startup.home.navigation.BottomNavItem
 import com.startup.home.navigation.HomeScreenNav
@@ -67,12 +68,15 @@ fun MainBottomNavigationScreen(
                 navController.navigate(MainScreenNav.MyPageGraph.route + "/${MyPageScreenNav.RequestUserOpinion.route}")
             }
 
-            MyPageScreenNavigationEvent.MoveToUnlink -> {
-                navController.navigate(MainScreenNav.MyPageGraph.route + "/${MyPageScreenNav.Unlink.route}")
+            is MyPageScreenNavigationEvent.MoveToUnlink -> {
+                navController.navigate(MainScreenNav.MyPageGraph.route + "/${MyPageScreenNav.Unlink.route}?argument=${navigationEvent.nickName}")
             }
 
-            MyPageScreenNavigationEvent.MoveToLoginActivity -> {
+            MyPageScreenNavigationEvent.MoveToLoginActivityWithLogout -> {
                 onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToLoginActivity)
+            }
+            MyPageScreenNavigationEvent.MoveToNotification -> {
+                navController.navigate(MainScreenNav.MyPageGraph.route + "/${MyPageScreenNav.Notification.route}")
             }
         }
     }
@@ -94,6 +98,14 @@ fun MainBottomNavigationScreen(
                 }
                 composable(BottomNavItem.MyPage.route) {
                     MyPageScreen(
+                        userInfo = UserInfo(
+                            memberId = 1,
+                            isPublic = true,
+                            exploredSpotCount = 5,
+                            memberNickName = "승빈짱짱",
+                            memberTier = "초보워키",
+                            memberEmail = ""
+                        ),
                         onNavigationEvent = ::handleMyPageScreenNavigationEvent
                     )
                 }
