@@ -20,7 +20,6 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.startup.common.base.BaseActivity
-import com.startup.common.util.EXTRA_NEED_TO_NICKNAME_SETTING
 import com.startup.login.R
 import com.startup.navigation.HomeModuleNavigator
 import com.startup.ui.WalkieTheme
@@ -66,13 +65,6 @@ class SplashActivity : BaseActivity<SplashUiEvent, SplashNavigationEvent>() {
 
                 SplashNavigationEvent.MoveToOnBoarding -> {
                     startActivity(Intent(this, LoginActivity::class.java))
-                    finish()
-                }
-
-                SplashNavigationEvent.MoveToOnBoardingAndNickNameSet -> {
-                    startActivity(Intent(this, LoginActivity::class.java).apply {
-                        putExtra(EXTRA_NEED_TO_NICKNAME_SETTING, true)
-                    })
                     finish()
                 }
             }

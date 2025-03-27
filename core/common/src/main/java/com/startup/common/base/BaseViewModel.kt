@@ -8,6 +8,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,24 +20,24 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 abstract class BaseViewModel : ViewModel(), DefaultLifecycleObserver {
 
     abstract val state: BaseState
 
-    private val _event = MutableSharedFlow<BaseEvent>(
-        extraBufferCapacity = Int.MAX_VALUE,
+    private val _event = Channel<BaseEvent>(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
-    val event = _event.asSharedFlow()
+    val event = _event.receiveAsFlow()
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private val ioDispatcher = Dispatchers.IO
 
     protected fun notifyEvent(event: BaseEvent) {
         coroutineScope.launch {
-            _event.emit(event)
+            _event.send(event)
         }
     }
 

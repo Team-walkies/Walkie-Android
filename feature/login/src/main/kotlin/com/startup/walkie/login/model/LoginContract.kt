@@ -9,8 +9,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 
-sealed interface LoginNavigationEvent : ScreenNavigationEvent {
+sealed interface LoginNavigationEvent : NavigationEvent {
     data object MoveToMainActivity : LoginNavigationEvent
+}
+sealed interface LoginScreenNavigationEvent : ScreenNavigationEvent {
+    data object MoveToNickNameSettingScreen: LoginNavigationEvent
+    data class MoveToGetCharacterScreen(val nickName: String): LoginNavigationEvent
 }
 
 
@@ -25,6 +29,7 @@ sealed interface LoginUiEvent : UiEvent {
 sealed interface NickNameSettingEvent : UiEvent {
     data class OnNickNameChanged(val nickNameTextFieldValue: TextFieldValue) :
         NickNameSettingEvent
+    data class OnClickNickNameConfirm(val nickName: String): NickNameSettingEvent
 }
 
 sealed interface NickNameNavigationEvent : NavigationEvent {
@@ -34,6 +39,7 @@ sealed interface NickNameNavigationEvent : NavigationEvent {
 interface NickNameViewState : BaseState {
     val nickName: StateFlow<TextFieldValue>
     val placeHolder: StateFlow<String>
+    val providerToken: StateFlow<String?>
 }
 
 class NickNameViewStateImpl : NickNameViewState {
@@ -43,4 +49,5 @@ class NickNameViewStateImpl : NickNameViewState {
         )
     )
     override val placeHolder: MutableStateFlow<String> = MutableStateFlow("닉네임")
+    override val providerToken: MutableStateFlow<String?> = MutableStateFlow(null)
 }

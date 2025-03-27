@@ -3,7 +3,12 @@ package com.startup.data.remote.datasourceimpl
 import androidx.datastore.preferences.core.Preferences
 import com.startup.common.util.KakaoAuthFailException
 import com.startup.common.util.ResponseErrorException
+import com.startup.common.util.UserAuthNotFoundException
 import com.startup.data.datasource.AuthDataSource
+import com.startup.data.local.provider.TokenDataStoreProvider
+import com.startup.data.remote.dto.request.auth.JoinRequest
+import com.startup.data.remote.dto.request.auth.LoginRequest
+import com.startup.data.remote.dto.response.auth.TokenDto
 import com.startup.data.remote.ext.emitRemote
 import com.startup.data.remote.ext.requireNotNull
 import com.startup.data.remote.service.AuthService
@@ -11,7 +16,6 @@ import com.startup.data.remote.service.MemberService
 import com.startup.data.util.ACCESS_TOKEN_KEY_NAME
 import com.startup.data.util.KaKaoLoginClient
 import com.startup.data.util.REFRESH_ACCESS_TOKEN_KEY_NAME
-import com.startup.data.local.provider.TokenDataStoreProvider
 import com.startup.data.util.handleExceptionIfNeed
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -43,16 +47,17 @@ internal class AuthDataSourceImpl @Inject constructor(
     }
 
     override fun login(): Flow<Unit> = callbackFlow {
-        kakaoLogin().map {
-            val item = authService.login(it)
+        kakaoLogin().onEmpty {
+            throw KakaoAuthFailException("로그인 오류")
+        }.map {
+            val item = authService.login(LoginRequest(provider = "kakao", loginAccessToken = it))
             if (item.status != 200) {
-                throw ResponseErrorException(item.message.orEmpty())
+                throw UserAuthNotFoundException(
+                    message = item.message.orEmpty(),
+                    providerToken = it
+                )
             }
             item.data.requireNotNull()
-        }.onEmpty {
-            throw KakaoAuthFailException("로그인 오류")
-        }.catch {
-            throw KakaoAuthFailException("로그인 오류")
         }.onEach {
             tokenDataStoreProvider.putValue(accessTokenKey, it.accessToken!!)
             tokenDataStoreProvider.putValue(refreshTokenKey, it.refreshToken!!)
@@ -74,5 +79,21 @@ internal class AuthDataSourceImpl @Inject constructor(
             kaKaoLoginClient.logout()
             emitRemote(memberService.logout())
         }
+    }
+
+    override fun join(providerToken: String, nickName: String): Flow<Unit> = flow {
+        emitRemote(
+            authService.join(
+                JoinRequest(
+                    provider = "kakao",
+                    loginAccessToken = providerToken,
+                    nickName = nickName
+                )
+            )
+        )
+    }.map {
+        tokenDataStoreProvider.putValue(accessTokenKey, it.accessToken!!)
+        tokenDataStoreProvider.putValue(refreshTokenKey, it.refreshToken!!)
+        Unit
     }
 }

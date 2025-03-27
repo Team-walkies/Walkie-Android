@@ -14,17 +14,21 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.startup.common.base.BaseActivity
+import com.startup.common.base.BaseEvent
 import com.startup.navigation.HomeModuleNavigator
 import com.startup.ui.WalkieTheme
 import com.startup.walkie.login.model.GetCharacterNavigationEvent
 import com.startup.walkie.login.model.LoginNavigationEvent
+import com.startup.walkie.login.model.LoginScreenNavigationEvent
 import com.startup.walkie.login.model.LoginUiEvent
 import com.startup.walkie.login.model.NickNameSettingEvent
 import com.startup.walkie.navigation.LoginScreenNav
@@ -32,6 +36,9 @@ import com.startup.walkie.splash.SplashActivity
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
@@ -49,13 +56,23 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
         super.onCreate(savedInstanceState)
         setContent {
             WalkieTheme {
-                MainContent()
+                MainContent(viewModel.event)
             }
         }
+        handleNavigationEvent(viewModel.event.filterIsInstance())
     }
 
     override fun handleNavigationEvent(navigationEventFlow: Flow<LoginNavigationEvent>) {
-
+        navigationEventFlow.onEach {
+            when (it) {
+                LoginNavigationEvent.MoveToMainActivity -> {
+                    homeModuleNavigator.moveToHomeActivity(this)
+                    finish()
+                }
+                else -> {
+                }
+            }
+        }.launchIn(lifecycleScope)
     }
 
     override fun handleUiEvent(uiEvent: LoginUiEvent) {
@@ -71,18 +88,34 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
             is NickNameSettingEvent.OnNickNameChanged -> {
                 viewModel.onNickNameChanged(uiEvent.nickNameTextFieldValue)
             }
-
-            else -> {
-
+            is NickNameSettingEvent.OnClickNickNameConfirm -> {
+                viewModel.onJoinWalkie(uiEvent.nickName)
             }
         }
     }
 
 
     @Composable
-    fun MainContent() {
+    fun MainContent(eventFlow: Flow<BaseEvent>) {
         val navController = rememberNavController()
         val snackBarHostState = SnackbarHostState()
+
+        // 이벤트 수집
+        LaunchedEffect(Unit) {
+            eventFlow.collect { event ->
+                when (event) {
+                    is LoginScreenNavigationEvent.MoveToNickNameSettingScreen -> {
+                        navController.navigate(LoginScreenNav.NickNameSetting.route)
+                    }
+
+                    is LoginScreenNavigationEvent.MoveToGetCharacterScreen -> {
+                        navController.navigate(LoginScreenNav.NickNameSetting.route + "/${event.nickName}")
+
+                    }
+
+                }
+            }
+        }
         WalkieTheme {
 
             Scaffold(

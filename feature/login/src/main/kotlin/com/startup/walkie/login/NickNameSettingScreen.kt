@@ -69,7 +69,9 @@ fun NickNameSettingScreen(
                     .padding(end = 16.dp)
                     .align(Alignment.CenterEnd)
                     .noRippleClickable {
-
+                        if (enabledSave) {
+                            viewEvent.invoke(NickNameSettingEvent.OnClickNickNameConfirm(nickName = nickName.text))
+                        }
                     },
                 text = stringResource(R.string.onboarding_nick_name_apply),
                 textAlign = TextAlign.End,
@@ -113,10 +115,12 @@ fun NickNameSettingScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Box(modifier = Modifier
-                                    .weight(1F)
-                                    .height(24.dp),
-                                    contentAlignment = Alignment.CenterStart) {
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1F)
+                                        .height(24.dp),
+                                    contentAlignment = Alignment.CenterStart
+                                ) {
                                     if (nickName.text.isBlank()) {
                                         Text(
                                             modifier = Modifier
