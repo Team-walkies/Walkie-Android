@@ -80,6 +80,7 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
             LoginUiEvent.OnClickLoginButton -> {
                 viewModel.onLogin()
             }
+            else -> {}
         }
     }
 
@@ -91,6 +92,7 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
             is NickNameSettingEvent.OnClickNickNameConfirm -> {
                 viewModel.onJoinWalkie(uiEvent.nickName)
             }
+            else -> {}
         }
     }
 
@@ -132,7 +134,7 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
                 ) {
                     NavHost(
                         navController = navController,
-                        startDestination = LoginScreenNav.NickNameSetting.route
+                        startDestination = LoginScreenNav.Onboarding.route
                     ) {
                         composable(LoginScreenNav.Onboarding.route) {
                             LoginScreen(uiEventSender = ::handleUiEvent)
@@ -156,6 +158,7 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
                                     GetCharacterNavigationEvent.MoveToMainActivity -> {
                                         homeModuleNavigator.moveToHomeActivity(this@LoginActivity)
                                     }
+                                    else -> {}
                                 }
                             }
                         }
