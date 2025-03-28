@@ -10,7 +10,7 @@ abstract class BaseComposePermissionRequestDelegator(
 ) {
     protected val deniedBeforeLaunchedPermission = mutableListOf<String>()
 
-    abstract val requestPermissionType: UsePermissionHelper.Permission
+    abstract val requestPermissionTypes: List<UsePermissionHelper.Permission>
 
     abstract val permissionLauncher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>
 
@@ -18,13 +18,16 @@ abstract class BaseComposePermissionRequestDelegator(
 
     @SuppressLint("ComposableNaming")
     fun requestPermissionLauncher() {
-        val permission = UsePermissionHelper.getTypeOfPermission(requestPermissionType)
-        permission
+        val permissions = requestPermissionTypes.flatMap {
+            UsePermissionHelper.getTypeOfPermission(it).toList()
+        }.toTypedArray()
+
+        permissions
             .also { deniedBeforeLaunchedPermission.clear() }
             .filter { shouldShowRequestPermissionRationale(it) }
             .apply {
                 deniedBeforeLaunchedPermission.addAll(this)
             }
-        permissionLauncher.launch(permission)
+        permissionLauncher.launch(permissions)
     }
 }

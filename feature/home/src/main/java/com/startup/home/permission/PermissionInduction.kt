@@ -1,9 +1,9 @@
 package com.startup.home.permission
 
 import android.content.Context
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,217 +15,249 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.startup.common.util.BatteryOptimizationHelper
 import com.startup.common.util.UsePermissionHelper
+import com.startup.common.util.rememberPermissionRequestDelegator
+import com.startup.design_system.widget.button.PrimaryButton
+import com.startup.home.R
 import com.startup.ui.WalkieTheme
 
-/**
- * 권한 상태를 나타내는 데이터 클래스
- */
 data class PermissionState(
     val type: UsePermissionHelper.Permission,
     val isGranted: Boolean,
-    val title: String,
-    val description: String
+    val essential: Boolean = true,
+    @StringRes val title: Int,
+    @StringRes val description: Int,
+    @DrawableRes val iconRes: Int
 )
 
 /**
- * 권한 요청을 처리하는 바텀시트
+ * 바텀시트 공통 컨테이너 컴포넌트
  */
 @Composable
-fun PermissionBottomSheet(
-    permissions: List<PermissionState>,
-    onAllPermissionsGranted: () -> Unit,
+private fun PermissionBottomSheetContainer(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
 ) {
-    val context = LocalContext.current
-
-    // 권한 상태 추적
-    val permissionsState =
-        remember { mutableStateListOf<PermissionState>().apply { addAll(permissions) } }
-
-    // 모든 권한이 허용되었는지 확인
-    val allPermissionsGranted = permissionsState.all { it.isGranted }
-
-    // 권한 분류 - 배터리 최적화를 제외한 일반 권한
-    val normalPermissions = permissionsState.filter {
-        it.type != UsePermissionHelper.Permission.BATTERY_OPTIMIZATION && !it.isGranted
-    }
-
-    // 배터리 최적화 권한 필요 여부
-    val hasBatteryOptimization = permissionsState.any {
-        it.type == UsePermissionHelper.Permission.BATTERY_OPTIMIZATION && !it.isGranted
-    }
-
-    // 권한 거부 카운트 추적 (영구 거절 감지용)
-    val permissionDeniedCount =
-        remember { mutableStateMapOf<UsePermissionHelper.Permission, Int>() }
-
-    // 일반 권한 요청을 위한 런처
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { resultMap ->
-        updatePermissionStates(resultMap, permissionsState, permissionDeniedCount, context)
-
-        // 모든 권한이 허용되었는지 확인
-        if (permissionsState.all { it.isGranted }) {
-            onAllPermissionsGranted()
-        }
-    }
-
-
-    // todo 무조건 바꿔야함
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(
                 WalkieTheme.colors.white,
-                RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
             )
-            .padding(16.dp),
+            .padding(top = 24.dp, start = 16.dp, end = 16.dp, bottom = 28.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        content()
+    }
+}
+
+/**
+ * 권한 요청을 처리하는 바텀시트
+ *
+ * @param permissions 요청할 권한 목록
+ * @param onAllPermissionsGranted 모든 권한이 허용되었을 때 호출할 콜백
+ * @param onShowRationale 권한 설명이 필요할 때 호출할 콜백
+ * @param onNeverAskAgain 영구 거절된 경우 호출할 콜백
+ */
+@Composable
+fun EssentialPermissionBottomSheet(
+    permissions: List<PermissionState>,
+    onAllPermissionsGranted: () -> Unit,
+    onShowRationale: (List<String>) -> Unit = {},
+    onNeverAskAgain: (List<String>) -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+
+    val permissionsState =
+        remember { mutableStateListOf<PermissionState>().apply { addAll(permissions) } }
+
+    val requiredPermissions = permissionsState.filter { !it.isGranted }
+
+    val normalPermissions = requiredPermissions.filter {
+        it.type != UsePermissionHelper.Permission.BATTERY_OPTIMIZATION
+    }
+
+    val hasBatteryOptimization = requiredPermissions.any {
+        it.type == UsePermissionHelper.Permission.BATTERY_OPTIMIZATION
+    }
+
+    // 시스템 권한 타입 목록
+    val systemPermissionTypes = normalPermissions.map { it.type }
+
+    val permissionDelegator = if (systemPermissionTypes.isNotEmpty()) {
+        rememberPermissionRequestDelegator(
+            permissions = systemPermissionTypes,
+            doOnGranted = {
+                systemPermissionTypes.forEach { permissionType ->
+                    val index = permissionsState.indexOfFirst { it.type == permissionType }
+                    if (index != -1) {
+                        permissionsState[index] = permissionsState[index].copy(isGranted = true)
+                    }
+                }
+
+                if (hasBatteryOptimization && !BatteryOptimizationHelper.isBatteryOptimizationIgnored(
+                        context
+                    )
+                ) {
+                    openBatteryOptimizationSettings(context)
+
+                    val batteryIndex = permissionsState.indexOfFirst {
+                        it.type == UsePermissionHelper.Permission.BATTERY_OPTIMIZATION
+                    }
+                    if (batteryIndex != -1) {
+                        permissionsState[batteryIndex] =
+                            permissionsState[batteryIndex].copy(isGranted = true)
+                    }
+                }
+
+                if (permissionsState.all { it.isGranted }) {
+                    onAllPermissionsGranted()
+                }
+            },
+            doOnShouldShowRequestPermissionRationale = onShowRationale,
+            doOnNeverAskAgain = onNeverAskAgain
+        )
+    } else null
+
+    PermissionBottomSheetContainer(modifier = modifier) {
         Text(
-            text = "앱 권한 설정",
-            style = WalkieTheme.typography.head1,
-            color = WalkieTheme.colors.gray700,
-            modifier = Modifier.padding(vertical = 8.dp)
+            text = stringResource(R.string.permission_bottomsheet_title),
+            style = WalkieTheme.typography.head4.copy(color = WalkieTheme.colors.gray700),
+            modifier = Modifier.padding(bottom = 4.dp)
         )
 
         Text(
-            text = "앱을 제대로 사용하기 위해 아래 권한이 필요합니다.",
-            color = WalkieTheme.colors.blue300,
-            style = WalkieTheme.typography.body2,
+            text = stringResource(R.string.permission_bottomsheet_subtitle),
+            style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500),
         )
+
+        Spacer(modifier = Modifier.height(20.dp))
 
         permissionsState.forEach { permission ->
-            PermissionItemWithoutButton(permissionState = permission)
+            if (!permission.isGranted) PermissionItem(permissionState = permission)
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        if (!allPermissionsGranted) {
-            Button(
-                onClick = {
-                    requestPermissions(
-                        normalPermissions = normalPermissions,
-                        hasBatteryOptimization = hasBatteryOptimization,
-                        permissionLauncher = permissionLauncher,
-                        context = context,
-                        permissionsState = permissionsState
+        PrimaryButton(
+            text = stringResource(R.string.permission_bottomsheet_next),
+            onClick = {
+                if (permissionDelegator != null) {
+                    permissionDelegator.requestPermissionLauncher()
+                } else if (hasBatteryOptimization && !BatteryOptimizationHelper.isBatteryOptimizationIgnored(
+                        context
                     )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            ) {
-                Text(text = "모든 권한 허용하기")
-            }
-
-            Button(
-                onClick = { openAppSettings(context) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Settings,
-                        contentDescription = "Settings",
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "설정에서 권한 허용")
+                    // 시스템 권한은 없고 배터리 최적화만 필요한 경우
+                    openBatteryOptimizationSettings(context)
+
+                    val batteryIndex = permissionsState.indexOfFirst {
+                        it.type == UsePermissionHelper.Permission.BATTERY_OPTIMIZATION
+                    }
+                    if (batteryIndex != -1) {
+                        permissionsState[batteryIndex] =
+                            permissionsState[batteryIndex].copy(isGranted = true)
+                    }
+
+                    if (permissionsState.all { it.isGranted }) {
+                        onAllPermissionsGranted()
+                    }
+                } else if (permissionsState.all { it.isGranted }) {
+                    onAllPermissionsGranted()
                 }
             }
-        }
+        )
     }
 }
 
 /**
- * 권한 상태 업데이트 함수
+ * 알림 권한 요청을 위한 바텀시트
+ *
+ * @param onDismiss 취소 시 호출할 콜백
+ * @param onAllowPermission 권한 허용 시 호출할 콜백
+ * @param onShowRationale 권한 설명이 필요할 때 호출할 콜백
+ * @param onNeverAskAgain 다시 묻지 않음으로 설정된 경우 호출할 콜백
+ * @param modifier 컴포넌트에 적용할 Modifier
  */
-private fun updatePermissionStates(
-    resultMap: Map<String, Boolean>,
-    permissionsState: SnapshotStateList<PermissionState>,
-    permissionDeniedCount: SnapshotStateMap<UsePermissionHelper.Permission, Int>,
-    context: Context
+@Composable
+fun NotificationPermissionBottomSheet(
+    onDismiss: () -> Unit,
+    onAllowPermission: () -> Unit,
+    onShowRationale: (List<String>) -> Unit = {},
+    onNeverAskAgain: (List<String>) -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
-    resultMap.forEach { (permission, isGranted) ->
-        // 해당 권한에 맞는 Permission 타입 찾기
-        val permissionType = permissionsState.find { state ->
-            UsePermissionHelper.getTypeOfPermission(state.type).contains(permission)
-        }?.type ?: return@forEach
+    val notificationPermissionDelegator = rememberPermissionRequestDelegator(
+        permissions = listOf(UsePermissionHelper.Permission.POST_NOTIFICATIONS),
+        doOnGranted = onAllowPermission,
+        doOnShouldShowRequestPermissionRationale = onShowRationale,
+        doOnNeverAskAgain = onNeverAskAgain
+    )
 
-        if (isGranted) {
-            // 허용된 권한 업데이트
-            val index = permissionsState.indexOfFirst { it.type == permissionType }
-            if (index != -1) {
-                permissionsState[index] = permissionsState[index].copy(isGranted = true)
+    PermissionBottomSheetContainer(modifier = modifier) {
+        Text(
+            text = stringResource(R.string.permission_notification_title),
+            style = WalkieTheme.typography.head4.copy(color = WalkieTheme.colors.gray700),
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+        Text(
+            text = stringResource(R.string.permission_notification_subtitle),
+            style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500),
+        )
+        Image(
+            painter = painterResource(R.drawable.img_notification_permission),
+            contentDescription = null
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Button(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(54.dp),
+                onClick = onDismiss,
+                enabled = true,
+                colors = ButtonColors(
+                    contentColor = WalkieTheme.colors.gray500,
+                    containerColor = WalkieTheme.colors.gray100,
+                    disabledContentColor = WalkieTheme.colors.gray500,
+                    disabledContainerColor = WalkieTheme.colors.gray100
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    stringResource(R.string.permission_bottomsheet_later),
+                    style = WalkieTheme.typography.body1
+                )
             }
-        } else {
-            // 거부된 권한 카운트 증가
-            permissionDeniedCount[permissionType] = (permissionDeniedCount[permissionType] ?: 0) + 1
 
-            // 영구 거절의 경우 거부된 경우 설정으로 이동
-            if ((permissionDeniedCount[permissionType] ?: 0) >= 2) {
-                openAppSettings(context)
-            }
-        }
-    }
-}
-
-/**
- * 권한 요청 함수
- */
-private fun requestPermissions(
-    normalPermissions: List<PermissionState>,
-    hasBatteryOptimization: Boolean,
-    permissionLauncher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>,
-    context: Context,
-    permissionsState: SnapshotStateList<PermissionState>
-) {
-    // 일반 권한 요청
-    if (normalPermissions.isNotEmpty()) {
-        val permissionsToRequest = normalPermissions
-            .flatMap { UsePermissionHelper.getTypeOfPermission(it.type).toList() }
-            .toTypedArray()
-
-        if (permissionsToRequest.isNotEmpty()) {
-            permissionLauncher.launch(permissionsToRequest)
-        }
-    }
-
-    // 배터리 최적화 권한 요청
-    if (hasBatteryOptimization && !BatteryOptimizationHelper.isBatteryOptimizationIgnored(context)) {
-        openBatteryOptimizationSettings(context)
-
-        // 배터리 최적화 상태 업데이트
-        val index = permissionsState.indexOfFirst {
-            it.type == UsePermissionHelper.Permission.BATTERY_OPTIMIZATION
-        }
-        if (index != -1) {
-            permissionsState[index] = permissionsState[index].copy(isGranted = true)
+            PrimaryButton(
+                modifier = Modifier.weight(1f),
+                text = stringResource(R.string.permission_bottomsheet_notification),
+                onClick = {
+                    notificationPermissionDelegator?.requestPermissionLauncher()
+                }
+            )
         }
     }
 }
@@ -234,47 +266,56 @@ private fun requestPermissions(
  * 권한 항목 컴포넌트
  */
 @Composable
-fun PermissionItemWithoutButton(permissionState: PermissionState) {
-    Row(
-        modifier = Modifier
+fun PermissionItem(
+    permissionState: PermissionState,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(vertical = 8.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(color = WalkieTheme.colors.gray50),
+        horizontalAlignment = Alignment.Start
     ) {
-        Icon(
-            imageVector = if (permissionState.isGranted) Icons.Default.Check else Icons.Default.Warning,
-            contentDescription = "Permission status",
-            tint = if (permissionState.isGranted) WalkieTheme.colors.gray400 else WalkieTheme.colors.blue300
-        )
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 8.dp)
+        Row(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 4.dp)
         ) {
-            Text(
-                text = permissionState.title,
-                style = WalkieTheme.typography.body1,
-                color = WalkieTheme.colors.gray700
+            Image(
+                modifier = Modifier.size(18.dp),
+                painter = painterResource(permissionState.iconRes),
+                contentDescription = "Permission status",
             )
 
+            Spacer(Modifier.width(4.dp))
+
             Text(
-                text = permissionState.description,
-                style = WalkieTheme.typography.caption1,
-                color = WalkieTheme.colors.gray500
+                text = stringResource(permissionState.title),
+                style = WalkieTheme.typography.head6.copy(color = WalkieTheme.colors.gray700),
             )
+
+            Spacer(Modifier.width(4.dp))
+            if (permissionState.essential) {
+                Text(
+                    text = stringResource(R.string.permission_essential),
+                    style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.blue400),
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.permission_optional),
+                    style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500),
+                )
+            }
         }
-    }
-}
 
-/**
- * 시스템 설정의 앱 상세 화면으로 이동하는 함수
- */
-fun openAppSettings(context: Context) {
-    val intent = UsePermissionHelper.getPermissionSettingsIntent(context)
-    context.startActivity(intent)
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
+            text = stringResource(permissionState.description),
+            style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500),
+        )
+    }
 }
 
 /**
@@ -289,28 +330,45 @@ fun openBatteryOptimizationSettings(context: Context) {
 @Composable
 fun PermissionBottomSheetAllGrantedPreview() {
     WalkieTheme {
-        PermissionBottomSheet(
+        EssentialPermissionBottomSheet(
             permissions = listOf(
                 PermissionState(
                     type = UsePermissionHelper.Permission.ACTIVITY_RECOGNITION,
-                    isGranted = true,
-                    title = "신체 활동 권한",
-                    description = "걸음수 측정을 위해서 필요합니다."
+                    isGranted = false,
+                    essential = true,
+                    title = R.string.permission_activity_recognition,
+                    description = R.string.permission_activity_recognition_description,
+                    iconRes = R.drawable.ic_activity
                 ),
                 PermissionState(
-                    type = UsePermissionHelper.Permission.POST_NOTIFICATIONS,
-                    isGranted = true,
-                    title = "카메라",
-                    description = "정확한 걸음수 측정과 알림 수신을 위해 필요합니다."
+                    type = UsePermissionHelper.Permission.FOREGROUND_LOCATION,
+                    isGranted = false,
+                    essential = true,
+                    title = R.string.permission_location,
+                    description = R.string.permission_location_description,
+                    iconRes = R.drawable.ic_loaction_permission
                 ),
                 PermissionState(
                     type = UsePermissionHelper.Permission.BATTERY_OPTIMIZATION,
+                    essential = false,
                     isGranted = true,
-                    title = "배터리 최적화 제외",
-                    description = "백그라운드에서 앱이 원활하게 작동하기 위해 필요합니다."
+                    title = R.string.permission_battery_optimization,
+                    description = R.string.permission_battery_optimization_description,
+                    iconRes = R.drawable.ic_battery
                 )
             ),
             onAllPermissionsGranted = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PermissionBottomSheetNotification() {
+    WalkieTheme {
+        NotificationPermissionBottomSheet(
+            onDismiss = {},
+            onAllowPermission = {}
         )
     }
 }

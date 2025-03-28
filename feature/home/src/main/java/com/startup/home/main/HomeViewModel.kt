@@ -1,8 +1,9 @@
 package com.startup.home.main
 
 import androidx.lifecycle.viewModelScope
-import com.startup.common.base.BaseViewModel
 import com.startup.common.base.BaseState
+import com.startup.common.base.BaseViewModel
+import com.startup.common.base.UiEvent
 import com.startup.common.event.EggHatchingEvent
 import com.startup.domain.model.member.UserInfo
 import com.startup.domain.provider.StepDataStore
@@ -13,9 +14,12 @@ import com.startup.domain.usecase.GetMyData
 import com.startup.stepcounter.service.StepCounterService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -30,6 +34,9 @@ class HomeViewModel @Inject constructor(
     getMyData: GetMyData,
     private val spotRepository: SpotRepository
 ) : BaseViewModel() {
+
+    private val _showActivityPermissionAlert = MutableStateFlow(false)
+
     private val _state = HomeViewStateImpl(
         steps = stepCounter.observeSteps()
             .stateInViewModel(0),
@@ -46,16 +53,29 @@ class HomeViewModel @Inject constructor(
             .catch {
 
             }.stateInViewModel(null),
+        showActivityPermissionAlert = _showActivityPermissionAlert.stateInViewModel(false)
     )
     override val state: HomeViewState
         get() = _state
 
+    private val _uiEventFlow = MutableSharedFlow<UiEvent>(
+        extraBufferCapacity = 10,
+        replay = 1
+
+    )
+    val uiEventFlow: SharedFlow<UiEvent> = _uiEventFlow.asSharedFlow()
 
     private val _hatchingInfo = MutableStateFlow<Boolean?>(null)
     val hatchingInfo: StateFlow<Boolean?> = _hatchingInfo
 
     fun onHatchingAnimationDismissed() {
         _hatchingInfo.value = null
+    }
+
+    fun emitUiEvent(event: UiEvent) {
+        viewModelScope.launch {
+            _uiEventFlow.emit(event)
+        }
     }
 
     init {
@@ -82,6 +102,10 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             stepCounter.resetSteps()
         }
+    }
+
+    fun setActivityPermissionAlertState(show: Boolean) {
+        _showActivityPermissionAlert.value = show
     }
 
     fun initTodayStep() {
@@ -119,11 +143,13 @@ interface HomeViewState : BaseState {
     val currentHatchedCharacterCount: StateFlow<Int>
     val currentGainEggCount: StateFlow<Int>
     val userInfo: StateFlow<UserInfo?>
+    val showActivityPermissionAlert: StateFlow<Boolean>
 }
 
 class HomeViewStateImpl(
     override val steps: StateFlow<Int>,
     override val currentHatchedCharacterCount: StateFlow<Int>,
     override val currentGainEggCount: StateFlow<Int>,
-    override val userInfo: StateFlow<UserInfo?>
+    override val userInfo: StateFlow<UserInfo?>,
+    override val showActivityPermissionAlert: StateFlow<Boolean>
 ) : HomeViewState
