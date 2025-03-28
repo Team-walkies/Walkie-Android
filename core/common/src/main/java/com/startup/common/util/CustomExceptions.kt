@@ -27,6 +27,12 @@ class ResponseErrorException(
     val code: Int? = null
 ) : Exception(message), WalkieException
 
+class UserAuthNotFoundException(
+    override val message: String? = null,
+    val providerToken: String,
+    val code: Int? = null
+) : Exception(message), WalkieException
+
 class KakaoAuthFailException(
     override val message: String? = null,
     val code: Int? = null

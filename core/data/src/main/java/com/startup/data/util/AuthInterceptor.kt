@@ -3,6 +3,7 @@ package com.startup.data.util
 import androidx.datastore.preferences.core.Preferences
 import com.startup.common.util.Printer
 import com.startup.common.util.SessionExpireException
+import com.startup.common.util.SessionManager
 import com.startup.data.local.provider.TokenDataStoreProvider
 import com.startup.data.remote.service.AuthService
 import kotlinx.coroutines.runBlocking
@@ -17,6 +18,7 @@ import javax.inject.Singleton
 @Singleton
 internal class AuthInterceptor @Inject constructor(
     private val tokenDataStoreProvider: TokenDataStoreProvider,
+    private val sessionManager: SessionManager,
     private val authService: AuthService,
     @Named(ACCESS_TOKEN_KEY_NAME) private val accessTokenKey: Preferences.Key<String>,
     @Named(REFRESH_ACCESS_TOKEN_KEY_NAME) private val refreshTokenKey: Preferences.Key<String>,
@@ -51,6 +53,7 @@ internal class AuthInterceptor @Inject constructor(
                 runCatching { authService.refreshTokenUpdate(BEARER + refreshToken) }.getOrNull()
             val data = refreshResponse?.data
             if (refreshResponse?.status != 200 || data == null) {
+                sessionManager.notifySessionExpired()
                 throw SessionExpireException("세션 만료")
             } else {
                 tokenDataStoreProvider.putValue(accessTokenKey, data.accessToken.orEmpty())
@@ -66,6 +69,7 @@ internal class AuthInterceptor @Inject constructor(
             .build()
         val response = chain.proceed(newRequest)
         if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            sessionManager.notifySessionExpired()
             throw SessionExpireException("세션 만료")
         }
         return response

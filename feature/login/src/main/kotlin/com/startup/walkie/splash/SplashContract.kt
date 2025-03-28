@@ -10,6 +10,5 @@ sealed interface SplashUiEvent : UiEvent {
 
 sealed interface SplashNavigationEvent : ScreenNavigationEvent {
     data object MoveToMainActivity : SplashNavigationEvent
-    data object MoveToOnBoardingAndNickNameSet : SplashNavigationEvent
     data object MoveToOnBoarding : SplashNavigationEvent
 }

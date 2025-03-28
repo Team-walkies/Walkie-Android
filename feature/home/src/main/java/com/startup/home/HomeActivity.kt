@@ -326,6 +326,11 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
         }
     }
 
+    override fun navigateToLogin() {
+        loginModuleNavigator.navigateLoginView(this)
+        finish()
+    }
+
     @EntryPoint
     @InstallIn(SingletonComponent::class)
     interface SpotNavigatorEntryPoint {

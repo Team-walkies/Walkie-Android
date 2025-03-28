@@ -18,11 +18,7 @@ class SplashViewModel @Inject constructor(getMyData: GetMyData) : BaseViewModel(
     init {
         getMyData.invoke(Unit).onEach {
             delay(2_000)
-            if (it.memberNickName.isBlank()) {
-                notifyEvent(SplashNavigationEvent.MoveToOnBoardingAndNickNameSet)
-            } else {
-                notifyEvent(SplashNavigationEvent.MoveToMainActivity)
-            }
+            notifyEvent(SplashNavigationEvent.MoveToMainActivity)
         }.catch {
             delay(2_000)
             notifyEvent(SplashNavigationEvent.MoveToOnBoarding)

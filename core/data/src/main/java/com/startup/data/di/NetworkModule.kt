@@ -1,5 +1,6 @@
 package com.startup.data.di
 
+import com.startup.common.util.SessionManager
 import com.startup.data.BuildConfig
 import com.startup.data.annotations.AuthHttpClient
 import com.startup.data.annotations.AuthRetrofit
