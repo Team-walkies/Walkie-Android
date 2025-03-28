@@ -12,7 +12,11 @@ data class EggDetailModel(
     val obtainedPosition: String,
 ) {
     companion object {
-        fun EggDetail.toUiModel(): EggDetailModel = EggDetailModel(
+        fun List<EggDetail>.toUiModel(): List<EggDetailModel> = map {
+            it.toUiModel()
+        }
+
+        private fun EggDetail.toUiModel(): EggDetailModel = EggDetailModel(
             eggId = eggId,
             needStep = needStep,
             nowStep = nowStep,

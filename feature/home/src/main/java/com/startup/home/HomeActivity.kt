@@ -39,6 +39,7 @@ import com.startup.common.util.BatteryOptimizationHelper
 import com.startup.common.util.OsVersions
 import com.startup.common.util.UsePermissionHelper
 import com.startup.design_system.widget.bottom_sheet.WalkieDragHandle
+import com.startup.home.main.HomeViewModel
 import com.startup.home.navigation.HomeNavigationGraph
 import com.startup.home.navigation.MainScreenNav
 import com.startup.home.navigation.MyPageNavigationGraph

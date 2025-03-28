@@ -3,7 +3,7 @@ package com.startup.data.remote
 import com.google.gson.annotations.SerializedName
 
 data class BaseResponse<T : Any?>(
-    @SerializedName("success")
+    @SerializedName("status")
     val status: Int?,
     @SerializedName("message")
     val message: String?,

@@ -1,17 +1,23 @@
-package com.startup.home
+package com.startup.home.main
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel
 import com.startup.common.base.BaseState
 import com.startup.common.event.EggHatchingEvent
+import com.startup.domain.model.member.UserInfo
 import com.startup.domain.provider.StepDataStore
 import com.startup.domain.repository.SpotRepository
+import com.startup.domain.usecase.GetGainEggCount
+import com.startup.domain.usecase.GetHatchedCharacterCount
+import com.startup.domain.usecase.GetMyData
 import com.startup.stepcounter.service.StepCounterService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,11 +25,30 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val stepCounter: StepCounterService,
     private val dataStore: StepDataStore,
+    getGainEggCount: GetGainEggCount,
+    getHatchedCharacterCount: GetHatchedCharacterCount,
+    getMyData: GetMyData,
     private val spotRepository: SpotRepository
 ) : BaseViewModel() {
-    private val _state = mutableStateOf(StepCounterState())
-    override val state: BaseState
-        get() = _state.value
+    private val _state = HomeViewStateImpl(
+        steps = stepCounter.observeSteps()
+            .stateInViewModel(0),
+        currentGainEggCount =
+        getGainEggCount.invoke(Unit)
+            .catch {
+
+            }.stateInViewModel(0),
+        currentHatchedCharacterCount = getHatchedCharacterCount.invoke(Unit)
+            .catch {
+
+            }.stateInViewModel(0),
+        userInfo = getMyData.invoke(Unit)
+            .catch {
+
+            }.stateInViewModel(null),
+    )
+    override val state: HomeViewState
+        get() = _state
 
 
     private val _hatchingInfo = MutableStateFlow<Boolean?>(null)
@@ -34,12 +59,6 @@ class HomeViewModel @Inject constructor(
     }
 
     init {
-        viewModelScope.launch {
-            stepCounter.observeSteps()
-                .collect { steps ->
-                    _state.value = StepCounterState(steps = steps)
-                }
-        }
         viewModelScope.launch {
             EggHatchingEvent.hatchingAnimationFlow.collect { info ->
                 _hatchingInfo.value = info
@@ -95,6 +114,16 @@ class HomeViewModel @Inject constructor(
     }
 }
 
-data class StepCounterState(
-    val steps: Int = 0
-) : BaseState
+interface HomeViewState : BaseState {
+    val steps: StateFlow<Int>
+    val currentHatchedCharacterCount: StateFlow<Int>
+    val currentGainEggCount: StateFlow<Int>
+    val userInfo: StateFlow<UserInfo?>
+}
+
+class HomeViewStateImpl(
+    override val steps: StateFlow<Int>,
+    override val currentHatchedCharacterCount: StateFlow<Int>,
+    override val currentGainEggCount: StateFlow<Int>,
+    override val userInfo: StateFlow<UserInfo?>
+) : HomeViewState

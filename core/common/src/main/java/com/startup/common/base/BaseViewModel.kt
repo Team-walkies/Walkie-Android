@@ -2,6 +2,7 @@ package com.startup.common.base
 
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.startup.domain.util.BaseUseCase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -9,12 +10,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 abstract class BaseViewModel : ViewModel(), DefaultLifecycleObserver {
@@ -75,4 +79,13 @@ abstract class BaseViewModel : ViewModel(), DefaultLifecycleObserver {
                 onCompleted()
             }.flowOn(ioDispatcher)
     }
+
+    protected fun <T> Flow<T>.stateInViewModel(
+        initialValue: T,
+        scope: CoroutineScope = viewModelScope
+    ): StateFlow<T> = this.stateIn(
+        scope = scope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = initialValue
+    )
 }

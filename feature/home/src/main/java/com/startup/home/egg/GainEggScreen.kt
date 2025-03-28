@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.startup.common.util.DateUtil
 import com.startup.common.util.EMPTY_STRING
 import com.startup.design_system.widget.actionbar.PageActionBar
@@ -48,9 +49,12 @@ import com.startup.design_system.widget.progress.ProgressMedium
 import com.startup.design_system.widget.tag.TagMedium
 import com.startup.home.R
 import com.startup.home.egg.model.EggKind
+import com.startup.home.egg.model.GainEggViewState
+import com.startup.home.egg.model.GainEggViewStateImpl
 import com.startup.home.egg.model.MyEggModel
 import com.startup.ui.WalkieTheme
 import com.startup.ui.noRippleClickable
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -58,9 +62,10 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GainEggScreen(
-    eggList: List<MyEggModel>,
+    viewState: GainEggViewState,
     onNavigationEvent: (GainEggScreenNavigationEvent) -> Unit
 ) {
+    val eggList by viewState.eggList.collectAsStateWithLifecycle()
     var selectedEgg: MyEggModel? by remember {
         mutableStateOf(null)
     }
@@ -112,7 +117,9 @@ fun GainEggScreen(
                 }
                 item {
                     LazyVerticalGrid(
-                        modifier = Modifier.padding(top = 20.dp).height(pagerHeight),
+                        modifier = Modifier
+                            .padding(top = 20.dp)
+                            .height(pagerHeight),
                         columns = GridCells.Fixed(MAX_COLUMN_COUNT),
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -333,38 +340,7 @@ private fun PreviewBottomModal() {
 @Composable
 private fun PreviewGainEggScreen() {
     WalkieTheme {
-        GainEggScreen(
-            listOf(
-                MyEggModel(
-                    eggId = 0,
-                    nowStep = 8334,
-                    needStep = 10000,
-                    play = true,
-                    characterId = -1,
-                    eggKind = EggKind.Legend,
-                    obtainedPosition = "대전시 유성구",
-                    obtainedDate = DateUtil.convertDateTimeFormat("2024-01-12 12:20:10"),
-                ), MyEggModel(
-                    eggId = 3,
-                    nowStep = 8334,
-                    needStep = 10000,
-                    play = false,
-                    characterId = -1,
-                    eggKind = EggKind.Legend,
-                    obtainedPosition = "대전시 유성구",
-                    obtainedDate = DateUtil.convertDateTimeFormat("2024-01-12 12:20:10"),
-                ), MyEggModel(
-                    eggId = 2,
-                    nowStep = 8334,
-                    needStep = 10000,
-                    play = false,
-                    characterId = -1,
-                    eggKind = EggKind.Epic,
-                    obtainedPosition = "대전시 유성구",
-                    obtainedDate = DateUtil.convertDateTimeFormat("2024-01-12 12:20:10"),
-                )
-            ), {}
-        )
+        GainEggScreen(GainEggViewStateImpl(eggList = MutableStateFlow(emptyList()))) {}
     }
 }
 

@@ -11,6 +11,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.startup.home.main.HomeScreen
 import com.startup.domain.model.member.UserInfo
 import com.startup.home.mypage.MyPageScreen
 import com.startup.home.navigation.BottomNavItem
@@ -101,7 +102,12 @@ fun MainBottomNavigationScreen(
                         userInfo = UserInfo(
                             memberId = 1,
                             isPublic = true,
-                            exploredSpotCount = 5,
+                            exploredSpot = 5,
+                            recordedSpot = 2,
+                            provider = "",
+                            userCharacterId = 1,
+                            providerId = "",
+                            eggId = 1,
                             memberNickName = "승빈짱짱",
                             memberTier = "초보워키",
                             memberEmail = ""

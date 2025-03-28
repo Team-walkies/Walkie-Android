@@ -10,21 +10,36 @@ data class GetUserInfoResponse(
     val memberId: Long?,
     @SerializedName("memberEmail")
     val memberEmail: String?,
-    @SerializedName("memberNickName")
-    val memberNickName: String?,
-    @SerializedName("exploredSpotCount")
-    val exploredSpotCount: Int?,
+    @SerializedName("nickname")
+    val nickname: String?,
     @SerializedName("isPublic")
     val isPublic: Boolean?,
     @SerializedName("memberTier")
-    val memberTier: String?
+    val memberTier: String?,
+    @SerializedName("providerId")
+    val providerId: String?,
+    @SerializedName("provider")
+    val provider: String?,
+    @SerializedName("exploredSpot")
+    val exploredSpot: Int?,
+    @SerializedName("recordedSpot")
+    val recordedSpot: Int?,
+    @SerializedName("userCharacterId")
+    val userCharacterId: Long?,
+    @SerializedName("eggId")
+    val eggId: Long?
 ) {
     fun toDomain(): UserInfo = UserInfo(
         memberId = memberId.orZero(),
         memberEmail = memberEmail.orEmpty(),
-        memberNickName = memberNickName.orEmpty(),
-        exploredSpotCount = exploredSpotCount.orZero(),
+        memberNickName = nickname.orEmpty(),
         isPublic = isPublic.orFalse(),
-        memberTier = memberTier.orEmpty()
+        memberTier = memberTier.orEmpty(),
+        providerId = providerId.orEmpty(),
+        provider = provider.orEmpty(),
+        exploredSpot = exploredSpot.orZero(),
+        recordedSpot = recordedSpot.orZero(),
+        userCharacterId = userCharacterId.orZero(),
+        eggId = eggId.orZero()
     )
 }

@@ -35,8 +35,7 @@ import com.startup.ui.noRippleClickable
 import com.startup.walkie.login.model.NickNameSettingEvent
 import com.startup.walkie.login.model.NickNameViewState
 import com.startup.walkie.login.model.NickNameViewStateImpl
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import hasSpecialCharacters
 
 @Composable
 fun NickNameSettingScreen(
@@ -47,7 +46,7 @@ fun NickNameSettingScreen(
     val disableTextColor = WalkieTheme.colors.gray400
     val placeHolder by viewState.placeHolder.collectAsStateWithLifecycle()
     val nickName by viewState.nickName.collectAsStateWithLifecycle()
-    val nickNameContainedSpecialCharacters by viewState.nickNameContainedSpecialCharacters.collectAsStateWithLifecycle()
+    val nickNameContainedSpecialCharacters by remember { derivedStateOf { nickName.text.hasSpecialCharacters() } }
     val enabledSave by remember { derivedStateOf { nickName.text.isNotBlank() && !nickNameContainedSpecialCharacters } }
     val underLineColor =
         if (nickNameContainedSpecialCharacters) WalkieTheme.colors.red100 else if (enabledSave) WalkieTheme.colors.blue300 else WalkieTheme.colors.gray200
@@ -180,6 +179,6 @@ fun NickNameSettingScreen(
 @Preview(showBackground = true)
 fun PreviewNickNameSettingScreen() {
     WalkieTheme {
-        NickNameSettingScreen(NickNameViewStateImpl(CoroutineScope(Dispatchers.Main.immediate)), {})
+        NickNameSettingScreen(NickNameViewStateImpl(), {})
     }
 }

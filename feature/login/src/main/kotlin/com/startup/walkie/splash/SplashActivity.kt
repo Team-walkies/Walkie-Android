@@ -60,7 +60,7 @@ class SplashActivity : BaseActivity<SplashUiEvent, SplashNavigationEvent>() {
         navigationEventFlow.onEach {
             when (it) {
                 SplashNavigationEvent.MoveToMainActivity -> {
-                    homeModuleNavigator.moveToHomeActivity(this)
+                    startActivity(Intent(this, LoginActivity::class.java))
                     finish()
                 }
 

@@ -21,16 +21,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.startup.common.base.BaseActivity
 import com.startup.common.base.NavigationEvent
 import com.startup.common.base.UiEvent
 import com.startup.common.util.OsVersions
-import com.startup.home.StepCounterState
-import com.startup.home.HomeViewModel
+import com.startup.home.main.HomeViewModel
+import com.startup.home.main.HomeViewState
 import com.startup.ui.WalkieTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
@@ -65,7 +67,7 @@ class StepCounterActivity : BaseActivity<UiEvent, NavigationEvent>() {
 
         setContent {
             WalkieTheme {
-                val currentState = viewModel.state as StepCounterState
+                val currentState = viewModel.state
                 StepCounterScreen(
                     uiState = currentState,
                     resetStep = { viewModel.resetStepCount() }
@@ -114,10 +116,11 @@ class StepCounterActivity : BaseActivity<UiEvent, NavigationEvent>() {
 
 @Composable
 fun StepCounterScreen(
-    uiState: StepCounterState,
+    uiState: HomeViewState,
     modifier: Modifier = Modifier,
     resetStep: () -> Unit
 ) {
+    val steps by uiState.steps.collectAsStateWithLifecycle()
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -132,7 +135,7 @@ fun StepCounterScreen(
         )
 
         Text(
-            text = "${uiState.steps}",
+            text = "$steps",
             style = WalkieTheme.typography.head1,
             color = WalkieTheme.colors.black
         )
