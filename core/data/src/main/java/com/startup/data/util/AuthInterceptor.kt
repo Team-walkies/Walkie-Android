@@ -1,6 +1,7 @@
 package com.startup.data.util
 
 import androidx.datastore.preferences.core.Preferences
+import com.startup.common.util.EMPTY_STRING
 import com.startup.common.util.Printer
 import com.startup.common.util.SessionExpireException
 import com.startup.common.util.SessionManager
@@ -8,6 +9,8 @@ import com.startup.data.local.provider.LogoutManager
 import com.startup.data.local.provider.TokenDataStoreProvider
 import com.startup.data.remote.dto.request.auth.RefreshRequest
 import com.startup.data.remote.service.AuthService
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -26,12 +29,12 @@ internal class AuthInterceptor @Inject constructor(
     @Named(ACCESS_TOKEN_KEY_NAME) private val accessTokenKey: Preferences.Key<String>,
     @Named(REFRESH_ACCESS_TOKEN_KEY_NAME) private val refreshTokenKey: Preferences.Key<String>,
 ) : Interceptor {
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
     override fun intercept(chain: Interceptor.Chain): Response {
         val accessToken = runBlocking {
-            // TODO defaultValue 제거
             tokenDataStoreProvider.getValue(
                 accessTokenKey,
-                "eyJhbGciOiJIUzI1NiJ9.eyJwcm92aWRlcklkIjoiMzk1ODI1NjA0MCIsIm1lbWJlcklkIjo2LCJpYXQiOjE3NDI5MDc2MjEsImV4cCI6MTc0NTQ5OTYyMX0.1VSczNwwq6jALTcJwW3qiotSb2PieySdGdPFjwjmDGI"
+                EMPTY_STRING
             )
         }
 
@@ -43,33 +46,30 @@ internal class AuthInterceptor @Inject constructor(
         return if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
             Printer.e("LMH", "accessToken 만료 $accessToken")
             response.close()
-            refreshTokenUpdate(chain)
+            runBlocking(ioDispatcher) { refreshTokenUpdate(chain) }
         } else {
             response
         }
     }
 
-    private fun refreshTokenUpdate(
+    private suspend fun refreshTokenUpdate(
         chain: Interceptor.Chain,
     ): Response {
-        runBlocking {
-            val refreshToken =
-                tokenDataStoreProvider.getValue(refreshTokenKey, "")
-            val refreshResponse =
-                runCatching { authService.refreshTokenUpdate(RefreshRequest(refreshToken)) }.getOrNull()
-            val data = refreshResponse?.data
-            if (refreshResponse?.status != 200 || data == null) {
-                logoutManager.logout()
-                sessionManager.notifySessionExpired()
-                Printer.e("LMH", "refresh 토큰 세션 만료")
-            } else {
-                tokenDataStoreProvider.putValue(accessTokenKey, data.accessToken.orEmpty())
-                tokenDataStoreProvider.putValue(refreshTokenKey, data.refreshToken.orEmpty())
-                Printer.e("LMH", "토큰 재 발급")
-            }
+        val refreshToken =
+            tokenDataStoreProvider.getValue(refreshTokenKey, "")
+        val refreshResponse = runCatching { authService.refreshTokenUpdate(RefreshRequest(refreshToken)) }.getOrNull()
+        val data = refreshResponse?.data
+        if (refreshResponse?.status != 200 || data == null) {
+            logoutManager.logout()
+            sessionManager.notifySessionExpired()
+            Printer.e("LMH", "refresh 토큰 세션 만료")
+        } else {
+            tokenDataStoreProvider.putValue(accessTokenKey, data.accessToken.orEmpty())
+            tokenDataStoreProvider.putValue(refreshTokenKey, data.refreshToken.orEmpty())
+            Printer.e("LMH", "토큰 재 발급")
         }
 
-        val newToken = runBlocking { tokenDataStoreProvider.getValue(accessTokenKey, "") }
+        val newToken = tokenDataStoreProvider.getValue(accessTokenKey, "")
         Printer.e("LMH", "refreshTokenUpdate $newToken")
         val newRequest = chain.request().newBuilder()
             .removeHeader("Authorization")
@@ -77,7 +77,7 @@ internal class AuthInterceptor @Inject constructor(
             .build()
         val response = chain.proceed(newRequest)
         if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
-            runBlocking { logoutManager.logout() }
+            logoutManager.logout()
             sessionManager.notifySessionExpired()
             Printer.e("LMH", "refresh 토큰 세션 만료")
         }
