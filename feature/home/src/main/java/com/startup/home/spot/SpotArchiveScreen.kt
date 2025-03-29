@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -131,7 +132,7 @@ internal fun SpotArchiveScreen(
         WalkieWeekCalendar(
             events = events,
             onWeekChanged = {
-                displayDateWeekFirstDay = it
+                displayDateWeekFirstDay = getStartOfWeek(it)
                 selectedDate = CalendarModel(it, false)
             },
             selectDate = selectedDate,
@@ -391,6 +392,7 @@ private fun WalkieWeekCalendar(
         initialPage = Int.MAX_VALUE,
         pageCount = { Int.MAX_VALUE }
     )
+    val currentSelectedDate by rememberUpdatedState(selectDate)
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(selectDate.isSpecificDate) {
@@ -404,6 +406,7 @@ private fun WalkieWeekCalendar(
                             ((Int.MAX_VALUE) - (weeksDifference.toInt()) - 1),
                             animationSpec = tween(500)
                         )
+                    }.getOrElse {
                         onCompleteMove.invoke()
                     }
                 }
@@ -416,9 +419,9 @@ private fun WalkieWeekCalendar(
         snapshotFlow {
             pagerState.currentPage to pagerState.isScrollInProgress
         }.collect { (page, isScrolling) ->
-            if (!isScrolling && !selectDate.isSpecificDate) {
+            if (!isScrolling && !currentSelectedDate.isSpecificDate) {
                 val startOfWeek = today.plusWeeks((page.toLong() + 1) - Int.MAX_VALUE.toLong())
-                onWeekChanged(getStartOfWeek(startOfWeek))
+                onWeekChanged(startOfWeek)
             }
         }
     }

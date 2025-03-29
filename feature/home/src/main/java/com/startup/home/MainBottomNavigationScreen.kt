@@ -7,14 +7,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.startup.domain.model.member.UserInfo
 import com.startup.home.main.HomeScreen
 import com.startup.home.main.HomeViewModel
 import com.startup.home.mypage.MyPageScreen
+import com.startup.home.mypage.MyPageViewModel
 import com.startup.home.navigation.BottomNavItem
 import com.startup.home.navigation.HomeScreenNav
 import com.startup.home.navigation.MainScreenNav
@@ -26,6 +27,7 @@ fun MainBottomNavigationScreen(
     navController: NavController,
     homeViewModel: HomeViewModel,
     onNavigationEvent: (MainScreenNavigationEvent) -> Unit,
+    myPageViewModel: MyPageViewModel = hiltViewModel(),
 ) {
     val navHostController = rememberNavController()
 
@@ -78,6 +80,7 @@ fun MainBottomNavigationScreen(
             MyPageScreenNavigationEvent.MoveToLoginActivityWithLogout -> {
                 onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToLoginActivity)
             }
+
             MyPageScreenNavigationEvent.MoveToNotification -> {
                 navController.navigate(MainScreenNav.MyPageGraph.route + "/${MyPageScreenNav.Notification.route}")
             }
@@ -102,19 +105,7 @@ fun MainBottomNavigationScreen(
                 }
                 composable(BottomNavItem.MyPage.route) {
                     MyPageScreen(
-                        userInfo = UserInfo(
-                            memberId = 1,
-                            isPublic = true,
-                            exploredSpot = 5,
-                            recordedSpot = 2,
-                            provider = "",
-                            userCharacterId = 1,
-                            providerId = "",
-                            eggId = 1,
-                            memberNickName = "승빈짱짱",
-                            memberTier = "초보워키",
-                            memberEmail = ""
-                        ),
+                        myInfoViewState = myPageViewModel.state,
                         onNavigationEvent = ::handleMyPageScreenNavigationEvent
                     )
                 }

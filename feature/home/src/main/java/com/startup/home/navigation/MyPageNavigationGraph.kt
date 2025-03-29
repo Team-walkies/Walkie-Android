@@ -52,7 +52,7 @@ fun MyPageNavigationGraph(
     fun handleMyInfoUiEvent(event: MyInfoUIEvent) {
         when (event) {
             is MyInfoUIEvent.OnChangedProfileAccessToggle -> {
-                myPageViewModel.updateProfileAccess(event.enabled)
+                myPageViewModel.updateProfileAccess()
             }
         }
     }

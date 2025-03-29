@@ -13,14 +13,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 abstract class BaseViewModel : ViewModel(), DefaultLifecycleObserver {
@@ -32,8 +31,27 @@ abstract class BaseViewModel : ViewModel(), DefaultLifecycleObserver {
     )
     val event = _event.receiveAsFlow()
 
+    val viewModelEvent = MutableSharedFlow<BaseEvent>(
+        extraBufferCapacity = Int.MAX_VALUE,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private val ioDispatcher = Dispatchers.IO
+
+    init {
+        viewModelScope.launch {
+            viewModelEvent.collect(::handleViewModelEvent)
+        }
+    }
+
+    fun notifyViewModelEvent(event: BaseEvent) {
+        viewModelScope.launch {
+            viewModelEvent.emit(event)
+        }
+    }
+
+    open fun handleViewModelEvent(event: BaseEvent) {}
 
     protected fun notifyEvent(event: BaseEvent) {
         coroutineScope.launch {

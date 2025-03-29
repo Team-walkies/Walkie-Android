@@ -27,7 +27,11 @@ import com.startup.ui.WalkieTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
-fun MyInfoScreen(viewState: MyInfoViewState, uiEventSender: (MyInfoUIEvent) -> Unit, onNavigationEvent: (NavigationEvent) -> Unit) {
+fun MyInfoScreen(
+    viewState: MyInfoViewState,
+    uiEventSender: (MyInfoUIEvent) -> Unit,
+    onNavigationEvent: (NavigationEvent) -> Unit
+) {
     val isProfileAccess by viewState.isProfileAccess.collectAsState()
     Printer.e("LMH", "isProfileAccess $isProfileAccess")
     Column(
@@ -37,7 +41,7 @@ fun MyInfoScreen(viewState: MyInfoViewState, uiEventSender: (MyInfoUIEvent) -> U
     ) {
         PageActionBar(
             PageActionBarType.TitleActionBarType(
-                {onNavigationEvent.invoke(NavigationEvent.Back)},
+                { onNavigationEvent.invoke(NavigationEvent.Back) },
                 title = stringResource(R.string.my_info_title)
             )
         )
@@ -76,8 +80,9 @@ private fun PreviewMyInfoScreen() {
                 isProfileAccess = MutableStateFlow(false),
                 isNotificationEnabledTodayStep = MutableStateFlow(false),
                 isNotificationEnabledSpotArrive = MutableStateFlow(false),
+                userInfo = MutableStateFlow(null)
             ),
-            {},{}
+            {}, {}
         )
     }
 }

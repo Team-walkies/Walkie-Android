@@ -29,7 +29,7 @@ import com.startup.common.base.NavigationEvent
 import com.startup.design_system.widget.actionbar.PageActionBar
 import com.startup.design_system.widget.actionbar.PageActionBarType
 import com.startup.home.R
-import com.startup.home.character.CharacterKind
+import com.startup.home.character.CharacterRankKind
 import com.startup.home.egg.model.EggKind
 import com.startup.home.egg.model.EggOfCharacterGainProbabilityModel
 import com.startup.ui.WalkieTheme
@@ -129,7 +129,7 @@ internal fun EggOfCharacterGainColumnItemComponent(item: EggOfCharacterGainProba
                 item.rareProbability,
                 item.epicProbability,
                 item.legendProbability
-            ).zip(CharacterKind.entries.toList()) { percent, character ->
+            ).zip(CharacterRankKind.entries.toList()) { percent, character ->
                 EggOfCharacterProbabilityLabel(
                     title = stringResource(character.displayStrResId)
                             + stringResource(character.characterStrResId),

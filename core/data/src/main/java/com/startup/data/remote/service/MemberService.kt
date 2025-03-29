@@ -39,14 +39,14 @@ internal interface MemberService {
     suspend fun getWalkingEgg(): BaseResponse<EggDto>
 
     /** 같이 걷는 캐릭터 변경 API */
-    @PATCH("api/v1/members/character/play")
+    @PATCH("api/v1/members/characters/play")
     suspend fun modifyWalkingCharacter(@Body request: CharacterIdRequest): BaseResponse<Unit>
 
     /** 같이 걷는 캐릭터 조회 API */
-    @GET("api/v1/members/character/play")
+    @GET("api/v1/members/characters/play")
     suspend fun getWalkingCharacter(): BaseResponse<CharacterDto>
 
     /** 내 프로필 공개/비공개 토글 API, 요청하면 값이 반전 됨 */
-    @GET("api/v1/members/profile/visibility")
+    @PATCH("api/v1/members/profile/visibility")
     suspend fun changeUserProfileVisibility(): BaseResponse<IsPublicDto>
 }

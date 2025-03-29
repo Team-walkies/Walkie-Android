@@ -1,4 +1,4 @@
-package com.startup.data.util
+package com.startup.walkie.login
 
 import android.content.Context
 import com.kakao.sdk.auth.model.OAuthToken
@@ -6,16 +6,14 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import com.kakao.sdk.user.model.User
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-internal class KaKaoLoginClient @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val userApiClient: UserApiClient
+class KaKaoLoginClient(
+    private val context: Context,
+    private val userApiClient: UserApiClient = UserApiClient.instance
 ) {
     /**
      * 앱/웹 통합 카카오로그인 함수
@@ -57,46 +55,11 @@ internal class KaKaoLoginClient @Inject constructor(
             }
         }
 
-
-    private suspend fun UserApiClient.Companion.logOut() {
-        suspendCoroutine { continuation ->
-            instance.logout { error ->
-                continuation.resumeDisConnect(error)
-            }
-        }
-    }
-
-    /**
-     * 로그아웃
-     */
-    suspend fun logout(): Result<Unit> = runCatching {
-        UserApiClient.logOut()
-    }
-
-
-    private suspend fun UserApiClient.Companion.unLink() {
-        suspendCoroutine { continuation ->
-            instance.unlink { error ->
-                continuation.resumeDisConnect(error)
-            }
-        }
-    }
-
-
-    /**
-     * 연결끊기 회원탈퇴
-     */
-    suspend fun unLink(): Result<Unit> = runCatching {
-        UserApiClient.unLink()
-    }
-
-
     private suspend fun UserApiClient.Companion.me(): User = suspendCoroutine { continuation ->
         instance.me { user, error ->
             continuation.resumeUserInfo(user, error)
         }
     }
-
 
     /**
      * 카카오 사용자 정보 요청
@@ -114,16 +77,6 @@ internal class KaKaoLoginClient @Inject constructor(
             resume(token)
         } else {
             resumeWithException(RuntimeException("토큰 접근 에러"))
-        }
-    }
-
-    private fun Continuation<Unit>.resumeDisConnect(
-        error: Throwable?
-    ) {
-        if (error != null) {
-            resumeWithException(error)
-        } else {
-            resume(Unit)
         }
     }
 

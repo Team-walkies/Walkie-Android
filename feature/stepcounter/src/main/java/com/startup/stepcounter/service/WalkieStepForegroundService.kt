@@ -21,7 +21,6 @@ import com.startup.domain.provider.StepDataStore
 import com.startup.stepcounter.broadcastReciver.RestartServiceReceiver
 import com.startup.stepcounter.notification.NotificationCode.WALKIE_STEP_NOTIFICATION_ID
 import com.startup.stepcounter.notification.buildWalkieNotification
-import com.startup.stepcounter.notification.sendHatchingNotification
 import com.startup.stepcounter.notification.showPermissionNotification
 import com.startup.stepcounter.notification.updateStepNotification
 import dagger.hilt.EntryPoint
@@ -33,7 +32,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)

@@ -52,6 +52,8 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
         ).homeModuleNavigator()
     }
 
+    private val kaKaoLoginClient by lazy { KaKaoLoginClient(context = this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -69,6 +71,7 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
                     homeModuleNavigator.moveToHomeActivity(this)
                     finish()
                 }
+
                 else -> {
                 }
             }
@@ -79,7 +82,18 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
         when (uiEvent) {
             LoginUiEvent.OnClickLoginButton -> {
                 viewModel.onLogin()
+//                lifecycleScope.launch {
+//                    kaKaoLoginClient.login().fold(
+//                        onSuccess = { token ->
+//                            viewModel.onLogin(token.accessToken)
+//                        },
+//                        onFailure = { error ->
+//                            Printer.e("LMH", "로그인 오류 : $error")
+//                        }
+//                    )
+//                }
             }
+
             else -> {}
         }
     }
@@ -89,9 +103,11 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
             is NickNameSettingEvent.OnNickNameChanged -> {
                 viewModel.onNickNameChanged(uiEvent.nickNameTextFieldValue)
             }
+
             is NickNameSettingEvent.OnClickNickNameConfirm -> {
                 viewModel.onJoinWalkie(uiEvent.nickName)
             }
+
             else -> {}
         }
     }
@@ -158,6 +174,7 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
                                     GetCharacterNavigationEvent.MoveToMainActivity -> {
                                         homeModuleNavigator.moveToHomeActivity(this@LoginActivity)
                                     }
+
                                     else -> {}
                                 }
                             }

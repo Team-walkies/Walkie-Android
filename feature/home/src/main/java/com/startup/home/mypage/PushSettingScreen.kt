@@ -91,6 +91,7 @@ private fun PreviewPushSettingScreen() {
                 isProfileAccess = MutableStateFlow(false),
                 isNotificationEnabledTodayStep = MutableStateFlow(false),
                 isNotificationEnabledSpotArrive = MutableStateFlow(false),
+                userInfo = MutableStateFlow(null)
             ), {}, {})
     }
 }
