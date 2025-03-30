@@ -170,6 +170,28 @@
     <string name="push_setting_today_step_title">오늘의 걸음 수</string>
     <string name="push_setting_today_step_sub_title">하루 걸음 수를 알려드려요</string>
 
+    <string name="permission_activity_recognition_alert">신체활동 권한을 허용해 주세요</string>
+    <string name="permission_location_alert">위치 권한을 허용해 주세요</string>
+    <string name="permission_bottomsheet_title">워키 이용에 꼭 필요한 권한이에요!</string>
+    <string name="permission_bottomsheet_subtitle">원활한 이용을 위해 권한을 허용해주세요</string>
+    <string name="permission_notification_title">알이 부화하면 알려드릴게요!</string>
+    <string name="permission_notification_subtitle">‘마이 > ‘푸시 알림’에서 관리할 수 있어요</string>
+    <string name="permission_bottomsheet_next">다음</string>
+    <string name="permission_bottomsheet_later">나중에</string>
+    <string name="permission_bottomsheet_notification">알림 받기</string>
+    <string name="permission_activity_recognition">신체활동</string>
+    <string name="permission_activity_recognition_description">걸음수 측정하고 알 부화하기</string>
+    <string name="permission_location">위치</string>
+    <string name="permission_location_description">지도로 스팟 탐험하기</string>
+    <string name="permission_battery_optimization">배터리 최적화</string>
+    <string name="permission_battery_optimization_description">필요한 알림 받기</string>
+    <string name="permission_essential">(필수)</string>
+    <string name="permission_optional">(선택)</string>
+    <string name="permission_dialog_title">접근권한 허용</string>
+    <string name="permission_dialog_message">원할한 서비스이용을 위해 권한이 필요해요</string>
+    <string name="permission_dialog_negative">취소</string>
+    <string name="permission_dialog_positive">허용하기</string>
+
     <string name="unlink_header_title">탈퇴하기</string>
     <string name="unlink_title">%s이 떠나시다니,\n너무 아쉬워요</string>
     <string name="unlink_description_title_1">모든 데이터가 삭제돼요</string>

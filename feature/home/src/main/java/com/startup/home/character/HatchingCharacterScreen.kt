@@ -396,7 +396,7 @@ private fun CharacterItemContent(
             painter = painterResource(
                 id = if (isEmpty) {
                     when (currentTab) {
-                        CharacterTabType.JELLYFISH -> R.drawable.jelly_empty
+                        CharacterTabType.JELLYFISH -> R.drawable.jellyfish_empty
                         CharacterTabType.DINO -> R.drawable.dino_empty
                         else -> character.imageResource
                     }

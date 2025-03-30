@@ -67,6 +67,17 @@ object UsePermissionHelper {
     private val PERMISSION_BATTERY_OPTIMIZATION =
         arrayOf(Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
 
+    private val FOREGROUND_LOCATION = arrayOf(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    )
+
+    private val BACKGROUND_LOCATION = if (OsVersions.isGreaterThanOrEqualsQ()) {
+        arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+    } else {
+        arrayOf()
+    }
+
     fun getTypeOfPermission(type: Permission): Array<String> {
         return when (type) {
             Permission.GALLERY -> PERMISSION_GALLERY
@@ -76,6 +87,8 @@ object UsePermissionHelper {
             Permission.RECORD_AUDIO -> PERMISSION_RECORD_AUDIO
             Permission.ACTIVITY_RECOGNITION -> PERMISSION_ACTIVITY_RECOGNITION
             Permission.BATTERY_OPTIMIZATION -> PERMISSION_BATTERY_OPTIMIZATION
+            Permission.FOREGROUND_LOCATION -> FOREGROUND_LOCATION
+            Permission.BACKGROUND_LOCATION -> TODO()
         }
     }
 
@@ -110,6 +123,8 @@ object UsePermissionHelper {
         RECORD_AUDIO,
         POST_NOTIFICATIONS,
         ACTIVITY_RECOGNITION,
-        BATTERY_OPTIMIZATION
+        BATTERY_OPTIMIZATION,
+        FOREGROUND_LOCATION,
+        BACKGROUND_LOCATION
     }
 }

@@ -48,7 +48,7 @@ abstract class ComposePermissionRequestDelegator(
 
 @Composable
 fun rememberPermissionRequestDelegator(
-    permission: UsePermissionHelper.Permission,
+    permissions: List<UsePermissionHelper.Permission>,
     doOnGranted: () -> Unit,
     doOnShouldShowRequestPermissionRationale: (List<String>) -> Unit = {},
     doOnNeverAskAgain: (List<String>) -> Unit = {},
@@ -91,8 +91,8 @@ fun rememberPermissionRequestDelegator(
             doOnShouldShowRequestPermissionRationale = doOnShouldShowRequestPermissionRationale,
             doOnNeverAskAgain = doOnNeverAskAgain
         ) {
-            override val requestPermissionType: UsePermissionHelper.Permission
-                get() = permission
+            override val requestPermissionTypes: List<UsePermissionHelper.Permission>
+                get() = permissions
             override val permissionLauncher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>> =
                 permissionLauncher
         }

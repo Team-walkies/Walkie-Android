@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -43,9 +44,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.startup.common.extension.moveToAppDetailSetting
 import com.startup.common.util.Printer
 import com.startup.common.util.formatWithLocale
 import com.startup.design_system.widget.actionbar.MainLogoActionBar
+import com.startup.design_system.widget.permission.PermissionInduction
 import com.startup.design_system.widget.speechbubble.SpeechBubble
 import com.startup.home.HomeScreenNavigationEvent
 import com.startup.home.R
@@ -62,9 +65,13 @@ import withUnderline
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
+    state: HomeViewState,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit
 ) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
+    val showActivityRecognitionAlert by state.showActivityPermissionAlert.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = {
             MainLogoActionBar(isExistAlarm = false) {
@@ -79,6 +86,15 @@ fun HomeScreen(
             viewState = viewModel.state,
             onNavigationEvent = onNavigationEvent
         )
+
+        if (showActivityRecognitionAlert) {
+            PermissionInduction(
+                title = R.string.permission_activity_recognition_alert,
+                modifier = Modifier.padding(top = 68.dp)
+            ) {
+                context.moveToAppDetailSetting()
+            }
+        }
     }
 }
 
@@ -97,6 +113,7 @@ private fun HomeContent(
     val minRequiredHeight = 431.dp + 18.dp + 180.dp
     val needsScroll = minRequiredHeight > availableHeight
     val stepCount by viewState.steps.collectAsStateWithLifecycle()
+
     Column(
         modifier = Modifier
             .background(color = WalkieTheme.colors.white)
@@ -110,6 +127,8 @@ private fun HomeContent(
 
     ) {
         Spacer(modifier = Modifier.height(8.dp))
+
+
         if (!needsScroll) {
             // 충분히 큰 화면: 남은 공간을 모두 차지
             Box(

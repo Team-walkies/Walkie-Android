@@ -11,8 +11,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.startup.home.main.HomeScreen
 import com.startup.domain.model.member.UserInfo
+import com.startup.home.main.HomeScreen
+import com.startup.home.main.HomeViewModel
 import com.startup.home.mypage.MyPageScreen
 import com.startup.home.navigation.BottomNavItem
 import com.startup.home.navigation.HomeScreenNav
@@ -23,6 +24,7 @@ import com.startup.home.navigation.WalkieBottomNavigation
 @Composable
 fun MainBottomNavigationScreen(
     navController: NavController,
+    homeViewModel: HomeViewModel,
     onNavigationEvent: (MainScreenNavigationEvent) -> Unit,
 ) {
     val navHostController = rememberNavController()
@@ -94,6 +96,7 @@ fun MainBottomNavigationScreen(
             ) {
                 composable(BottomNavItem.Home.route) {
                     HomeScreen(
+                        state = homeViewModel.state,
                         onNavigationEvent = ::handleHomeScreenNavigationEvent
                     )
                 }
