@@ -101,8 +101,6 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
         dailyResetReceiver.setOnDateChangedListener(this)
         registerDailyResetReceiver()
 
-        viewModel.initTodayStep()
-
         setContent {
             WalkieTheme {
                 MainScreenWithPermissionBottomSheet()
@@ -119,7 +117,6 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
 
     override fun onDateChanged() {
         viewModel.resetStepCount()
-        viewModel.initTodayStep()
     }
 
     fun startStepCounterService() {

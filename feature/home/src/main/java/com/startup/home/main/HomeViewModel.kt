@@ -5,13 +5,17 @@ import com.startup.common.base.BaseState
 import com.startup.common.base.BaseViewModel
 import com.startup.common.base.UiEvent
 import com.startup.common.event.EggHatchingEvent
+import com.startup.common.util.Printer
+import com.startup.domain.model.egg.UpdateStepData
 import com.startup.domain.model.member.UserInfo
 import com.startup.domain.provider.StepDataStore
+import com.startup.domain.repository.LocationRepository
 import com.startup.domain.usecase.GetCurrentWalkCharacter
 import com.startup.domain.usecase.GetCurrentWalkEgg
 import com.startup.domain.usecase.GetGainEggCount
 import com.startup.domain.usecase.GetHatchedCharacterCount
 import com.startup.domain.usecase.GetMyData
+import com.startup.domain.usecase.UpdateEggOfStepCount
 import com.startup.home.character.model.WalkieCharacter
 import com.startup.home.character.model.WalkieCharacter.Companion.toUiModel
 import com.startup.home.egg.model.EggKind
@@ -26,7 +30,10 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,6 +41,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val stepCounter: StepCounterService,
     private val dataStore: StepDataStore,
+    private val locationRepository: LocationRepository,
+    private val updateEggOfStepCount: UpdateEggOfStepCount,
     getGainEggCount: GetGainEggCount,
     getHatchedCharacterCount: GetHatchedCharacterCount,
     getMyData: GetMyData,
@@ -76,7 +85,7 @@ class HomeViewModel @Inject constructor(
             ),
         currentWalkCharacter = getCurrentWalkCharacter.invoke(Unit)
             .map { it.toUiModel() }
-            .catch {  }
+            .catch { }
             .stateInViewModel(WalkieCharacter.ofEmpty()),
         showActivityPermissionAlert = _showActivityPermissionAlert.stateInViewModel(false)
     )
@@ -104,11 +113,79 @@ class HomeViewModel @Inject constructor(
     }
 
     init {
+        observeEggHatchingEvents()
+        processUserInfo()
+        setupTargetSteps()
+    }
+
+    private fun observeEggHatchingEvents() {
         viewModelScope.launch {
             EggHatchingEvent.hatchingAnimationFlow.collect { info ->
                 _hatchingInfo.value = info
             }
         }
+    }
+
+    private fun processUserInfo() {
+        viewModelScope.launch {
+            _state.userInfo
+                .filterNotNull()
+                .take(1)
+                .catch { }
+                .collect { userInfo ->
+                    Printer.e("JUNWOO", "eggId : ${userInfo.eggId}")
+                    updateStepProgress(userInfo)
+                }
+        }
+    }
+
+    private fun updateStepProgress(userInfo: UserInfo) {
+        viewModelScope.launch {
+            val remainingStep = dataStore.getTargetStep() - dataStore.getCurrentSteps()
+
+            if (remainingStep > 0) {
+                // 남은 걸음수가 있는 경우
+                Printer.e("JUNWOO", "remainingStep : $remainingStep")
+                updateStepWithStepCount(userInfo.eggId, remainingStep)
+            } else {
+                // 목표 달성한 경우 - 위치 정보 포함하여 업데이트
+                updateEggWithLocationData(userInfo.eggId, remainingStep)
+            }
+        }
+    }
+
+    private fun updateStepWithStepCount(eggId: Long, steps: Int) {
+        updateEggOfStepCount.invoke(
+            UpdateStepData(
+                eggId = eggId,
+                nowStep = steps
+            )
+        ).catch {}.launchIn(viewModelScope)
+    }
+
+    private fun updateEggWithLocationData(eggId: Long, steps: Int) {
+        viewModelScope.launch {
+            locationRepository.getCurrentLocation().collect { locationData ->
+                Printer.e(
+                    "JUNWOO",
+                    "latitude : ${locationData.latitude} , longitude : ${locationData.longitude}"
+                )
+
+                updateEggOfStepCount.invoke(
+                    UpdateStepData(
+                        eggId = eggId,
+                        nowStep = steps,
+                        latitude = locationData.latitude,
+                        longitude = locationData.longitude
+                    )
+                ).catch {}.launchIn(viewModelScope)
+
+                resetStepCount()
+            }
+        }
+    }
+
+    private fun setupTargetSteps() {
         // todo fetching or 로컬에 저장
         viewModelScope.launch {
             dataStore.setTargetStep(target = 100)
@@ -132,35 +209,6 @@ class HomeViewModel @Inject constructor(
     fun setActivityPermissionAlertState(show: Boolean) {
         _showActivityPermissionAlert.value = show
     }
-
-    fun initTodayStep() {
-        viewModelScope.launch {
-            val previousSteps = stepCounter.checkAndResetForNewDay()
-
-            // 이전 걸음 수가 있으면 업로드 및 UI 업데이트
-            previousSteps?.let { steps ->
-                uploadYesterdaySteps(steps)
-            }
-        }
-    }
-
-    private fun uploadYesterdaySteps(steps: Int) {
-        // todo 실제 usecase로 핸들링
-//        uploadStepUseCase.executeOnViewModel(
-//            params = steps,
-//            onEach = {
-//                // 업로드 성공 시 UI 업데이트
-//                updateMainActivity()
-//            },
-//            onError = { error ->
-//                // 에러 처리
-//            }
-//        ).launchIn(viewModelScope)
-    }
-
-    private fun updateMainActivity() {
-        // todo view 업데이트
-    }
 }
 
 interface HomeViewState : BaseState {
@@ -169,7 +217,7 @@ interface HomeViewState : BaseState {
     val currentGainEggCount: StateFlow<Int>
     val userInfo: StateFlow<UserInfo?>
     val currentWalkEgg: StateFlow<MyEggModel>
-    val currentWalkCharacter : StateFlow<WalkieCharacter>
+    val currentWalkCharacter: StateFlow<WalkieCharacter>
     val showActivityPermissionAlert: StateFlow<Boolean>
 }
 

@@ -5,6 +5,7 @@ import com.startup.data.datasource.EggDataSource
 import com.startup.data.remote.dto.request.egg.UpdateEggOfStepCountRequest
 import com.startup.domain.model.egg.EggDetail
 import com.startup.domain.model.egg.MyEgg
+import com.startup.domain.model.egg.UpdateEggStepInfo
 import com.startup.domain.model.egg.UpdateStepData
 import com.startup.domain.repository.EggRepository
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +17,7 @@ internal class EggRepositoryImpl @Inject constructor(private val eggDataSource: 
     override fun getEggDetailInfo(eggId: Long): Flow<EggDetail> =
         eggDataSource.getEggDetailInfo(eggId).map { it.toDomain(eggId) }
 
-    override fun updateEggOfStepCount(request: UpdateStepData): Flow<Unit> =
+    override fun updateEggOfStepCount(request: UpdateStepData): Flow<UpdateEggStepInfo> =
         eggDataSource.updateEggOfStepCount(
             UpdateEggOfStepCountRequest(
                 eggId = request.eggId,
@@ -24,7 +25,7 @@ internal class EggRepositoryImpl @Inject constructor(private val eggDataSource: 
                 longitude = request.longitude,
                 latitude = request.latitude
             )
-        )
+        ).map { it.toDomain() }
 
     override fun getMyEggList(): Flow<List<MyEgg>> =
         eggDataSource.getMyEggList().map { it.eggs?.map { it.toDomain() } ?: emptyList() }

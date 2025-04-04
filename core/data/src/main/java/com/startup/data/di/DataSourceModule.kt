@@ -3,11 +3,13 @@ package com.startup.data.di
 import com.startup.data.datasource.AuthDataSource
 import com.startup.data.datasource.CharacterDataSource
 import com.startup.data.datasource.EggDataSource
+import com.startup.data.datasource.LocationDataSource
 import com.startup.data.datasource.MemberDataSource
 import com.startup.data.datasource.NoticeDataSource
 import com.startup.data.datasource.ReviewDataSource
 import com.startup.data.datasource.SpotDataSource
 import com.startup.data.datasource.UserDataSource
+import com.startup.data.local.datasourceimpl.LocationDataSourceImpl
 import com.startup.data.local.datasourceimpl.UserDataSourceImpl
 import com.startup.data.remote.datasourceimpl.AuthDataSourceImpl
 import com.startup.data.remote.datasourceimpl.CharacterDataSourceImpl
@@ -63,4 +65,8 @@ internal abstract class DataSourceModule {
     @Singleton
     @Binds
     abstract fun bindsNetworkChecker(networkChecker: NetworkCheckerImpl): NetworkChecker
+
+    @Singleton
+    @Binds
+    abstract fun bindsLocationDataSource(dataSource: LocationDataSourceImpl): LocationDataSource
 }

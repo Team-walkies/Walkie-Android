@@ -8,7 +8,7 @@ data class UpdateEggOfStepCountRequest(
     @SerializedName("nowStep")
     val nowStep: Int,
     @SerializedName("latitude")
-    val latitude: Double,
+    val latitude: Double?,
     @SerializedName("longitude")
-    val longitude: Double,
+    val longitude: Double?,
 )
