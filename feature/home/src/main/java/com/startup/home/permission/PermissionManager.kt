@@ -76,8 +76,8 @@ class PermissionManager(
      */
     private fun initPermissionStates() {
         val states = mutableListOf<PermissionState>()
-        addActivityRecognitionPermission(states)
         addLocationPermission(states)
+        addActivityRecognitionPermission(states)
         addBatteryOptimizationPermission(states)
         permissionStates = states
     }
@@ -205,7 +205,6 @@ class PermissionManager(
 
         when (action) {
             NotificationAction.NEVER_ASK_AGAIN -> {
-                // todo 오프모임때 논의 이후 추가로직 설정
                 // updateUiState { it.copy(showPermissionSettingsDialog = true) }
             }
 

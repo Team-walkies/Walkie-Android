@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.startup.common.util.BatteryOptimizationHelper
@@ -157,7 +158,7 @@ fun EssentialPermissionBottomSheet(
         Spacer(modifier = Modifier.height(20.dp))
 
         PrimaryButton(
-            text = stringResource(R.string.permission_bottomsheet_next),
+            text = stringResource(R.string.permission_bottomsheet_grant),
             onClick = {
                 if (permissionDelegator != null) {
                     permissionDelegator.requestPermissionLauncher()
@@ -214,13 +215,16 @@ fun NotificationPermissionBottomSheet(
     PermissionBottomSheetContainer(modifier = modifier) {
         Text(
             text = stringResource(R.string.permission_notification_title),
+            textAlign = TextAlign.Center,
             style = WalkieTheme.typography.head4.copy(color = WalkieTheme.colors.gray700),
             modifier = Modifier.padding(bottom = 4.dp)
         )
+        Spacer(Modifier.height(4.dp))
         Text(
             text = stringResource(R.string.permission_notification_subtitle),
             style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500),
         )
+        Spacer(Modifier.height(20.dp))
         Image(
             painter = painterResource(R.drawable.img_notification_permission),
             contentDescription = null
