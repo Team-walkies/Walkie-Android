@@ -7,21 +7,26 @@ import com.startup.common.base.UiEvent
 import com.startup.common.event.EggHatchingEvent
 import com.startup.domain.model.member.UserInfo
 import com.startup.domain.provider.StepDataStore
-import com.startup.domain.repository.SpotRepository
+import com.startup.domain.usecase.GetCurrentWalkCharacter
+import com.startup.domain.usecase.GetCurrentWalkEgg
 import com.startup.domain.usecase.GetGainEggCount
 import com.startup.domain.usecase.GetHatchedCharacterCount
 import com.startup.domain.usecase.GetMyData
+import com.startup.home.character.model.WalkieCharacter
+import com.startup.home.character.model.WalkieCharacter.Companion.toUiModel
+import com.startup.home.egg.model.EggKind
+import com.startup.home.egg.model.MyEggModel
+import com.startup.home.egg.model.MyEggModel.Companion.toUiModel
 import com.startup.stepcounter.service.StepCounterService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,7 +37,8 @@ class HomeViewModel @Inject constructor(
     getGainEggCount: GetGainEggCount,
     getHatchedCharacterCount: GetHatchedCharacterCount,
     getMyData: GetMyData,
-    private val spotRepository: SpotRepository
+    getCurrentWalkEgg: GetCurrentWalkEgg,
+    getCurrentWalkCharacter: GetCurrentWalkCharacter,
 ) : BaseViewModel() {
 
     private val _showActivityPermissionAlert = MutableStateFlow(false)
@@ -53,6 +59,25 @@ class HomeViewModel @Inject constructor(
             .catch {
 
             }.stateInViewModel(null),
+        currentWalkEgg = getCurrentWalkEgg.invoke(Unit)
+            .map { it.toUiModel() }
+            .catch { }
+            .stateInViewModel(
+                MyEggModel(
+                    characterId = 0,
+                    eggKind = EggKind.Empty,
+                    obtainedDate = "",
+                    obtainedPosition = "",
+                    eggId = 0,
+                    play = false,
+                    nowStep = 0,
+                    needStep = 0
+                )
+            ),
+        currentWalkCharacter = getCurrentWalkCharacter.invoke(Unit)
+            .map { it.toUiModel() }
+            .catch {  }
+            .stateInViewModel(WalkieCharacter.ofEmpty()),
         showActivityPermissionAlert = _showActivityPermissionAlert.stateInViewModel(false)
     )
     override val state: HomeViewState
@@ -143,6 +168,8 @@ interface HomeViewState : BaseState {
     val currentHatchedCharacterCount: StateFlow<Int>
     val currentGainEggCount: StateFlow<Int>
     val userInfo: StateFlow<UserInfo?>
+    val currentWalkEgg: StateFlow<MyEggModel>
+    val currentWalkCharacter : StateFlow<WalkieCharacter>
     val showActivityPermissionAlert: StateFlow<Boolean>
 }
 
@@ -151,5 +178,7 @@ class HomeViewStateImpl(
     override val currentHatchedCharacterCount: StateFlow<Int>,
     override val currentGainEggCount: StateFlow<Int>,
     override val userInfo: StateFlow<UserInfo?>,
+    override val currentWalkEgg: StateFlow<MyEggModel>,
+    override val currentWalkCharacter: StateFlow<WalkieCharacter>,
     override val showActivityPermissionAlert: StateFlow<Boolean>
 ) : HomeViewState

@@ -33,21 +33,26 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.startup.common.extension.getAppVersion
+import com.startup.common.extension.orZero
 import com.startup.design_system.widget.actionbar.MainActionBar
 import com.startup.design_system.widget.modal.ErrorTwoButtonModal
-import com.startup.domain.model.member.UserInfo
 import com.startup.home.MyPageScreenNavigationEvent
 import com.startup.home.R
+import com.startup.home.mypage.model.MyInfoViewState
 import com.startup.ui.WalkieTheme
 import com.startup.ui.noRippleClickable
 import withColor
 
 @Composable
-fun MyPageScreen(userInfo: UserInfo, onNavigationEvent: (MyPageScreenNavigationEvent) -> Unit) {
+fun MyPageScreen(
+    myInfoViewState: MyInfoViewState,
+    onNavigationEvent: (MyPageScreenNavigationEvent) -> Unit
+) {
     val context = LocalContext.current
     var isLogoutDialogShow by remember { mutableStateOf(false) }
-
+    val userInfo by myInfoViewState.userInfo.collectAsStateWithLifecycle()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -64,7 +69,7 @@ fun MyPageScreen(userInfo: UserInfo, onNavigationEvent: (MyPageScreenNavigationE
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = userInfo.memberNickName,
+                    text = userInfo?.memberNickName.orEmpty(),
                     style = WalkieTheme.typography.head2.copy(color = WalkieTheme.colors.gray700)
                 )
                 Text(
@@ -73,7 +78,7 @@ fun MyPageScreen(userInfo: UserInfo, onNavigationEvent: (MyPageScreenNavigationE
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 UserTierTag(
-                    userInfo.memberTier,
+                    userInfo?.memberTier.orEmpty(),
                     textColor = WalkieTheme.colors.blue400,
                     backgroundColor = WalkieTheme.colors.blue50
                 )
@@ -82,8 +87,8 @@ fun MyPageScreen(userInfo: UserInfo, onNavigationEvent: (MyPageScreenNavigationE
             Text(
                 stringResource(
                     R.string.current_explored_spot_count_desc,
-                    userInfo.exploredSpot
-                ).withColor(userInfo.exploredSpot.toString(), WalkieTheme.colors.blue400),
+                    userInfo?.exploredSpot.orZero()
+                ).withColor(userInfo?.exploredSpot.orZero().toString(), WalkieTheme.colors.blue400),
                 style = WalkieTheme.typography.head5.copy(color = WalkieTheme.colors.gray500)
             )
             Spacer(modifier = Modifier.height(20.dp))
@@ -188,7 +193,7 @@ fun MyPageScreen(userInfo: UserInfo, onNavigationEvent: (MyPageScreenNavigationE
                 )
                 Text(
                     modifier = Modifier.noRippleClickable {
-                        onNavigationEvent.invoke(MyPageScreenNavigationEvent.MoveToUnlink(userInfo.memberNickName))
+                        onNavigationEvent.invoke(MyPageScreenNavigationEvent.MoveToUnlink(userInfo?.memberNickName.orEmpty()))
                     },
                     text = stringResource(R.string.unlink),
                     style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray400)
@@ -316,7 +321,7 @@ fun UserTierTag(text: String, textColor: Color, backgroundColor: Color) {
 @Preview
 @Composable
 private fun PreviewMyPageScreen() {
-    WalkieTheme {
+    WalkieTheme {/*
         MyPageScreen(
             userInfo = UserInfo(
                 memberId = 1,
@@ -331,6 +336,6 @@ private fun PreviewMyPageScreen() {
                 memberTier = "초보워키",
                 memberEmail = ""
             )
-        ) {}
+        ) {}*/
     }
 }

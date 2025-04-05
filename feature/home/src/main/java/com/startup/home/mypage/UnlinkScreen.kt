@@ -53,6 +53,7 @@ fun UnlinkScreen(
         Column(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
+                .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

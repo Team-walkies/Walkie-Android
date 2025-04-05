@@ -15,14 +15,14 @@ data class MyEggModel(
 ) {
     companion object {
         fun List<MyEgg>.toUiModel(): List<MyEggModel> = map { it.toUiModel() }
-        private fun MyEgg.toUiModel(): MyEggModel = MyEggModel(
+        fun MyEgg.toUiModel(): MyEggModel = MyEggModel(
             characterId = characterId,
             eggId = eggId,
             needStep = needStep,
             nowStep = nowStep,
             play = play,
             eggKind = EggKind.rankOfEggKind(rank),
-            obtainedDate = DateUtil.convertDateTimeFormat(obtainedDate),
+            obtainedDate = DateUtil.convertDateFormat(obtainedDate),
             obtainedPosition = obtainedPosition
         )
 

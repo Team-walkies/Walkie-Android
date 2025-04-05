@@ -34,6 +34,7 @@ fun String.styleText(rules: List<StyleRule>): AnnotatedString {
                         end = rule.end
                     )
                 }
+
                 is StyleRule.Bold -> {
                     addStyle(
                         style = SpanStyle(fontWeight = FontWeight.Bold),
@@ -41,6 +42,7 @@ fun String.styleText(rules: List<StyleRule>): AnnotatedString {
                         end = rule.end
                     )
                 }
+
                 is StyleRule.ColorText -> {
                     addStyle(
                         style = SpanStyle(color = rule.color),
@@ -81,9 +83,11 @@ fun String.applyColorToSubstring(substring: String, color: Color): AnnotatedStri
     val start = this.indexOf(substring)
     if (start == -1) return AnnotatedString(this)
 
-    return this.styleText(
-        listOf(StyleRule.ColorText(start, start + substring.length, color))
-    )
+    return runCatching {
+        this.styleText(
+            listOf(StyleRule.ColorText(start, start + substring.length, color))
+        )
+    }.getOrElse { AnnotatedString(this) }
 }
 
 /**
@@ -134,7 +138,11 @@ fun String.withColor(substring: String, color: Color): AnnotatedString {
 /**
  * 접두사와 나머지 부분에 다른 색상 적용하는 확장 함수
  */
-fun String.withColoredPrefix(prefix: String, prefixColor: Color, restColor: Color): AnnotatedString {
+fun String.withColoredPrefix(
+    prefix: String,
+    prefixColor: Color,
+    restColor: Color
+): AnnotatedString {
     return this.applyColorPrefix(prefix, prefixColor, restColor)
 }
 

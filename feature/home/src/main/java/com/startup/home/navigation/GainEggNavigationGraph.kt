@@ -10,9 +10,13 @@ import com.startup.home.egg.EggGainProbabilityScreen
 import com.startup.home.egg.GainEggScreen
 import com.startup.home.egg.GainEggScreenNavigationEvent
 import com.startup.home.egg.GainEggViewModel
+import com.startup.home.egg.model.GainEggUiEvent
 
 @Composable
-fun GainEggNavigationGraph(parentNavController: NavHostController, gainEggViewModel: GainEggViewModel = hiltViewModel()) {
+fun GainEggNavigationGraph(
+    parentNavController: NavHostController,
+    gainEggViewModel: GainEggViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
     fun handleGainEggScreenNavigationEvent(navigationEvent: GainEggScreenNavigationEvent) {
         when (navigationEvent) {
@@ -33,7 +37,13 @@ fun GainEggNavigationGraph(parentNavController: NavHostController, gainEggViewMo
             GainEggScreen(
                 gainEggViewModel.state,
                 ::handleGainEggScreenNavigationEvent
-            )
+            ) { uiEvent ->
+                when (uiEvent) {
+                    is GainEggUiEvent.OnChangedClickWalkEgg -> {
+                        gainEggViewModel.updateEgg(uiEvent.eggId)
+                    }
+                }
+            }
         }
         composable(GainEggScreenNav.EggGainProbabilityNav.route) { EggGainProbabilityScreen { navController.navigateUp() } }
     }

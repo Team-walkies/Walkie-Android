@@ -49,6 +49,7 @@ import com.startup.design_system.widget.progress.ProgressMedium
 import com.startup.design_system.widget.tag.TagMedium
 import com.startup.home.R
 import com.startup.home.egg.model.EggKind
+import com.startup.home.egg.model.GainEggUiEvent
 import com.startup.home.egg.model.GainEggViewState
 import com.startup.home.egg.model.GainEggViewStateImpl
 import com.startup.home.egg.model.MyEggModel
@@ -63,7 +64,8 @@ import java.util.Locale
 @Composable
 fun GainEggScreen(
     viewState: GainEggViewState,
-    onNavigationEvent: (GainEggScreenNavigationEvent) -> Unit
+    onNavigationEvent: (GainEggScreenNavigationEvent) -> Unit,
+    uiEventSender: (GainEggUiEvent) -> Unit
 ) {
     val eggList by viewState.eggList.collectAsStateWithLifecycle()
     var selectedEgg: MyEggModel? by remember {
@@ -147,7 +149,8 @@ fun GainEggScreen(
                 selectedEgg = null
             },
             egg = selectedEgg!!,
-            sheetState = sheetState
+            sheetState = sheetState,
+            uiEventSender
         )
     }
 }
@@ -180,7 +183,8 @@ private fun EmptyGainEggView() {
 private fun EggBottomModal(
     onClickCancel: () -> Unit,
     egg: MyEggModel,
-    sheetState: SheetState
+    sheetState: SheetState,
+    uiEventSender: (GainEggUiEvent) -> Unit
 ) {
     WalkieTheme {
         ModalBottomSheet(
@@ -191,14 +195,14 @@ private fun EggBottomModal(
             contentColor = WalkieTheme.colors.white,
             scrimColor = WalkieTheme.colors.blackOpacity60,
         ) {
-            EggBottomModalContent(egg)
+            EggBottomModalContent(egg, onClickCancel, uiEventSender)
         }
     }
 }
 
 /** 알 detail 및 같이 걸을 알 선택할 수 있는 바텀 시트 View */
 @Composable
-private fun EggBottomModalContent(egg: MyEggModel) {
+private fun EggBottomModalContent(egg: MyEggModel, onClickCancel : ()-> Unit, uiEventSender: (GainEggUiEvent) -> Unit) {
     Column(
         modifier = Modifier
             .wrapContentSize()
@@ -299,7 +303,8 @@ private fun EggBottomModalContent(egg: MyEggModel) {
         Box(
             modifier = Modifier.noRippleClickable {
                 if (!egg.play) {
-                    // TODO 같이 걷는 알 변경
+                    uiEventSender.invoke(GainEggUiEvent.OnChangedClickWalkEgg(egg.eggId))
+                    onClickCancel.invoke()
                 }
             }
         ) {
@@ -331,7 +336,7 @@ private fun PreviewBottomModal() {
                 eggKind = EggKind.Epic,
                 obtainedPosition = "대전시 유성구",
                 obtainedDate = DateUtil.convertDateTimeFormat("2024-01-12 12:20:10"),
-            )
+            ),{}, {}
         )
     }
 }
@@ -340,7 +345,7 @@ private fun PreviewBottomModal() {
 @Composable
 private fun PreviewGainEggScreen() {
     WalkieTheme {
-        GainEggScreen(GainEggViewStateImpl(eggList = MutableStateFlow(emptyList()))) {}
+        GainEggScreen(GainEggViewStateImpl(eggList = MutableStateFlow(emptyList())), onNavigationEvent = {}) {}
     }
 }
 

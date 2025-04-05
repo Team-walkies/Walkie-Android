@@ -52,9 +52,11 @@ import com.startup.design_system.widget.permission.PermissionInduction
 import com.startup.design_system.widget.speechbubble.SpeechBubble
 import com.startup.home.HomeScreenNavigationEvent
 import com.startup.home.R
+import com.startup.home.character.model.WalkieCharacter
 import com.startup.home.egg.EggLayoutModel
 import com.startup.home.egg.getEggLayoutModel
 import com.startup.home.egg.model.EggKind
+import com.startup.home.egg.model.MyEggModel
 import com.startup.home.menu.HistoryItemModel
 import com.startup.ui.WalkieTheme
 import com.startup.ui.noRippleClickable
@@ -113,7 +115,8 @@ private fun HomeContent(
     val minRequiredHeight = 431.dp + 18.dp + 180.dp
     val needsScroll = minRequiredHeight > availableHeight
     val stepCount by viewState.steps.collectAsStateWithLifecycle()
-
+    val myEggModel by viewState.currentWalkEgg.collectAsStateWithLifecycle()
+    val walkieCharacterWithWalk by viewState.currentWalkCharacter.collectAsStateWithLifecycle()
     Column(
         modifier = Modifier
             .background(color = WalkieTheme.colors.white)
@@ -138,7 +141,9 @@ private fun HomeContent(
             ) {
                 EggAndPartnerSection(
                     stepCount = stepCount,
+                    eggModel = myEggModel,
                     onNavigationEvent = onNavigationEvent,
+                    walkieCharacter = walkieCharacterWithWalk,
                     useFixedHeight = false
                 )
             }
@@ -146,7 +151,9 @@ private fun HomeContent(
             // 작은 화면: 고정 높이 사용 (스크롤 필요)
             EggAndPartnerSection(
                 stepCount = stepCount,
+                eggModel = myEggModel,
                 onNavigationEvent = onNavigationEvent,
+                walkieCharacter = walkieCharacterWithWalk,
                 useFixedHeight = true
             )
         }
@@ -162,6 +169,8 @@ private fun HomeContent(
 @Composable
 private fun EggAndPartnerSection(
     stepCount: Int,
+    eggModel: MyEggModel,
+    walkieCharacter: WalkieCharacter,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
     useFixedHeight: Boolean
 ) {
@@ -190,28 +199,27 @@ private fun EggAndPartnerSection(
                 EggLayout(
                     modifier = Modifier.fillMaxSize(),
                     step = stepCount,
-                    eggKind = EggKind.Rare,
+                    eggModel = eggModel,
                     onNavigationEvent = onNavigationEvent
                 )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            PartnerInfoBox()
+            PartnerInfoBox(stringResource(walkieCharacter.characterNameResId))
         }
-        //todo 파트너 캐릭터 교체
         Image(
             modifier = Modifier
                 .size(120.dp)
                 .align(Alignment.BottomEnd)
                 .offset(x = (-8).dp),
-            painter = painterResource(R.drawable.jelly_1),
+            painter = painterResource(walkieCharacter.characterImageResId),
             contentDescription = stringResource(R.string.desc_partner)
         )
     }
 }
 
 @Composable
-private fun PartnerInfoBox() {
+private fun PartnerInfoBox(partnerName: String) {
     Box(
         modifier = Modifier
             .height(52.dp)
@@ -220,9 +228,8 @@ private fun PartnerInfoBox() {
             .background(WalkieTheme.colors.gray100),
         contentAlignment = Alignment.CenterStart,
     ) {
-        val partner = "해파리"
         Text(
-            text = stringResource(R.string.home_walking_with, partner).withBold(partner),
+            text = stringResource(R.string.home_walking_with, partnerName).withBold(partnerName),
             modifier = Modifier.padding(start = 16.dp),
             textAlign = TextAlign.Start,
             style = WalkieTheme.typography.body2
@@ -265,7 +272,6 @@ private fun HistoryItems(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Printer.e("LMH", "HistoryItems $eggCount, $characterCount, $spotCount")
         getDefaultHistoryMenu(
             eggCount = eggCount,
             characterCount = characterCount,
@@ -368,10 +374,10 @@ private fun HistoryItem(
 fun EggLayout(
     modifier: Modifier = Modifier,
     step: Int,
-    eggKind: EggKind = EggKind.Empty,
+    eggModel: MyEggModel,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
 ) {
-    val eggAttribute = getEggLayoutModel(eggKind)
+    val eggAttribute = getEggLayoutModel(eggModel.eggKind)
 
     Box(
         modifier = modifier
@@ -387,7 +393,7 @@ fun EggLayout(
     ) {
         EggContent(
             step = step,
-            eggKind = eggKind,
+            eggModel = eggModel,
             eggAttribute = eggAttribute,
             onNavigationEvent = onNavigationEvent
         )
@@ -397,7 +403,7 @@ fun EggLayout(
 @Composable
 private fun EggContent(
     step: Int,
-    eggKind: EggKind,
+    eggModel: MyEggModel,
     eggAttribute: EggLayoutModel,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
 ) {
@@ -417,9 +423,9 @@ private fun EggContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
         ) {
-            if (eggKind != EggKind.Empty) {
+            if (eggModel.eggKind != EggKind.Empty) {
                 SpeechBubble(
-                    steps = step.formatWithLocale(),
+                    steps = (eggModel.needStep - eggModel.nowStep).formatWithLocale(),
                     modifier = Modifier
                         .offset(y = 30.dp)
                         .zIndex(5f),
@@ -431,7 +437,7 @@ private fun EggContent(
                 Image(
                     modifier = Modifier.size(eggSize),
                     painter = painterResource(eggAttribute.eggDrawable),
-                    colorFilter = if (eggKind == EggKind.Empty) {
+                    colorFilter = if (eggModel.eggKind == EggKind.Empty) {
                         ColorFilter.tint(
                             WalkieTheme.colors.blue300,
                             blendMode = BlendMode.SrcIn
@@ -441,7 +447,7 @@ private fun EggContent(
                 )
 
                 // 알 선택 텍스트
-                if (eggKind == EggKind.Empty) {
+                if (eggModel.eggKind == EggKind.Empty) {
                     Text(
                         text = stringResource(R.string.home_choice_egg).withUnderline(),
                         style = WalkieTheme.typography.head5,
@@ -458,7 +464,7 @@ private fun EggContent(
         }
 
         // 이펙트 이미지
-        if (eggKind != EggKind.Empty) {
+        if (eggModel.eggKind != EggKind.Empty) {
             eggAttribute.effectDrawable?.let { drawableRes ->
                 Image(
                     modifier = Modifier

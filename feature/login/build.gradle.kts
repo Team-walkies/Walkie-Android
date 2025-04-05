@@ -11,4 +11,6 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.kakao.login)
+    implementation(libs.kotlinx.coroutines.android)
 }

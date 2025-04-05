@@ -54,7 +54,7 @@ import com.startup.design_system.widget.button.PrimaryButton
 import com.startup.design_system.widget.tag.TagMedium
 import com.startup.home.R
 import com.startup.home.character.model.CharacterFactory
-import com.startup.home.character.model.WalkieCharacter
+import com.startup.home.character.model.BaseWalkieCharacter
 import com.startup.ui.WalkieTheme
 import com.startup.ui.WalkieTheme.colors
 import com.startup.ui.noRippleClickable
@@ -111,8 +111,8 @@ fun CharacterTabsContent() {
     var showBottomSheet by remember { mutableStateOf(false) }
 
     //todo state로 관리
-    var selectedCharacter by remember { mutableStateOf<WalkieCharacter?>(null) }
-    var viewingCharacter by remember { mutableStateOf<WalkieCharacter?>(null) }
+    var selectedCharacter by remember { mutableStateOf<BaseWalkieCharacter?>(null) }
+    var viewingCharacter by remember { mutableStateOf<BaseWalkieCharacter?>(null) }
 
     Column {
         CharacterTypeTabs(
@@ -180,8 +180,8 @@ private fun CharacterTypeTabs(
 @Composable
 private fun CharacterContentByType(
     tabIndex: Int,
-    selectedCharacter: WalkieCharacter?,
-    onCharacterClick: (WalkieCharacter) -> Unit
+    selectedCharacter: BaseWalkieCharacter?,
+    onCharacterClick: (BaseWalkieCharacter) -> Unit
 ) {
     when (tabIndex) {
         CharacterTabType.JELLYFISH -> JellyfishContent(
@@ -221,8 +221,8 @@ fun CharacterTab(
 
 @Composable
 fun JellyfishContent(
-    selectedCharacter: WalkieCharacter?,
-    onCharacterClick: (WalkieCharacter) -> Unit
+    selectedCharacter: BaseWalkieCharacter?,
+    onCharacterClick: (BaseWalkieCharacter) -> Unit
 ) {
     val jellyfishCharacters = CharacterFactory.getJellyfishCharacters()
 
@@ -243,8 +243,8 @@ fun JellyfishContent(
 
 @Composable
 fun DinosaurContent(
-    selectedCharacter: WalkieCharacter?,
-    onCharacterClick: (WalkieCharacter) -> Unit
+    selectedCharacter: BaseWalkieCharacter?,
+    onCharacterClick: (BaseWalkieCharacter) -> Unit
 ) {
     // todo fetch
     // 첫 번째와 세 번째 캐릭터만 empty(미획득)로 가정
@@ -264,11 +264,11 @@ fun DinosaurContent(
 @Composable
 fun CharacterGrid(
     description: String,
-    characters: List<WalkieCharacter>,
-    selectedCharacter: WalkieCharacter?,
+    characters: List<BaseWalkieCharacter>,
+    selectedCharacter: BaseWalkieCharacter?,
     emptyCharacterIds: List<String>,
     currentTab: Int,
-    onCharacterClick: (WalkieCharacter) -> Unit,
+    onCharacterClick: (BaseWalkieCharacter) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -293,11 +293,11 @@ fun CharacterGrid(
 
 @Composable
 private fun CharacterGridItems(
-    characters: List<WalkieCharacter>,
-    selectedCharacter: WalkieCharacter?,
+    characters: List<BaseWalkieCharacter>,
+    selectedCharacter: BaseWalkieCharacter?,
     emptyCharacterIds: List<String>,
     currentTab: Int,
-    onCharacterClick: (WalkieCharacter) -> Unit,
+    onCharacterClick: (BaseWalkieCharacter) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val rows = characters.chunked(2)
@@ -336,11 +336,11 @@ private fun CharacterGridItems(
 @Composable
 fun CharacterItem(
     modifier: Modifier = Modifier,
-    character: WalkieCharacter,
+    character: BaseWalkieCharacter,
     isSelected: Boolean = false,
     isEmpty: Boolean = false,
     currentTab: Int = CharacterTabType.JELLYFISH,
-    onClick: (WalkieCharacter) -> Unit,
+    onClick: (BaseWalkieCharacter) -> Unit,
 ) {
     Box(
         modifier = modifier
@@ -384,7 +384,7 @@ fun CharacterItem(
 
 @Composable
 private fun CharacterItemContent(
-    character: WalkieCharacter,
+    character: BaseWalkieCharacter,
     isEmpty: Boolean,
     currentTab: Int
 ) {
@@ -443,10 +443,10 @@ private fun CharacterItemContent(
 @Composable
 fun CharacterDetailBottomSheet(
     sheetState: SheetState,
-    character: WalkieCharacter?,
-    selectedCharacter: WalkieCharacter?,
+    character: BaseWalkieCharacter?,
+    selectedCharacter: BaseWalkieCharacter?,
     onDismiss: () -> Unit,
-    onSelectPartner: (WalkieCharacter) -> Unit
+    onSelectPartner: (BaseWalkieCharacter) -> Unit
 ) {
     val density = LocalDensity.current
     val screenHeight = with(density) {
@@ -484,9 +484,9 @@ fun CharacterDetailBottomSheet(
 
 @Composable
 fun CharacterDetailContent(
-    character: WalkieCharacter,
-    selectedCharacter: WalkieCharacter?,
-    onSelectPartner: (WalkieCharacter) -> Unit
+    character: BaseWalkieCharacter,
+    selectedCharacter: BaseWalkieCharacter?,
+    onSelectPartner: (BaseWalkieCharacter) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -512,7 +512,7 @@ fun CharacterDetailContent(
 
 @Composable
 private fun CharacterDetailScrollableContent(
-    character: WalkieCharacter,
+    character: BaseWalkieCharacter,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -551,7 +551,7 @@ private fun CharacterDetailScrollableContent(
 }
 
 @Composable
-private fun CharacterInfoTags(character: WalkieCharacter) {
+private fun CharacterInfoTags(character: BaseWalkieCharacter) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -626,9 +626,9 @@ private fun CharacterHistoryItem() {
 
 @Composable
 private fun CharacterSelectButton(
-    character: WalkieCharacter,
+    character: BaseWalkieCharacter,
     isAlreadySelected: Boolean,
-    onSelectPartner: (WalkieCharacter) -> Unit
+    onSelectPartner: (BaseWalkieCharacter) -> Unit
 ) {
     val buttonText = if (isAlreadySelected) {
         stringResource(R.string.character_already_selected)

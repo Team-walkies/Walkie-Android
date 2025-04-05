@@ -3,9 +3,11 @@ package com.startup.walkie.login
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel
+import com.startup.common.util.Printer
 import com.startup.common.util.UserAuthNotFoundException
 import com.startup.domain.usecase.JoinWalkie
 import com.startup.domain.usecase.LoginWalkie
+import com.startup.walkie.login.model.LoginNavigationEvent
 import com.startup.walkie.login.model.LoginScreenNavigationEvent
 import com.startup.walkie.login.model.NickNameViewState
 import com.startup.walkie.login.model.NickNameViewStateImpl
@@ -34,14 +36,16 @@ class LoginViewModel @Inject constructor(
                 _state.providerToken.update { exception.providerToken }
                 notifyEvent(LoginScreenNavigationEvent.MoveToNickNameSettingScreen)
             }
-        }
+        }.onEach {
+            notifyEvent(LoginNavigationEvent.MoveToMainActivity)
+        }.launchIn(viewModelScope)
     }
 
     fun onJoinWalkie(nickName: String) {
         _state.providerToken.value?.let { providerToken ->
             joinWalkie.invoke(providerToken to nickName).onEach {
                 notifyEvent(LoginScreenNavigationEvent.MoveToGetCharacterScreen(nickName))
-            }.catch {  }.launchIn(viewModelScope)
+            }.catch { }.launchIn(viewModelScope)
         }
     }
 }

@@ -1,8 +1,10 @@
 package com.startup.home.mypage.model
 
+import com.startup.common.base.BaseEvent
 import com.startup.common.base.BaseState
 import com.startup.common.base.ScreenNavigationEvent
 import com.startup.common.base.UiEvent
+import com.startup.domain.model.member.UserInfo
 import com.startup.domain.model.notice.Notice
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,6 +14,7 @@ interface MyInfoViewState : BaseState {
     val isNotificationEnabledSpotArrive: StateFlow<Boolean>
     val isNotificationEnabledEggHatched: StateFlow<Boolean>
     val isNotificationEnabledTodayStep: StateFlow<Boolean>
+    val userInfo : StateFlow<UserInfo?>
 }
 
 interface NoticeViewState : BaseState {
@@ -27,11 +30,15 @@ class MyInfoViewStateImpl(
     override val isProfileAccess: StateFlow<Boolean>,
     override val isNotificationEnabledSpotArrive: StateFlow<Boolean>,
     override val isNotificationEnabledEggHatched: StateFlow<Boolean>,
-    override val isNotificationEnabledTodayStep: StateFlow<Boolean>
+    override val isNotificationEnabledTodayStep: StateFlow<Boolean>,
+    override val userInfo: StateFlow<UserInfo?>
 ) : MyInfoViewState
 
 sealed interface MyInfoUIEvent : UiEvent {
     data class OnChangedProfileAccessToggle(val enabled: Boolean) : MyInfoUIEvent
+}
+sealed interface MyInfoViewModelEvent : BaseEvent {
+    data object OnChangedProfileVisibility: MyInfoViewModelEvent
 }
 
 sealed interface UnlinkUiEvent : UiEvent {

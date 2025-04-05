@@ -7,11 +7,14 @@ import javax.inject.Inject
 
 internal class AuthRepositoryImpl @Inject constructor(private val authDataSource: AuthDataSource) :
     AuthRepository {
-    override fun login(): Flow<Unit> = authDataSource.login()
+    override fun login(): Flow<Unit> =
+        authDataSource.login()
 
     override fun unLink(): Flow<Unit> = authDataSource.unLink()
 
     override fun logOut(): Flow<Unit> = authDataSource.logOut()
-    override fun join(providerToken: String, nickName: String): Flow<Unit> =
-        authDataSource.join(providerToken, nickName)
+    override fun localLogout(): Flow<Unit> = authDataSource.localLogout()
+
+    override fun joinWalkie(providerToken: String, nickName: String): Flow<Unit> =
+        authDataSource.joinWalkie(providerToken, nickName)
 }

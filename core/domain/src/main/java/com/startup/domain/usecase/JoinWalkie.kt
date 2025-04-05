@@ -9,6 +9,6 @@ class JoinWalkie @Inject constructor(private val authRepository: AuthRepository)
     BaseUseCase<Unit, Pair<String, String>>() {
     override fun invoke(params: Pair<String, String>): Flow<Unit>{
         val (providerToken, nickName) = params
-        return authRepository.join(providerToken, nickName)
+        return authRepository.joinWalkie(providerToken, nickName)
     }
 }

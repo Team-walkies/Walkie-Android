@@ -1,6 +1,8 @@
 package com.startup.data.di
 
 import com.startup.data.local.datasourceimpl.StepDataStoreImpl
+import com.startup.data.local.provider.LogoutManager
+import com.startup.data.local.provider.LogoutManagerImpl
 import com.startup.data.local.provider.NotificationDataStoreProvider
 import com.startup.data.local.provider.NotificationDataStoreProviderImpl
 import com.startup.data.local.provider.TokenDataStoreProvider
@@ -33,4 +35,8 @@ internal abstract class DataStoreModule {
     @Singleton
     @Binds
     abstract fun bindUserSettingPreferenceDataStoreProvider(userSettingDataStoreProvider: UserSettingDataStoreProviderImpl): UserSettingDataStoreProvider
+
+    @Singleton
+    @Binds
+    abstract fun bindLogoutManager(logoutManager: LogoutManagerImpl): LogoutManager
 }

@@ -91,12 +91,25 @@
             android:name=".login.LoginActivity"
             android:exported="false"
             android:theme="@style/Theme.Walkie">
-
         </activity>
         <activity
             android:name="com.startup.spot.SpotActivity"
             android:exported="false"
             android:theme="@style/Theme.Walkie" />
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="oauth"
+                    android:scheme="kakao${NATIVE_APP_KEY}" />
+            </intent-filter>
+        </activity>
 
     </application>
 

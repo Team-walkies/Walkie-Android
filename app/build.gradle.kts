@@ -16,7 +16,10 @@ android {
         versionCode = 1
         versionName = "1.0"
         targetSdk = Const.TARGET_SDK
-        buildConfigField("String", "NATIVE_APP_KEY", properties.getProperty("NATIVE_APP_KEY"))
+        val nativeAppKey = properties.getProperty("NATIVE_APP_KEY")
+        buildConfigField("String", "NATIVE_APP_KEY", nativeAppKey)
+
+        manifestPlaceholders["NATIVE_APP_KEY"] = nativeAppKey
     }
 
     buildFeatures {
