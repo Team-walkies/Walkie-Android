@@ -308,7 +308,17 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                                         this
                                     }
                                 },
-                            parentNavController = navController
+                            parentNavController = navController,
+                            onNavigationEvent = {
+                                when (it) {
+                                    MainScreenNavigationEvent.MoveToLoginActivity -> {
+                                        loginModuleNavigator.navigateLoginView(context = this@HomeActivity)
+                                        finish()
+                                    }
+
+                                    else -> {}
+                                }
+                            },
                         )
                     }
                 }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -20,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.startup.common.base.NavigationEvent
+import com.startup.home.MainScreenNavigationEvent
 import com.startup.home.mypage.MyInfoScreen
 import com.startup.home.mypage.MyPageViewModel
 import com.startup.home.mypage.PersonalInfoPolicyScreen
@@ -37,11 +39,23 @@ fun MyPageNavigationGraph(
     destinationRoute: String,
     parentNavController: NavHostController,
     myPageViewModel: MyPageViewModel = hiltViewModel(),
+    onNavigationEvent: (MainScreenNavigationEvent) -> Unit,
 ) {
     val navController = rememberNavController()
     val snackBarHostState = SnackbarHostState()
     // 홈화면(각각의 NavGraph), 지도화면(각각의 NavGraph), 마이페이지 화면(각각의 NavGraph)
 
+    LaunchedEffect(Unit) {
+        myPageViewModel.event.collect {
+            when (it) {
+                MainScreenNavigationEvent.MoveToLoginActivity -> {
+                    onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToLoginActivity)
+                }
+
+                else -> {}
+            }
+        }
+    }
     fun backPress() {
         val isBackStackExist = navController.navigateUp()
         if (!isBackStackExist) {
@@ -130,6 +144,7 @@ fun MyPageNavigationGraph(
                             when (it) {
                                 UnlinkUiEvent.UnlinkWalkie -> {
                                     // TODO
+                                    myPageViewModel.unLink()
                                 }
                             }
                         })

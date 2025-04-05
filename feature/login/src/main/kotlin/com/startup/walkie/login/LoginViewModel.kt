@@ -35,6 +35,7 @@ class LoginViewModel @Inject constructor(
             if (exception is UserAuthNotFoundException) {
                 _state.providerToken.update { exception.providerToken }
                 notifyEvent(LoginScreenNavigationEvent.MoveToNickNameSettingScreen)
+                Printer.e("LMH", "EXCEPTION $exception")
             }
         }.onEach {
             notifyEvent(LoginNavigationEvent.MoveToMainActivity)

@@ -7,6 +7,6 @@ data class JoinRequest(
     val provider: String,
     @SerializedName("loginAccessToken")
     val loginAccessToken: String,
-    @SerializedName("nickName")
+    @SerializedName("nickname")
     val nickName: String
 )
