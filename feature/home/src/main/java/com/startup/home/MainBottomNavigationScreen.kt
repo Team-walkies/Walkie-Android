@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,17 @@ fun MainBottomNavigationScreen(
 ) {
     val navHostController = rememberNavController()
 
+    LaunchedEffect(Unit) {
+        myPageViewModel.event.collect {
+            when (it) {
+                MainScreenNavigationEvent.MoveToLoginActivity -> {
+                    onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToLoginActivity)
+                }
+
+                else -> {}
+            }
+        }
+    }
     fun handleHomeScreenNavigationEvent(navigationEvent: HomeScreenNavigationEvent) {
         when (navigationEvent) {
             HomeScreenNavigationEvent.MoveToGainEgg -> {
@@ -78,7 +90,7 @@ fun MainBottomNavigationScreen(
             }
 
             MyPageScreenNavigationEvent.MoveToLoginActivityWithLogout -> {
-                onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToLoginActivity)
+                myPageViewModel.logout()
             }
 
             MyPageScreenNavigationEvent.MoveToNotification -> {

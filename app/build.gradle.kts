@@ -18,8 +18,7 @@ android {
         targetSdk = Const.TARGET_SDK
         val nativeAppKey = properties.getProperty("NATIVE_APP_KEY")
         buildConfigField("String", "NATIVE_APP_KEY", nativeAppKey)
-
-        manifestPlaceholders["NATIVE_APP_KEY"] = nativeAppKey
+        manifestPlaceholders["NATIVE_APP_KEY"] = nativeAppKey?.trim('"') ?: ""
     }
 
     buildFeatures {

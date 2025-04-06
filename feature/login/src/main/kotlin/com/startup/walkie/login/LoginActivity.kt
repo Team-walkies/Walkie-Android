@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.startup.common.base.BaseActivity
 import com.startup.common.base.BaseEvent
+import com.startup.common.util.Printer
 import com.startup.navigation.HomeModuleNavigator
 import com.startup.ui.WalkieTheme
 import com.startup.walkie.login.model.GetCharacterNavigationEvent
@@ -51,8 +52,6 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
             SplashActivity.HomeModuleNavigatorEntryPoint::class.java
         ).homeModuleNavigator()
     }
-
-    private val kaKaoLoginClient by lazy { KaKaoLoginClient(context = this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,16 +81,6 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
         when (uiEvent) {
             LoginUiEvent.OnClickLoginButton -> {
                 viewModel.onLogin()
-//                lifecycleScope.launch {
-//                    kaKaoLoginClient.login().fold(
-//                        onSuccess = { token ->
-//                            viewModel.onLogin(token.accessToken)
-//                        },
-//                        onFailure = { error ->
-//                            Printer.e("LMH", "로그인 오류 : $error")
-//                        }
-//                    )
-//                }
             }
 
             else -> {}
@@ -121,16 +110,15 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
         // 이벤트 수집
         LaunchedEffect(Unit) {
             eventFlow.collect { event ->
+                Printer.e("LMH", "GET NAVIGATION EVENT $event")
                 when (event) {
                     is LoginScreenNavigationEvent.MoveToNickNameSettingScreen -> {
                         navController.navigate(LoginScreenNav.NickNameSetting.route)
                     }
 
                     is LoginScreenNavigationEvent.MoveToGetCharacterScreen -> {
-                        navController.navigate(LoginScreenNav.NickNameSetting.route + "/${event.nickName}")
-
+                        navController.navigate(LoginScreenNav.GetCharacter.route + "/${event.nickName}")
                     }
-
                 }
             }
         }
@@ -162,7 +150,7 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
                             )
                         }
                         composable(
-                            route = LoginScreenNav.GetEgg.route + "/{nickName}",
+                            route = LoginScreenNav.GetCharacter.route + "/{nickName}",
                             arguments = listOf(
                                 navArgument("nickName") { type = NavType.StringType },
                             )

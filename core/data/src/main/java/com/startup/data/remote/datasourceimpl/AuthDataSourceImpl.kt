@@ -9,7 +9,6 @@ import com.startup.data.local.provider.LogoutManager
 import com.startup.data.local.provider.TokenDataStoreProvider
 import com.startup.data.remote.dto.request.auth.JoinRequest
 import com.startup.data.remote.dto.request.auth.LoginRequest
-import com.startup.data.remote.dto.response.auth.TokenDto
 import com.startup.data.remote.ext.emitRemote
 import com.startup.data.remote.ext.requireNotNull
 import com.startup.data.remote.service.AuthService
@@ -18,6 +17,7 @@ import com.startup.data.util.ACCESS_TOKEN_KEY_NAME
 import com.startup.data.util.KakaoLoginClient
 import com.startup.data.util.REFRESH_ACCESS_TOKEN_KEY_NAME
 import com.startup.data.util.handleExceptionIfNeed
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
@@ -49,36 +49,14 @@ internal class AuthDataSourceImpl @Inject constructor(
         )
     }
 
-    override fun loginWithKakao(kakaoAccessToken: String): Flow<Unit> = flow<TokenDto> {
-        emitRemote(
-            authService.login(
-                LoginRequest(
-                    provider = "kakao",
-                    loginAccessToken = kakaoAccessToken
-                )
-            )
-        )
-    }.map {
-        tokenDataStoreProvider.putValue(accessTokenKey, it.accessToken!!)
-        tokenDataStoreProvider.putValue(refreshTokenKey, it.refreshToken!!)
-        Unit
-    }.catch {
-        if (it is ResponseErrorException) {
-            throw UserAuthNotFoundException(
-                message = it.message,
-                providerToken = kakaoAccessToken
-            )
-        }
-    }
-
     override fun login(): Flow<Unit> = callbackFlow {
         kakaoLogin().onEmpty {
             throw KakaoAuthFailException("로그인 오류")
         }.map {
             val item = authService.login(LoginRequest(provider = "kakao", loginAccessToken = it))
-            if (item.status == 204) {
+            if (item.data != null && item.data.accessToken == null) {
                 throw UserAuthNotFoundException(
-                    message = item.message.orEmpty(),
+                    message = "계정 없음",
                     providerToken = it
                 )
             }
@@ -88,14 +66,19 @@ internal class AuthDataSourceImpl @Inject constructor(
             tokenDataStoreProvider.putValue(refreshTokenKey, it.refreshToken!!)
             send(Unit)
         }.catch {
-            throw ResponseErrorException("로그인 오류")
+            if (it is UserAuthNotFoundException) {
+                throw it
+            } else {
+                throw ResponseErrorException("로그인 오류")
+            }
         }.launchIn(this)
+        awaitClose()
     }
 
     override fun unLink(): Flow<Unit> = flow {
         handleExceptionIfNeed {
-            kakaoLoginClient.unLink()
             emitRemote(memberService.withdrawalService())
+            kakaoLoginClient.unLink()
             logoutManager.logout()
         }
     }

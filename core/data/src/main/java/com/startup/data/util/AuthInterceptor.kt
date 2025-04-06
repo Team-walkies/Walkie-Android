@@ -5,6 +5,7 @@ import com.startup.common.util.Printer
 import com.startup.common.util.SessionExpireException
 import com.startup.common.util.SessionManager
 import com.startup.data.local.provider.TokenDataStoreProvider
+import com.startup.data.remote.dto.request.auth.RefreshRequest
 import com.startup.data.remote.service.AuthService
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -50,14 +51,16 @@ internal class AuthInterceptor @Inject constructor(
             val refreshToken =
                 tokenDataStoreProvider.getValue(refreshTokenKey, "")
             val refreshResponse =
-                runCatching { authService.refreshTokenUpdate(BEARER + refreshToken) }.getOrNull()
+                runCatching { authService.refreshTokenUpdate(RefreshRequest(refreshToken)) }.getOrNull()
             val data = refreshResponse?.data
             if (refreshResponse?.status != 200 || data == null) {
                 sessionManager.notifySessionExpired()
+                Printer.e("LMH", "refresh 토큰 세션 만료")
                 throw SessionExpireException("세션 만료")
             } else {
                 tokenDataStoreProvider.putValue(accessTokenKey, data.accessToken.orEmpty())
                 tokenDataStoreProvider.putValue(refreshTokenKey, data.refreshToken.orEmpty())
+                Printer.e("LMH", "토큰 재 발급")
             }
         }
 
@@ -70,6 +73,7 @@ internal class AuthInterceptor @Inject constructor(
         val response = chain.proceed(newRequest)
         if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
             sessionManager.notifySessionExpired()
+            Printer.e("LMH", "refresh 토큰 세션 만료")
             throw SessionExpireException("세션 만료")
         }
         return response

@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface AuthDataSource {
     fun kakaoLogin(): Flow<String>
-    fun loginWithKakao(kakaoAccessToken: String): Flow<Unit>
     fun login(): Flow<Unit>
     fun unLink(): Flow<Unit>
     fun logOut(): Flow<Unit>

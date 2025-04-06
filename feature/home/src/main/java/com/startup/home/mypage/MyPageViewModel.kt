@@ -8,15 +8,17 @@ import com.startup.domain.usecase.GetArriveSpotNotiEnabled
 import com.startup.domain.usecase.GetEggHatchedNotiEnabled
 import com.startup.domain.usecase.GetMyData
 import com.startup.domain.usecase.GetTodayStepNotiEnabled
+import com.startup.domain.usecase.LocalLogout
+import com.startup.domain.usecase.Unlink
 import com.startup.domain.usecase.UpdateArriveSpotNotiEnabled
 import com.startup.domain.usecase.UpdateEggHatchedNotiEnabled
 import com.startup.domain.usecase.UpdateTodayStepNotiEnabled
+import com.startup.home.MainScreenNavigationEvent
 import com.startup.home.mypage.model.MyInfoViewModelEvent
 import com.startup.home.mypage.model.MyInfoViewState
 import com.startup.home.mypage.model.MyInfoViewStateImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
@@ -25,7 +27,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,14 +38,18 @@ class MyPageViewModel @Inject constructor(
     private val changeUserProfileVisibility: ChangeUserProfileVisibility,
     private val updateArriveSpotNotiEnabled: UpdateArriveSpotNotiEnabled,
     private val updateEggHatchedNotiEnabled: UpdateEggHatchedNotiEnabled,
-    private val updateTodayStepNotiEnabled: UpdateTodayStepNotiEnabled
+    private val updateTodayStepNotiEnabled: UpdateTodayStepNotiEnabled,
+    private val unlink: Unlink,
+    private val localLogout: LocalLogout
 ) : BaseViewModel() {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _state: MyInfoViewStateImpl = MyInfoViewStateImpl(
-        isNotificationEnabledEggHatched = getEggHatchedNotiEnabled.invoke(Unit)
+        isNotificationEnabledEggHatched = getEggHatchedNotiEnabled
+            .invoke(Unit)
             .stateInViewModel(false),
 
-        isNotificationEnabledSpotArrive = getArriveSpotNotiEnabled.invoke(Unit)
+        isNotificationEnabledSpotArrive = getArriveSpotNotiEnabled
+            .invoke(Unit)
             .stateInViewModel(false),
 
         isProfileAccess = merge(
@@ -53,27 +58,57 @@ class MyPageViewModel @Inject constructor(
             .flatMapLatest { getMyData.invoke(Unit).map { it.isPublic } }
             .stateInViewModel(false),
 
-        isNotificationEnabledTodayStep = getTodayStepNotiEnabled.invoke(Unit)
+        isNotificationEnabledTodayStep = getTodayStepNotiEnabled
+            .invoke(Unit)
             .stateInViewModel(false),
-        userInfo = getMyData.invoke(Unit).catch {  }.stateInViewModel(null)
+        userInfo = getMyData
+            .invoke(Unit)
+            .catch { }
+            .stateInViewModel(null)
     )
     override val state: MyInfoViewState get() = _state
 
     fun updateArriveSpotNoti(enabled: Boolean) {
-        updateArriveSpotNotiEnabled.invoke(enabled).launchIn(viewModelScope)
+        updateArriveSpotNotiEnabled
+            .invoke(enabled)
+            .launchIn(viewModelScope)
     }
 
     fun updateTodayStepNoti(enabled: Boolean) {
-        updateTodayStepNotiEnabled.invoke(enabled).launchIn(viewModelScope)
+        updateTodayStepNotiEnabled
+            .invoke(enabled)
+            .launchIn(viewModelScope)
     }
 
     fun updateEggHatchedNoti(enabled: Boolean) {
-        updateEggHatchedNotiEnabled.invoke(enabled).launchIn(viewModelScope)
+        updateEggHatchedNotiEnabled
+            .invoke(enabled)
+            .launchIn(viewModelScope)
     }
 
     fun updateProfileAccess() {
-        changeUserProfileVisibility.invoke(Unit).onEach {
-            notifyViewModelEvent(MyInfoViewModelEvent.OnChangedProfileVisibility)
-        }.catch { Printer.e("LMH", "updateProfileAccess Error $it") }.launchIn(viewModelScope)
+        changeUserProfileVisibility
+            .invoke(Unit)
+            .onEach { notifyViewModelEvent(MyInfoViewModelEvent.OnChangedProfileVisibility) }
+            .catch { Printer.e("LMH", "updateProfileAccess Error $it") }
+            .launchIn(viewModelScope)
+    }
+
+    fun unLink() {
+        unlink
+            .invoke(Unit)
+            .onEach { notifyEvent(MainScreenNavigationEvent.MoveToLoginActivity) }
+            .catch { }
+            .launchIn(viewModelScope)
+    }
+
+    fun logout() {
+        localLogout
+            .invoke(Unit)
+            .onEach {
+                notifyEvent(MainScreenNavigationEvent.MoveToLoginActivity)
+            }
+            .catch { }
+            .launchIn(viewModelScope)
     }
 }
