@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.startup.common.util.Printer
 import com.startup.common.util.SessionManager
 import com.startup.common.util.SessionManagerEntryPoint
 import dagger.hilt.android.EntryPointAccessors
@@ -34,6 +35,7 @@ abstract class BaseActivity<UE : UiEvent, NE : NavigationEvent> : ComponentActiv
     }
 
     private fun handleSessionExpired() {
+        Printer.e("LMH", "토큰 만료로 인한 강제 로그인 뷰로 이동")
         sessionManager.clearSessionState()
         navigateToLogin()
     }

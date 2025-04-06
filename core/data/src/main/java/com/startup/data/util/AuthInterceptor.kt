@@ -4,6 +4,7 @@ import androidx.datastore.preferences.core.Preferences
 import com.startup.common.util.Printer
 import com.startup.common.util.SessionExpireException
 import com.startup.common.util.SessionManager
+import com.startup.data.local.provider.LogoutManager
 import com.startup.data.local.provider.TokenDataStoreProvider
 import com.startup.data.remote.dto.request.auth.RefreshRequest
 import com.startup.data.remote.service.AuthService
@@ -20,6 +21,7 @@ import javax.inject.Singleton
 internal class AuthInterceptor @Inject constructor(
     private val tokenDataStoreProvider: TokenDataStoreProvider,
     private val sessionManager: SessionManager,
+    private val logoutManager: LogoutManager,
     private val authService: AuthService,
     @Named(ACCESS_TOKEN_KEY_NAME) private val accessTokenKey: Preferences.Key<String>,
     @Named(REFRESH_ACCESS_TOKEN_KEY_NAME) private val refreshTokenKey: Preferences.Key<String>,
@@ -27,7 +29,10 @@ internal class AuthInterceptor @Inject constructor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val accessToken = runBlocking {
             // TODO defaultValue 제거
-            tokenDataStoreProvider.getValue(accessTokenKey, "eyJhbGciOiJIUzI1NiJ9.eyJwcm92aWRlcklkIjoiMzk1ODI1NjA0MCIsIm1lbWJlcklkIjo2LCJpYXQiOjE3NDI5MDc2MjEsImV4cCI6MTc0NTQ5OTYyMX0.1VSczNwwq6jALTcJwW3qiotSb2PieySdGdPFjwjmDGI")
+            tokenDataStoreProvider.getValue(
+                accessTokenKey,
+                "eyJhbGciOiJIUzI1NiJ9.eyJwcm92aWRlcklkIjoiMzk1ODI1NjA0MCIsIm1lbWJlcklkIjo2LCJpYXQiOjE3NDI5MDc2MjEsImV4cCI6MTc0NTQ5OTYyMX0.1VSczNwwq6jALTcJwW3qiotSb2PieySdGdPFjwjmDGI"
+            )
         }
 
         val request = chain.request()
@@ -54,9 +59,9 @@ internal class AuthInterceptor @Inject constructor(
                 runCatching { authService.refreshTokenUpdate(RefreshRequest(refreshToken)) }.getOrNull()
             val data = refreshResponse?.data
             if (refreshResponse?.status != 200 || data == null) {
+                logoutManager.logout()
                 sessionManager.notifySessionExpired()
                 Printer.e("LMH", "refresh 토큰 세션 만료")
-                throw SessionExpireException("세션 만료")
             } else {
                 tokenDataStoreProvider.putValue(accessTokenKey, data.accessToken.orEmpty())
                 tokenDataStoreProvider.putValue(refreshTokenKey, data.refreshToken.orEmpty())
@@ -72,9 +77,9 @@ internal class AuthInterceptor @Inject constructor(
             .build()
         val response = chain.proceed(newRequest)
         if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            runBlocking { logoutManager.logout() }
             sessionManager.notifySessionExpired()
             Printer.e("LMH", "refresh 토큰 세션 만료")
-            throw SessionExpireException("세션 만료")
         }
         return response
     }
