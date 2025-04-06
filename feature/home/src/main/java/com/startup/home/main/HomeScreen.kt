@@ -416,6 +416,21 @@ private fun EggContent(
         val screenWidth = configuration.screenWidthDp.dp
         val eggSize = minOf(screenWidth - 12.dp, maxEggSize) // 좌우 패딩 6dp씩 고려
 
+        // 이펙트 이미지
+        if (eggModel.eggKind != EggKind.Empty) {
+            eggAttribute.effectDrawable?.let { drawableRes ->
+                Image(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(y = 78.dp)
+                        .align(Alignment.BottomCenter),
+                    painter = painterResource(drawableRes),
+                    contentDescription = stringResource(R.string.desc_empty_egg),
+                    contentScale = ContentScale.FillWidth
+                )
+            }
+        }
+
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -460,21 +475,6 @@ private fun EggContent(
                         color = WalkieTheme.colors.blue50
                     )
                 }
-            }
-        }
-
-        // 이펙트 이미지
-        if (eggModel.eggKind != EggKind.Empty) {
-            eggAttribute.effectDrawable?.let { drawableRes ->
-                Image(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .offset(y = 78.dp)
-                        .align(Alignment.BottomCenter),
-                    painter = painterResource(drawableRes),
-                    contentDescription = stringResource(R.string.desc_empty_egg),
-                    contentScale = ContentScale.FillWidth
-                )
             }
         }
     }

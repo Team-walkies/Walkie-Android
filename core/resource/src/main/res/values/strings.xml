@@ -174,9 +174,9 @@
     <string name="permission_location_alert">위치 권한을 허용해 주세요</string>
     <string name="permission_bottomsheet_title">워키 이용에 꼭 필요한 권한이에요!</string>
     <string name="permission_bottomsheet_subtitle">원활한 이용을 위해 권한을 허용해주세요</string>
-    <string name="permission_notification_title">알이 부화하면 알려드릴게요!</string>
+    <string name="permission_notification_title">걸음 수가 채워지면\n알 부화 소식을 알려드릴게요!</string>
     <string name="permission_notification_subtitle">‘마이 > ‘푸시 알림’에서 관리할 수 있어요</string>
-    <string name="permission_bottomsheet_next">다음</string>
+    <string name="permission_bottomsheet_grant">허용하기</string>
     <string name="permission_bottomsheet_later">나중에</string>
     <string name="permission_bottomsheet_notification">알림 받기</string>
     <string name="permission_activity_recognition">신체활동</string>
@@ -184,7 +184,7 @@
     <string name="permission_location">위치</string>
     <string name="permission_location_description">지도로 스팟 탐험하기</string>
     <string name="permission_battery_optimization">배터리 최적화</string>
-    <string name="permission_battery_optimization_description">필요한 알림 받기</string>
+    <string name="permission_battery_optimization_description">걸음수 정확도 높이기</string>
     <string name="permission_essential">(필수)</string>
     <string name="permission_optional">(선택)</string>
     <string name="permission_dialog_title">접근권한 허용</string>
