@@ -88,8 +88,19 @@ private fun BottomSheetCalendarContent(
     var isNextMonthEnabled by remember { mutableStateOf(today.isAfter(currentDate)) }
     LaunchedEffect(currentDate.month) {
         isNextMonthEnabled = today.isAfter(currentDate)
-        if (selectDate != currentDate) {
-            selectDate = currentDate.withDayOfMonth(1)
+        val targetDay = selectDate.dayOfMonth
+        val lastDayOfNewMonth = currentDate.lengthOfMonth()
+        val correctedDay = minOf(targetDay, lastDayOfNewMonth)
+        val candidateDate = currentDate.withDayOfMonth(correctedDay)
+        // 오늘보다 미래면 today와 비교해서 이전 날짜로 보정
+        selectDate = if (candidateDate.isAfter(today)) {
+            if (today.month == currentDate.month && today.year == currentDate.year) {
+                today // 같은 월이면 today까지만 선택
+            } else {
+                currentDate.withDayOfMonth(minOf(today.dayOfMonth, lastDayOfNewMonth))
+            }
+        } else {
+            candidateDate
         }
     }
     Column(
