@@ -48,6 +48,13 @@ object DateUtil {
         return today.minusDays(today.dayOfWeek.value.toLong() % 7)
     }
 
+    fun matchWeekdayInSameWeekUntilToday(from: LocalDate, to: LocalDate, today: LocalDate = LocalDate.now()): LocalDate {
+        val fromDayOfWeek = from.dayOfWeek.value
+        val toStartOfWeek = to.minusDays((to.dayOfWeek.value - 1).toLong())
+        val aligned = toStartOfWeek.plusDays((fromDayOfWeek - 1).toLong())
+        return if (aligned.isAfter(today)) today else aligned
+    }
+
     fun formatTimeRange(startTimeStr: String, endTimeStr: String): String = kotlin.runCatching {
         val startTime = convertLocalTime(startTimeStr)
         val endTime = convertLocalTime(endTimeStr)
