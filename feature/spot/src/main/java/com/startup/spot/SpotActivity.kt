@@ -1,21 +1,27 @@
 package com.startup.spot
 
+import android.os.Bundle
+import android.webkit.CookieManager
+import android.webkit.WebView
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.startup.common.base.BaseActivity
-import com.startup.common.base.BaseViewModel
-import com.startup.common.base.NavigationEvent
-import com.startup.common.base.UiEvent
 import com.startup.navigation.LoginModuleNavigator
+import com.startup.ui.WalkieTheme
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
-class SpotActivity: BaseActivity<UiEvent, NavigationEvent>() {
-    override val viewModel: BaseViewModel by viewModels<SpotViewModel>()
+class SpotActivity : BaseActivity<SpotUiEvent, SpotNavigationEvent>() {
+    override val viewModel: SpotViewModel by viewModels<SpotViewModel>()
     private val loginModuleNavigator: LoginModuleNavigator by lazy {
         EntryPointAccessors.fromApplication(
             applicationContext,
@@ -23,12 +29,40 @@ class SpotActivity: BaseActivity<UiEvent, NavigationEvent>() {
         ).loginNavigatorNavigator()
     }
 
-    override fun handleNavigationEvent(navigationEventFlow: Flow<NavigationEvent>) {
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            WebView.setWebContentsDebuggingEnabled(true)
+            WalkieTheme {
+                CookieManager.getInstance().removeAllCookies(null)
+                SpotScreen(
+                    event = viewModel.event.filterIsInstance<SpotEvent>(),
+                    uiEvent = ::handleUiEvent
+                )
+                handleNavigationEvent(viewModel.event.filterIsInstance())
+            }
+        }
     }
 
-    override fun handleUiEvent(uiEvent: UiEvent) {
+    override fun handleNavigationEvent(navigationEventFlow: Flow<SpotNavigationEvent>) {
 
+        navigationEventFlow.onEach {
+            when (it) {
+                SpotNavigationEvent.FinishSpotActivity -> {
+      setResult(RESULT_OK) // -1
+                    finish()
+                }
+
+                SpotNavigationEvent.Logout -> {
+                    loginModuleNavigator.navigateLoginView(context = this)
+                    finish()
+                }
+            }
+        }.launchIn(lifecycleScope)
+    }
+
+    override fun handleUiEvent(uiEvent: SpotUiEvent) {
+        viewModel.notifyViewModelEvent(uiEvent)
     }
 
     override fun navigateToLogin() {
@@ -41,5 +75,4 @@ class SpotActivity: BaseActivity<UiEvent, NavigationEvent>() {
     interface LoginNavigatorEntryPoint {
         fun loginNavigatorNavigator(): LoginModuleNavigator
     }
-
 }

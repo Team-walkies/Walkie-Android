@@ -3,6 +3,7 @@ package com.startup.data.repository
 import com.startup.data.datasource.AuthDataSource
 import com.startup.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 internal class AuthRepositoryImpl @Inject constructor(private val authDataSource: AuthDataSource) :
@@ -17,4 +18,6 @@ internal class AuthRepositoryImpl @Inject constructor(private val authDataSource
 
     override fun joinWalkie(providerToken: String, nickName: String): Flow<Unit> =
         authDataSource.joinWalkie(providerToken, nickName)
+
+    override fun getAccessToken(): Flow<String> = authDataSource.getAccessToken()
 }

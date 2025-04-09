@@ -111,4 +111,6 @@ internal class AuthDataSourceImpl @Inject constructor(
         tokenDataStoreProvider.putValue(refreshTokenKey, it.refreshToken!!)
         Unit
     }
+
+    override fun getAccessToken(): Flow<String> = tokenDataStoreProvider.getFlowValue(accessTokenKey)
 }

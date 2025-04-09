@@ -8,4 +8,5 @@ interface AuthRepository {
     fun logOut(): Flow<Unit>
     fun localLogout(): Flow<Unit>
     fun joinWalkie(providerToken: String, nickName:String): Flow<Unit>
+    fun getAccessToken(): Flow<String>
 }

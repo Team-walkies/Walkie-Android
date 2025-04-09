@@ -6,7 +6,7 @@ import com.startup.common.extension.orZero
 import com.startup.domain.model.member.UserInfo
 
 data class GetUserInfoResponse(
-    @SerializedName("memberId")
+    @SerializedName("id")
     val memberId: Long?,
     @SerializedName("memberEmail")
     val memberEmail: String?,
