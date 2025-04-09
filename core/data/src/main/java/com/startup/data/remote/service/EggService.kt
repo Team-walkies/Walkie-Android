@@ -1,10 +1,11 @@
 package com.startup.data.remote.service
 
 import com.startup.data.remote.BaseResponse
+import com.startup.data.remote.dto.request.egg.UpdateEggOfStepCountRequest
 import com.startup.data.remote.dto.response.egg.EggCountResponse
 import com.startup.data.remote.dto.response.egg.EggDetailDto
+import com.startup.data.remote.dto.response.egg.EggStepUpdateResponse
 import com.startup.data.remote.dto.response.egg.MyEggResponse
-import com.startup.data.remote.dto.request.egg.UpdateEggOfStepCountRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -17,7 +18,7 @@ internal interface EggService {
 
     /** 알의 걸은 걸음수 업데이트 API */
     @PATCH("api/v1/eggs/steps")
-    suspend fun updateEggOfStepCount(@Body request: UpdateEggOfStepCountRequest): BaseResponse<Unit>
+    suspend fun updateEggOfStepCount(@Body request: UpdateEggOfStepCountRequest): BaseResponse<EggStepUpdateResponse>
 
     /** 보유한 알 리스트 조회 API */
     @GET("api/v1/eggs")

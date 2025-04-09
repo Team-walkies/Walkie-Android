@@ -66,13 +66,6 @@
             android:theme="@style/Theme.Walkie" />
 
         <activity
-            android:name="com.startup.home.step.StepCounterActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Walkie">
-
-        </activity>
-
-        <activity
             android:name="com.startup.home.HomeActivity"
             android:exported="false"
             android:theme="@style/Theme.Walkie">

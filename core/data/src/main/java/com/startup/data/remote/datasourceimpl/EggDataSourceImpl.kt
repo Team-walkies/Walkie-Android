@@ -1,10 +1,11 @@
 package com.startup.data.remote.datasourceimpl
 
 import com.startup.data.datasource.EggDataSource
+import com.startup.data.remote.dto.request.egg.UpdateEggOfStepCountRequest
 import com.startup.data.remote.dto.response.egg.EggCountResponse
 import com.startup.data.remote.dto.response.egg.EggDetailDto
+import com.startup.data.remote.dto.response.egg.EggStepUpdateResponse
 import com.startup.data.remote.dto.response.egg.MyEggResponse
-import com.startup.data.remote.dto.request.egg.UpdateEggOfStepCountRequest
 import com.startup.data.remote.ext.emitRemote
 import com.startup.data.remote.service.EggService
 import com.startup.data.util.handleExceptionIfNeed
@@ -20,7 +21,7 @@ internal class EggDataSourceImpl @Inject constructor(private val eggService: Egg
         }
     }
 
-    override fun updateEggOfStepCount(request: UpdateEggOfStepCountRequest): Flow<Unit> =
+    override fun updateEggOfStepCount(request: UpdateEggOfStepCountRequest): Flow<EggStepUpdateResponse> =
         flow {
             handleExceptionIfNeed {
                 emitRemote(eggService.updateEggOfStepCount(request))
