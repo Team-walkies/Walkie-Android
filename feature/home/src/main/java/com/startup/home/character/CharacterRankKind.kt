@@ -1,10 +1,18 @@
 package com.startup.home.character
 
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import com.startup.home.R
 import com.startup.home.character.model.CharacterKind
 import com.startup.home.character.model.WalkieCharacterData
 import com.startup.home.egg.model.EggKind
+import com.startup.home.egg.model.EggKind.Empty
+import com.startup.home.egg.model.EggKind.Epic
+import com.startup.home.egg.model.EggKind.Legend
+import com.startup.home.egg.model.EggKind.Normal
+import com.startup.home.egg.model.EggKind.Rare
+import com.startup.ui.WalkieTheme
 
 enum class CharacterRankKind(
     @StringRes val displayStrResId: Int,
@@ -82,6 +90,27 @@ enum class CharacterRankKind(
                     Legend -> WalkieCharacterData(R.string.dino_dragon, R.drawable.dino_10) // 0
                 }
 
+            }
+        }
+    }
+
+    @Composable
+    fun getTextColor(): Color {
+        return when (this) {
+            Normal -> {
+                WalkieTheme.colors.blue500
+            }
+
+            Rare -> {
+                WalkieTheme.colors.green300
+            }
+
+            Epic -> {
+                WalkieTheme.colors.orange300
+            }
+
+            Legend -> {
+                WalkieTheme.colors.purple300
             }
         }
     }
