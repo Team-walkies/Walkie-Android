@@ -57,7 +57,8 @@ internal fun SpotScreen(
                 }
 
                 is SpotEvent.RequestCurrentSteps -> {
-                    // TODO @IslandOrDream 스팟 탐험 완료 후 걸음 수 데이터 전달이 필요하여 요청, 이후 걸음 수 측정 종료
+                    val steps = event.steps.toString()
+                    sendToWebView(webView, method = "getStepsFromMobile", message = steps)
                 }
             }
         }
@@ -91,9 +92,6 @@ internal fun SpotScreen(
                     }
                     addJavascriptInterface(SpotBridgeJsInterface {
                         uiEvent.invoke(it)
-                        if (it == SpotUiEvent.RequestCurrentSteps) {
-                            sendToWebView(webView, method = "getStepsFromMobile", message = "300")
-                        }
                         Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show()
                     }, "AndroidBridge")
                     webViewClient = WebViewClient()
@@ -102,7 +100,11 @@ internal fun SpotScreen(
                             origin: String?,
                             callback: GeolocationPermissions.Callback?
                         ) {
-                            if (UsePermissionHelper.isGrantedPermissions(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                            if (UsePermissionHelper.isGrantedPermissions(
+                                    context,
+                                    Manifest.permission.ACCESS_FINE_LOCATION
+                                )
+                            ) {
                                 // 권한이 이미 승인된 경우
                                 callback?.invoke(origin, true, false)
                                 Printer.e("LMH", "권한이 이미 승인된 경우")
