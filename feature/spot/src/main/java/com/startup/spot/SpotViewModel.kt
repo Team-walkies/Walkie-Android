@@ -5,21 +5,26 @@ import com.startup.common.base.BaseEvent
 import com.startup.common.base.BaseState
 import com.startup.common.base.BaseViewModel
 import com.startup.common.util.Printer
+import com.startup.domain.provider.StepDataStore
 import com.startup.domain.usecase.GetSpotWebViewParams
 import com.startup.domain.usecase.LocalLogout
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SpotViewModel @Inject constructor(
     getSpotWebViewParams: GetSpotWebViewParams,
     private val logout: LocalLogout,
+    private val stepDataStore: StepDataStore
 ) :
     BaseViewModel() {
     override val state: BaseState = object : BaseState {}
+
+    private var spotStepStartValue = 0
 
     init {
         getSpotWebViewParams.invoke(Unit)
@@ -58,12 +63,19 @@ class SpotViewModel @Inject constructor(
                 }
 
                 SpotUiEvent.RequestCurrentSteps -> {
-                    // TODO @IslandOrDream 스팟 탐험 완료 후 걸음 수 데이터 전달이 필요하여 요청, 이후 걸음 수 측정 종료
-                    notifyEvent(SpotEvent.RequestCurrentSteps(2))
+                    // 스팟 탐험 완료 후 현재까지 증가한 걸음수를 계산하여 전달
+                    viewModelScope.launch {
+                        val currentSteps = stepDataStore.getCurrentSteps()
+                        val spotStepsDifference = currentSteps - spotStepStartValue
+                        notifyEvent(SpotEvent.RequestCurrentSteps(spotStepsDifference))
+                    }
                 }
 
                 SpotUiEvent.StartCountingSteps -> {
-                    // TODO @IslandOrDream 걸음 수 측정 시작
+                    // 스팟 탐험 걸음수 측정 시작 - 현재 걸음수를 기준점으로 저장
+                    viewModelScope.launch {
+                        spotStepStartValue = stepDataStore.getCurrentSteps()
+                    }
                 }
             }
         }
