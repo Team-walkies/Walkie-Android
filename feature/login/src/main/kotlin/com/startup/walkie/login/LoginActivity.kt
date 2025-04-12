@@ -161,6 +161,7 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
                                 when (it) {
                                     GetCharacterNavigationEvent.MoveToMainActivity -> {
                                         homeModuleNavigator.moveToHomeActivity(this@LoginActivity)
+                                        finish() // 홈 이동 이후, 로그인 액티비티 스택에서 제거
                                     }
 
                                     else -> {}

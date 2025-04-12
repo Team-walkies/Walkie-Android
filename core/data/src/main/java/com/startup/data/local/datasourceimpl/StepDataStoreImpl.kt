@@ -3,6 +3,7 @@ package com.startup.data.local.datasourceimpl
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -27,7 +28,7 @@ class StepDataStoreImpl @Inject constructor(
     private companion object {
         private val CURRENT_STEPS = intPreferencesKey("current_steps")
         private val TARGET_STEP = intPreferencesKey("target_step")
-
+        private val TARGET_REACHED = booleanPreferencesKey("target_reached")
         private val LAST_RESET_DATE = stringPreferencesKey("last_reset_date")
         private val YESTERDAY_STEPS = intPreferencesKey("yesterday_steps")
     }
@@ -55,6 +56,16 @@ class StepDataStoreImpl @Inject constructor(
     override suspend fun resetSteps() {
         context.dataStore.edit { preferences ->
             preferences[CURRENT_STEPS] = 0
+        }
+    }
+
+    override suspend fun isTargetReached(): Boolean {
+        return context.dataStore.data.first()[TARGET_REACHED] ?: false
+    }
+
+    override suspend fun setTargetReached(reached: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[TARGET_REACHED] = reached
         }
     }
 

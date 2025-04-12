@@ -1,9 +1,10 @@
-package com.startup.common
+package com.startup.common.animation
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.RepeatMode
@@ -45,6 +46,7 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.startup.common.R
 import com.startup.common.util.OsVersions
 import com.startup.ui.WalkieTheme
 import kotlinx.coroutines.CoroutineScope
@@ -54,7 +56,9 @@ import kotlinx.coroutines.launch
 @SuppressLint("MissingPermission")
 @Composable
 fun EggHatchingAnimation(
-    character: String = "해파리",
+    characterName: String,
+    @DrawableRes characterImageResId: Int,
+    eggRank: Int = 0, // -1: Empty, 0: Normal, 1: Rare, 2: Epic, 3: Legend
     onDismiss: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -74,12 +78,21 @@ fun EggHatchingAnimation(
     // 진동 애니메이션 (캐릭터 부화시)
     val vibrateAnim = remember { Animatable(0f) }
 
+    // 알 등급에 따른 로티 선택
+    val eggLottieAsset = remember(eggRank) {
+        when (eggRank) {
+            0 -> "walkie_EggBlue.json"     // Normal
+            1 -> "walkie_EggGreen.json"    // Rare
+            2 -> "walkie_EggYellow.json"   // Epic
+            3 -> "walkie_EggPurple.json"   // Legend
+            else -> "walkie_EggBlue.json"  // Default
+        }
+    }
 
     val eggCrackingComposition by rememberLottieComposition(
-        LottieCompositionSpec.Asset("walkie_EggBlue.json")
+        LottieCompositionSpec.Asset(eggLottieAsset)
     )
 
-    //todo 로티 교체 캐릭터 등급 마다 로티 변경
     val explosionComposition by rememberLottieComposition(
         LottieCompositionSpec.Asset("walkie_Confetti.json")
     )
@@ -155,7 +168,8 @@ fun EggHatchingAnimation(
             // 결과 영역 - 캐릭터와 텍스트
             if (showCharacterImage) {
                 AnimatedResultSection(
-                    character = character,
+                    characterName = characterName,
+                    characterImageResId = characterImageResId,
                     visible = showCharacterImage
                 )
             }
@@ -357,7 +371,8 @@ fun AnimatedLottie(
  */
 @Composable
 fun AnimatedResultSection(
-    character: String,
+    characterName: String,
+    @DrawableRes characterImageResId: Int,
     visible: Boolean
 ) {
     val alpha by animateFloatAsState(
@@ -376,7 +391,7 @@ fun AnimatedResultSection(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = stringResource(R.string.hatching_result, character),
+                text = stringResource(R.string.hatching_result, characterName),
                 color = WalkieTheme.colors.white,
                 style = WalkieTheme.typography.head2,
                 textAlign = TextAlign.Center
@@ -389,10 +404,9 @@ fun AnimatedResultSection(
                 .alpha(alpha),
             contentAlignment = Alignment.Center
         ) {
-            //todo 이미지 캐릭터 이미지 fetch
             Image(
-                painter = painterResource(id = R.drawable.jelly_1),
-                contentDescription = "Character",
+                painter = painterResource(id = characterImageResId),
+                contentDescription = characterName,
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -421,13 +435,15 @@ fun AnimatedGlowImage(
 
 @Preview(showBackground = true)
 @Composable
-fun EggHatchingAnimationPreview() {
+fun EggHatchingLegendaryPreview() {
     Surface(
         modifier = Modifier.fillMaxSize(),
     ) {
-        // 기존 EggHatchingAnimation 함수 호출
         WalkieTheme {
             EggHatchingAnimation(
+                characterName = "우주 해파리",
+                characterImageResId = R.drawable.jelly_10,
+                eggRank = 3,  // Legend 등급
                 onDismiss = {}
             )
         }
