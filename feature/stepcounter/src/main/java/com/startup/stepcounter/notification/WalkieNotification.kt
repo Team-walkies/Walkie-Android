@@ -8,6 +8,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.startup.common.util.OsVersions
@@ -22,7 +23,6 @@ import com.startup.stepcounter.notification.NotificationCode.WALKIE_STEP_NOTIFIC
 import com.startup.stepcounter.notification.NotificationCode.WALKIE_STEP_NOTIFICATION_ID
 
 
-//todo 토스처럼 알림 취소 한 후 걸음수 측정될때마다 살아나게 할지 아님 취소하자마자 살아나게 할지 기획측 문의
 @SuppressLint("RemoteViewLayout")
 fun buildWalkieNotification(context: Context, step: Int, target: Int = 10000): Notification {
     createNotificationChannel(context)
@@ -90,14 +90,15 @@ private fun createNotificationChannel(context: Context) {
 }
 
 private fun createPendingIntent(context: Context): PendingIntent {
-    val intent = Intent().apply {
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-    } // todo 펜딩인텐트 추가
+    val deepLinkIntent = Intent(Intent.ACTION_VIEW).apply {
+        data = Uri.parse("walkie://splash")
+        flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+    }
 
     return PendingIntent.getActivity(
         context,
         0,
-        intent,
+        deepLinkIntent,
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
     )
 }
@@ -125,6 +126,7 @@ fun buildArriveNotification(context: Context): Notification {
         .setContentTitle(context.getString(R.string.notification_arrive_title))
         .setContentText(context.getString(R.string.notification_arrive_message))
         .setAutoCancel(true)
+        .setContentIntent(createPendingIntent(context))
         .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
         .build()
 }
@@ -167,11 +169,12 @@ fun sendArriveNotification(context: Context) {
  */
 fun buildHatchingNotification(context: Context): Notification {
 
-    return NotificationCompat.Builder(context, ACTIVITY_PERMISSION_NOTIFICATION_CHANNEL_ID)
+    return NotificationCompat.Builder(context, NotificationCode.HATCHING_NOTIFICATION_CHANNEL_ID)
         .setSmallIcon(R.drawable.ic_walkie_artwork)
         .setContentTitle(context.getString(R.string.notification_hatching_title))
         .setContentText(context.getString(R.string.notification_hatching_message))
         .setAutoCancel(true)
+        .setContentIntent(createPendingIntent(context))
         .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
         .build()
 }
@@ -233,6 +236,7 @@ private fun buildPermissionInductionNotification(context: Context): Notification
         .setSmallIcon(R.drawable.ic_walkie_artwork)
         .setContentTitle(context.getString(R.string.notification_permission_title))
         .setContentText(context.getString(R.string.notification_permission_message))
+        .setContentIntent(createPendingIntent(context))
         .setAutoCancel(true)
         .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
         .build()

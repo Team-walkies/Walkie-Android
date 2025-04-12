@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".WalkieApplication"
@@ -25,10 +25,10 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:usesCleartextTraffic="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Walkie"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
         <receiver
@@ -68,8 +68,7 @@
         <activity
             android:name="com.startup.home.HomeActivity"
             android:exported="false"
-            android:theme="@style/Theme.Walkie">
-        </activity>
+            android:theme="@style/Theme.Walkie" />
 
         <activity
             android:name=".splash.SplashActivity"
@@ -80,13 +79,23 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="splash"
+                    android:scheme="walkie" />
+            </intent-filter>
         </activity>
 
         <activity
             android:name=".login.LoginActivity"
             android:exported="false"
-            android:theme="@style/Theme.Walkie">
-        </activity>
+            android:theme="@style/Theme.Walkie" />
         <activity
             android:name="com.startup.spot.SpotActivity"
             android:exported="false"

@@ -99,8 +99,8 @@ class HomeViewModel @Inject constructor(
     )
     val uiEventFlow: SharedFlow<UiEvent> = _uiEventFlow.asSharedFlow()
 
-    private val _hatchingInfo = MutableStateFlow<Boolean?>(null)
-    val hatchingInfo: StateFlow<Boolean?> = _hatchingInfo
+    private val _hatchingInfo = MutableStateFlow<HatchingAnimationCharacterData?>(null)
+    val hatchingInfo: StateFlow<HatchingAnimationCharacterData?> = _hatchingInfo
 
     fun onHatchingAnimationDismissed() {
         _hatchingInfo.value = null
@@ -120,8 +120,16 @@ class HomeViewModel @Inject constructor(
 
     private fun observeEggHatchingEvents() {
         viewModelScope.launch {
-            EggHatchingEvent.hatchingAnimationFlow.collect { info ->
-                _hatchingInfo.value = info
+            EggHatchingEvent.hatchingAnimationFlow.collect { isHatching ->
+                if (isHatching) {
+                    _hatchingInfo.value = HatchingAnimationCharacterData(
+                        isHatching = true,
+                        character = _state.currentWalkCharacter.value,
+                        eggKind = _state.currentWalkEgg.value.eggKind
+                    )
+                } else {
+                    _hatchingInfo.value = null
+                }
             }
         }
     }
@@ -188,7 +196,7 @@ class HomeViewModel @Inject constructor(
     private fun setupTargetSteps() {
         // todo fetching or 로컬에 저장
         viewModelScope.launch {
-            dataStore.setTargetStep(target = 100)
+            dataStore.setTargetStep(target = 20)
         }
     }
 
@@ -230,3 +238,9 @@ class HomeViewStateImpl(
     override val currentWalkCharacter: StateFlow<WalkieCharacter>,
     override val showActivityPermissionAlert: StateFlow<Boolean>
 ) : HomeViewState
+
+data class HatchingAnimationCharacterData(
+    val isHatching: Boolean,
+    val character: WalkieCharacter? = null,
+    val eggKind: EggKind = EggKind.Empty
+)

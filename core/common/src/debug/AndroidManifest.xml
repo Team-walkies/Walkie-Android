@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- HatchingAnimation 프리뷰 용으로 추가 -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+</manifest>

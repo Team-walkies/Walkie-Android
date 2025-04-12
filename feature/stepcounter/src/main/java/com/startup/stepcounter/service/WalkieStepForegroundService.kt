@@ -21,6 +21,7 @@ import com.startup.domain.provider.StepDataStore
 import com.startup.stepcounter.broadcastReciver.RestartServiceReceiver
 import com.startup.stepcounter.notification.NotificationCode.WALKIE_STEP_NOTIFICATION_ID
 import com.startup.stepcounter.notification.buildWalkieNotification
+import com.startup.stepcounter.notification.sendHatchingNotification
 import com.startup.stepcounter.notification.showPermissionNotification
 import com.startup.stepcounter.notification.updateStepNotification
 import dagger.hilt.EntryPoint
@@ -160,12 +161,15 @@ internal class WalkieStepForegroundService @Inject constructor() : Service(), Se
         serviceScope.launch {
             stepDataStore.saveCurrentSteps(totalSteps)
             val targetSteps = stepDataStore.getTargetStep()
-            if (totalSteps >= targetSteps || targetSteps != 0) {
+            val isAlreadyReached = stepDataStore.isTargetReached()
+
+            if (targetSteps in 1..totalSteps && !isAlreadyReached) {
+                stepDataStore.setTargetReached(true)
                 EggHatchingEvent.triggerHatchingAnimation()
-                stepDataStore.setTargetStep(target = 0)
+                sendHatchingNotification(context)
             }
 
-            updateStepNotification(context, totalSteps, targetSteps)
+            updateStepNotification(context = context, steps = totalSteps, target = targetSteps)
         }
     }
 

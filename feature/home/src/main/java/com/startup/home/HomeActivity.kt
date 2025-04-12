@@ -19,6 +19,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -28,12 +29,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.startup.common.EggHatchingAnimation
+import com.startup.common.animation.EggHatchingAnimation
 import com.startup.common.base.BaseActivity
 import com.startup.common.base.NavigationEvent
 import com.startup.common.base.UiEvent
 import com.startup.common.util.OsVersions
 import com.startup.design_system.widget.modal.PrimaryTwoButtonModal
+import com.startup.home.character.model.CharacterFactory
 import com.startup.home.main.HomeViewModel
 import com.startup.home.navigation.HomeNavigationGraph
 import com.startup.home.navigation.MainScreenNav
@@ -321,10 +323,24 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                 }
             }
 
-            hatchingInfo?.let { trigger ->
-                if (trigger) {
+            hatchingInfo?.let { event ->
+                if (event.isHatching) {
+                    val character = event.character
+                        ?: viewModel.state.currentWalkCharacter.collectAsState().value
+                    val eggKind = event.eggKind
+
+                    val characterName = stringResource(id = character.characterNameResId)
+                    val allCharacters = CharacterFactory.getAllCharacters()
+                    val foundCharacter = allCharacters.find {
+                        it.imageResource == character.characterImageResId
+                    }
+                    val characterRank = foundCharacter?.rarity?.ordinal?.minus(1) ?: 0
+                    val eggRank = eggKind.ordinal - 1
+
                     EggHatchingAnimation(
-                        character = "해파리",
+                        characterName = characterName,
+                        characterImageResId = character.characterImageResId,
+                        eggRank = eggRank,
                         onDismiss = { viewModel.onHatchingAnimationDismissed() }
                     )
                 }

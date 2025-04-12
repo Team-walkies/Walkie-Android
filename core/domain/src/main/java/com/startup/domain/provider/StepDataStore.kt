@@ -9,6 +9,8 @@ interface StepDataStore {
     suspend fun setTargetStep(target: Int)
     suspend fun resetSteps()
     fun observeSteps(): Flow<Int>
+    suspend fun isTargetReached(): Boolean
+    suspend fun setTargetReached(reached: Boolean)
 
     // 걸음수 초기화 관련 로직
     suspend fun isLastResetToday(): Boolean
