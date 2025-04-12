@@ -1,5 +1,7 @@
 package com.startup.walkie.login
 
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,20 +24,28 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.startup.design_system.widget.toast.ShowToast
 import com.startup.login.R
 import com.startup.ui.WalkieTheme
 import com.startup.ui.noRippleClickable
 import com.startup.walkie.login.model.LoginUiEvent
 import com.startup.walkie.login.model.OnBoardingPagerItem
+import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(uiEventSender: (LoginUiEvent) -> Unit) {
@@ -61,6 +71,25 @@ fun LoginScreen(uiEventSender: (LoginUiEvent) -> Unit) {
             description = stringResource(R.string.onboarding_4_sub_title)
         ),
     )
+
+    val context = LocalContext.current
+    var backPressedOnce by remember { mutableStateOf(false) }
+
+    BackHandler {
+        if (backPressedOnce) {
+            (context as? Activity)?.finish()
+        } else {
+            backPressedOnce = true
+        }
+    }
+
+    // 2초 후 플래그 리셋
+    LaunchedEffect(backPressedOnce) {
+        if (backPressedOnce) {
+            delay(2000)
+            backPressedOnce = false
+        }
+    }
 
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp
@@ -176,6 +205,10 @@ fun LoginScreen(uiEventSender: (LoginUiEvent) -> Unit) {
                 style = WalkieTheme.typography.body1.copy(color = WalkieTheme.colors.black)
             )
         }
+    }
+
+    if (backPressedOnce) {
+        ShowToast(stringResource(R.string.toast_home_back_press), 2_000) {}
     }
 }
 

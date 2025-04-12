@@ -1,18 +1,27 @@
 package com.startup.home
 
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.startup.design_system.widget.toast.ShowToast
 import com.startup.home.main.HomeScreen
 import com.startup.home.main.HomeViewModel
 import com.startup.home.mypage.MyPageScreen
@@ -22,6 +31,7 @@ import com.startup.home.navigation.HomeScreenNav
 import com.startup.home.navigation.MainScreenNav
 import com.startup.home.navigation.MyPageScreenNav
 import com.startup.home.navigation.WalkieBottomNavigation
+import kotlinx.coroutines.delay
 
 @Composable
 fun MainBottomNavigationScreen(
@@ -31,6 +41,26 @@ fun MainBottomNavigationScreen(
     myPageViewModel: MyPageViewModel = hiltViewModel(),
 ) {
     val navHostController = rememberNavController()
+
+    val context = LocalContext.current
+    var backPressedOnce by remember { mutableStateOf(false) }
+    val canNavigateBack = navHostController.previousBackStackEntry != null
+
+    BackHandler(enabled = !canNavigateBack) {
+        if (backPressedOnce) {
+            (context as? Activity)?.finish()
+        } else {
+            backPressedOnce = true
+        }
+    }
+
+    // 2초 후 플래그 리셋
+    LaunchedEffect(backPressedOnce) {
+        if (backPressedOnce) {
+            delay(2000)
+            backPressedOnce = false
+        }
+    }
 
     LaunchedEffect(Unit) {
         myPageViewModel.event.collect {
@@ -131,5 +161,9 @@ fun MainBottomNavigationScreen(
                 onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToSpotActivity)
             }
         )
+    }
+
+    if (backPressedOnce) {
+        ShowToast(stringResource(R.string.toast_home_back_press), 2_000) {}
     }
 }
