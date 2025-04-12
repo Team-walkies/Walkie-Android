@@ -1,6 +1,7 @@
 package com.startup.spot
 
 import android.Manifest
+import android.view.ViewGroup
 import android.webkit.GeolocationPermissions
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
@@ -31,7 +32,12 @@ internal fun SpotScreen(
     uiEvent: (SpotUiEvent) -> Unit
 ) {
     val context = LocalContext.current
-    val webView = remember { WebView(context) }
+    val webView = remember { WebView(context).apply {
+        layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+    } }
     val haptic = LocalHapticFeedback.current
     webView.clearHistory()
     webView.clearCache(true)
@@ -41,7 +47,7 @@ internal fun SpotScreen(
                 is SpotEvent.LoadWebView -> {
                     val data = event.spotWebPostRequestData
                     val url =
-                        BuildConfig.BASE_SPOT_URL + "?accessToken=${data.accessToken}&memberId=${data.userId}&characterRank=${data.characterRank}&characterType=${data.characterType}&characterClass=${data.characterClass}"
+                        BuildConfig.BASE_SPOT_URL + "/?accessToken=${data.accessToken}&memberId=${data.userId}&characterRank=${data.characterRank}&characterType=${data.characterType}&characterClass=${data.characterClass}"
                     Printer.e("LMH", "URL $url")
                     webView.loadUrl(url)
                 }
@@ -98,7 +104,7 @@ internal fun SpotScreen(
                         ) {
                             if (UsePermissionHelper.isGrantedPermissions(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
                                 // 권한이 이미 승인된 경우
-                                callback?.invoke(origin, true, true)
+                                callback?.invoke(origin, true, false)
                                 Printer.e("LMH", "권한이 이미 승인된 경우")
                             } else {
                                 locationPermissionCallback = callback
