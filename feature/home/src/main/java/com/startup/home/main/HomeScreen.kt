@@ -417,7 +417,7 @@ private fun EggContent(
         val eggSize = minOf(screenWidth - 12.dp, maxEggSize) // 좌우 패딩 6dp씩 고려
 
         // 이펙트 이미지
-        if (eggModel.eggKind != EggKind.Empty) {
+        if (eggModel.eggKind == EggKind.Empty) {
             eggAttribute.effectDrawable?.let { drawableRes ->
                 Image(
                     modifier = Modifier

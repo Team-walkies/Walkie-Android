@@ -42,6 +42,7 @@ import com.startup.design_system.widget.review.RatingSmallView
 import com.startup.home.R
 import com.startup.home.spot.model.CalendarModel
 import com.startup.home.spot.model.ReviewModel
+import com.startup.home.spot.model.SpotArchiveUiEvent
 import com.startup.home.spot.model.SpotArchiveViewState
 import com.startup.home.spot.model.SpotArchiveViewStateImpl
 import com.startup.ui.WalkieTheme
@@ -53,15 +54,19 @@ import java.time.LocalDate
 @Composable
 internal fun SpotArchiveScreen(
     state: SpotArchiveViewState,
-    onDateUpdate: (CalendarModel) -> Unit,
+    uiEventSender: (SpotArchiveUiEvent) -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val monthCalendarSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val optionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isCalendarBottomModalShow by remember {
         mutableStateOf(false)
     }
     val selectedDate by state.currentSelectedDate.collectAsStateWithLifecycle()
     val reviews by state.eventList.map { eventMap ->
-        eventMap["${selectedDate.date.year}${selectedDate.date.month}"] ?: emptyList()
+        eventMap["${getStartOfWeek(selectedDate.date)}"]?.filter { it.date == selectedDate.date } ?: emptyList()
+    }.collectAsStateWithLifecycle(emptyList())
+    val eventList by state.eventList.map { eventMap ->
+        eventMap["${getStartOfWeek(selectedDate.date)}"] ?: emptyList()
     }.collectAsStateWithLifecycle(emptyList())
     var selectedOptionOfReview: ReviewModel? by remember {
         mutableStateOf(null)
@@ -73,7 +78,7 @@ internal fun SpotArchiveScreen(
             .fillMaxSize()
             .background(color = WalkieTheme.colors.white)
     ) {
-        PageActionBar(PageActionBarType.JustBackActionBarType({}))
+        PageActionBar(PageActionBarType.JustBackActionBarType({ uiEventSender.invoke(SpotArchiveUiEvent.OnBack) }))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -106,7 +111,7 @@ internal fun SpotArchiveScreen(
                         .noRippleClickable {
                             val weekFirstDay = getStartOfWeek(today)
                             displayDateWeekFirstDay = weekFirstDay
-                            onDateUpdate.invoke(CalendarModel(today, true))
+                            uiEventSender.invoke(SpotArchiveUiEvent.OnDateChanged(CalendarModel(today, true)))
                         },
                     text = stringResource(R.string.date_today),
                     style = WalkieTheme.typography.caption1.copy(color = WalkieTheme.colors.gray500),
@@ -115,43 +120,41 @@ internal fun SpotArchiveScreen(
         }
         Spacer(modifier = Modifier.height(12.dp))
         WalkieWeekCalendar(
-            events = reviews.map { it.date },
+            events = eventList.map { it.date },
             onWeekChanged = {
                 displayDateWeekFirstDay = getStartOfWeek(it)
-                onDateUpdate.invoke(CalendarModel(it, false))
+                uiEventSender.invoke(SpotArchiveUiEvent.OnDateChanged(CalendarModel(it, false)))
             },
             selectDate = selectedDate,
             onDateSelected = {
-                onDateUpdate.invoke(CalendarModel(it, false))
+                uiEventSender.invoke(SpotArchiveUiEvent.OnDateChanged(CalendarModel(it, false)))
             },
             onCompleteMove = {
-                onDateUpdate.invoke(CalendarModel(selectedDate.date, false))
+                uiEventSender.invoke(SpotArchiveUiEvent.OnDateChanged(CalendarModel(selectedDate.date, false)))
             })
         Spacer(modifier = Modifier.height(11.dp))
         HorizontalDivider(thickness = 4.dp, color = WalkieTheme.colors.gray50)
         Spacer(modifier = Modifier.height(12.dp))
-        LazyColumn(
-            modifier = Modifier
-                .padding(horizontal = 16.dp),
-        ) {
-            item {
-                Row {
-                    Text(
-                        text = stringResource(R.string.calendar_review_title),
-                        style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = " ${reviews.size}",
-                        style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
-                    )
-                }
-            }
-            if (reviews.isEmpty()) {
+        if (reviews.isEmpty()) {
+            EmptyReviewView()
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp),
+            ) {
                 item {
-                    EmptyReviewView()
+                    Row {
+                        Text(
+                            text = stringResource(R.string.calendar_review_title),
+                            style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "${reviews.size}",
+                            style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
+                        )
+                    }
                 }
-            } else {
                 item { Spacer(modifier = Modifier.height(12.dp)) }
                 items(reviews) { item ->
                     ReviewItem(item) {
@@ -163,7 +166,7 @@ internal fun SpotArchiveScreen(
         }
     }
     if (isCalendarBottomModalShow) {
-        BottomSheetCalendarComponent(
+        BottomSheetMonthCalendarComponent(
             currentSelectedDate = selectedDate.date,
             onClickCancel = {
                 isCalendarBottomModalShow = false
@@ -171,27 +174,58 @@ internal fun SpotArchiveScreen(
             onSelectDay = {
                 val weekFirstDay = getStartOfWeek(it)
                 displayDateWeekFirstDay = weekFirstDay
-                onDateUpdate.invoke(CalendarModel(it, true))
+                uiEventSender.invoke(SpotArchiveUiEvent.OnDateChanged(CalendarModel(it, true)))
                 isCalendarBottomModalShow = false
             },
-            sheetState = sheetState
+            sheetState = monthCalendarSheetState
         )
     }
-    if (selectedOptionOfReview != null) {
-
+    selectedOptionOfReview?.let {
+        BottomSheetReviewOption(
+            onClickCancel = {
+                selectedOptionOfReview = null
+            },
+            onClickDelete = {
+                uiEventSender.invoke(SpotArchiveUiEvent.OnDeleteReview(review = it))
+                selectedOptionOfReview = null
+            },
+            onClickModify = {
+                uiEventSender.invoke(SpotArchiveUiEvent.OnModifyReview(review = it))
+                selectedOptionOfReview = null
+            },
+            sheetState = optionSheetState
+        )
     }
 }
 
 @Composable
 private fun EmptyReviewView() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = stringResource(R.string.calendar_review_empty),
-            style = WalkieTheme.typography.body1.copy(color = WalkieTheme.colors.gray400),
-        )
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = stringResource(R.string.calendar_review_title),
+                style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = "0",
+                style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        Box(
+            modifier = Modifier.padding(top = 170.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(R.string.calendar_review_empty),
+                style = WalkieTheme.typography.body1.copy(color = WalkieTheme.colors.gray400),
+            )
+        }
     }
 }
 
@@ -370,7 +404,7 @@ private fun PreviewSpotArchiveScreen() {
     WalkieTheme {
         SpotArchiveScreen(
             SpotArchiveViewStateImpl(),
-            onDateUpdate = {}
+            {}
         )
     }
 }

@@ -110,7 +110,7 @@ enum class EggKind(
                 1 -> Rare
                 2 -> Epic
                 3 -> Legend
-                else -> Normal
+                else -> Empty
             }
         }
     }

@@ -60,7 +60,7 @@ fun HomeNavigationGraph(destinationRoute: String, parentNavController: NavHostCo
             ) {
                 composable(HomeScreenNav.GainEgg.route) { GainEggNavigationGraph(parentNavController = parentNavController) }
                 composable(HomeScreenNav.GainCharacter.route) { HatchingCharacterScreen(::handleNavigationEvent) }
-                composable(HomeScreenNav.SpotArchive.route) { SpotArchiveNavigationGraph() }
+                composable(HomeScreenNav.SpotArchive.route) { SpotArchiveNavigationGraph(parentNavController = parentNavController) }
                 composable(HomeScreenNav.Notification.route) {
                     NotificationListScreen(onNavigationEvent = ::handleNavigationEvent)
                 }
