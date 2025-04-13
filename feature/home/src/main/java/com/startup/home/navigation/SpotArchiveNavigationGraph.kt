@@ -2,15 +2,17 @@ package com.startup.home.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.startup.home.spot.SpotArchiveScreen
 import com.startup.home.spot.SpotArchiveViewModel
 import com.startup.home.spot.SpotReviewModifyScreen
+import com.startup.home.spot.model.SpotArchiveUiEvent
 
 @Composable
-fun SpotArchiveNavigationGraph(spotArchiveViewModel: SpotArchiveViewModel = hiltViewModel()) {
+fun SpotArchiveNavigationGraph(parentNavController: NavHostController, spotArchiveViewModel: SpotArchiveViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
@@ -18,9 +20,25 @@ fun SpotArchiveNavigationGraph(spotArchiveViewModel: SpotArchiveViewModel = hilt
     ) {
         composable(SpotArchiveScreenNav.SpotArchive.route) {
             SpotArchiveScreen(
-                spotArchiveViewModel.state,
-                spotArchiveViewModel::changedSelectedDate
-            )
+                spotArchiveViewModel.state
+            ) {
+                when (it) {
+                    SpotArchiveUiEvent.OnBack -> {
+                        parentNavController.navigateUp()
+                    }
+                    is SpotArchiveUiEvent.OnDateChanged -> {
+                        spotArchiveViewModel.changedSelectedDate(it.calendarModel)
+                    }
+
+                    is SpotArchiveUiEvent.OnModifyReview -> {
+                        spotArchiveViewModel.modifyReview(it.review)
+                    }
+
+                    is SpotArchiveUiEvent.OnDeleteReview -> {
+                        spotArchiveViewModel.deleteReview(it.review)
+                    }
+                }
+            }
         }
         composable(SpotArchiveScreenNav.SpotReviewModify.route) { SpotReviewModifyScreen() }
     }

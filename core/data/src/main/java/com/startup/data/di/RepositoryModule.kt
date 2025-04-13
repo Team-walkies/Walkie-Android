@@ -6,6 +6,7 @@ import com.startup.data.repository.EggRepositoryImpl
 import com.startup.data.repository.LocationRepositoryImpl
 import com.startup.data.repository.MemberRepositoryImpl
 import com.startup.data.repository.NoticeRepositoryImpl
+import com.startup.data.repository.ReviewRepositoryImpl
 import com.startup.data.repository.SpotRepositoryImpl
 import com.startup.data.repository.UserRepositoryImpl
 import com.startup.domain.repository.AuthRepository
@@ -14,6 +15,7 @@ import com.startup.domain.repository.EggRepository
 import com.startup.domain.repository.LocationRepository
 import com.startup.domain.repository.MemberRepository
 import com.startup.domain.repository.NoticeRepository
+import com.startup.domain.repository.ReviewRepository
 import com.startup.domain.repository.SpotRepository
 import com.startup.domain.repository.UserRepository
 import dagger.Binds
@@ -56,4 +58,8 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindLocationRepository(repository: LocationRepositoryImpl): LocationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindReviewRepository(repository: ReviewRepositoryImpl): ReviewRepository
 }

@@ -125,6 +125,8 @@
     <string name="calendar_review_step_title">이동 거리</string>
     <string name="calendar_review_step_count">걸음 수</string>
     <string name="calendar_review_step_duration">이동 시간</string>
+    <string name="calendar_review_delete">삭제하기</string>
+    <string name="calendar_review_modify">수정하기</string>
     <string name="desc_calendar_review_option">리뷰 수정, 삭제 선택 버튼</string>
     <string name="desc_calendar_review_map_kind">리뷰 스팟 위치 종류</string>
     <string name="date_today">오늘</string>

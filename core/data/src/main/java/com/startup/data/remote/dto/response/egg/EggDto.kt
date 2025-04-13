@@ -26,7 +26,7 @@ data class EggDto(
     fun toDomain() = MyEgg(
         characterId = characterId.orZero(),
         eggId = eggId.orZero(),
-        rank = rank.orZero(),
+        rank = rank ?: -1,
         needStep = needStep.orZero(),
         nowStep = nowStep.orZero(),
         play = play.orFalse(),

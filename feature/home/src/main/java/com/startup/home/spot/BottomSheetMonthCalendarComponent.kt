@@ -45,7 +45,7 @@ import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun BottomSheetCalendarComponent(
+internal fun BottomSheetMonthCalendarComponent(
     currentSelectedDate: LocalDate,
     onClickCancel: () -> Unit,
     onSelectDay: (LocalDate) -> Unit,
