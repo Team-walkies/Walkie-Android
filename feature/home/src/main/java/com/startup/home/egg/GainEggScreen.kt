@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -41,6 +42,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.startup.common.extension.shimmerEffect
+import com.startup.common.util.BaseUiState
 import com.startup.common.util.DateUtil
 import com.startup.common.util.EMPTY_STRING
 import com.startup.design_system.widget.actionbar.PageActionBar
@@ -67,7 +70,8 @@ fun GainEggScreen(
     onNavigationEvent: (GainEggScreenNavigationEvent) -> Unit,
     uiEventSender: (GainEggUiEvent) -> Unit
 ) {
-    val eggList by viewState.eggList.collectAsStateWithLifecycle()
+    val eggUiState by viewState.eggUiState.collectAsStateWithLifecycle()
+
     var selectedEgg: MyEggModel? by remember {
         mutableStateOf(null)
     }
@@ -97,26 +101,23 @@ fun GainEggScreen(
                 .padding(top = 12.dp, start = 16.dp, end = 16.dp)
         ) {
             item {
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         stringResource(R.string.current_gain_egg),
                         style = WalkieTheme.typography.head2.copy(color = WalkieTheme.colors.gray700)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        eggList.size.toString(),
-                        style = WalkieTheme.typography.head2.copy(color = WalkieTheme.colors.gray500)
-                    )
+                    if (eggUiState.isShowShimmer) {
+                        SkeletonEggCountText()
+                    } else {
+                        Text(
+                            eggUiState.data.size.toString(),
+                            style = WalkieTheme.typography.head2.copy(color = WalkieTheme.colors.gray500)
+                        )
+                    }
                 }
             }
-            if (eggList.isNotEmpty()) {
-                item {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        stringResource(R.string.current_gain_egg_choice),
-                        style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
-                    )
-                }
+            if (eggUiState.isShowShimmer) {
                 item {
                     LazyVerticalGrid(
                         modifier = Modifier
@@ -126,19 +127,43 @@ fun GainEggScreen(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
-                        itemsIndexed(
-                            items = eggList,
-                            key = { _, item -> item.eggId },
-                        ) { _, item ->
-                            EggGridItemComponent(egg = item) {
-                                selectedEgg = it
-                            }
+                        items(8) {
+                            SkeletonEggGridItemComponent()
                         }
                     }
                 }
             } else {
-                item {
-                    EmptyGainEggView()
+                if (eggUiState.data.isNotEmpty()) {
+                    item {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            stringResource(R.string.current_gain_egg_choice),
+                            style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
+                        )
+                    }
+                    item {
+                        LazyVerticalGrid(
+                            modifier = Modifier
+                                .padding(top = 20.dp)
+                                .height(pagerHeight),
+                            columns = GridCells.Fixed(MAX_COLUMN_COUNT),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
+                            itemsIndexed(
+                                items = eggUiState.data,
+                                key = { _, item -> item.eggId },
+                            ) { _, item ->
+                                EggGridItemComponent(egg = item) {
+                                    selectedEgg = it
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    item {
+                        EmptyGainEggView()
+                    }
                 }
             }
         }
@@ -346,13 +371,30 @@ private fun PreviewBottomModal() {
     }
 }
 
+@Composable
+private fun SkeletonEggCountText() {
+    Box(
+        modifier = Modifier
+            .width(20.dp)
+            .height(20.dp)
+            .clip(shape = RoundedCornerShape(8.dp))
+            .shimmerEffect()
+    ) { }
+}
+
 @PreviewScreenSizes
 @Composable
 private fun PreviewGainEggScreen() {
     WalkieTheme {
         GainEggScreen(
-            GainEggViewStateImpl(eggList = MutableStateFlow(emptyList())),
-            onNavigationEvent = {}) {}
+            GainEggViewStateImpl(
+                eggUiState = MutableStateFlow(
+                    BaseUiState(
+                        isShowShimmer = true,
+                        emptyList()
+                    )
+                )
+            ), onNavigationEvent = {}) {}
     }
 }
 
