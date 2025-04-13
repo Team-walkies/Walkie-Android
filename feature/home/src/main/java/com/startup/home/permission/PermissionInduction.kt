@@ -158,7 +158,7 @@ fun EssentialPermissionBottomSheet(
         Spacer(modifier = Modifier.height(20.dp))
 
         PrimaryButton(
-            text = stringResource(R.string.permission_bottomsheet_grant),
+            text = stringResource(R.string.permission_bottomsheet_check),
             onClick = {
                 if (permissionDelegator != null) {
                     permissionDelegator.requestPermissionLauncher()

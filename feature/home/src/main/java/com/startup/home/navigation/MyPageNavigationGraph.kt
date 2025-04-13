@@ -129,8 +129,16 @@ fun MyPageNavigationGraph(
                 composable(MyPageScreenNav.Notice.route) {
                     NoticeNavigationGraph(parentNavController = parentNavController)
                 }
-                composable(MyPageScreenNav.PersonalInfoPolicy.route) { PersonalInfoPolicyScreen() }
-                composable(MyPageScreenNav.RequestUserOpinion.route) { RequestUserOpinionScreen() }
+                composable(MyPageScreenNav.PersonalInfoPolicy.route) {
+                    PersonalInfoPolicyScreen(
+                        onNavigationEvent = ::handleNavigationEvent
+                    )
+                }
+                composable(MyPageScreenNav.RequestUserOpinion.route) {
+                    RequestUserOpinionScreen(
+                        onNavigationEvent = ::handleNavigationEvent
+                    )
+                }
                 composable(
                     route = MyPageScreenNav.Unlink.route + "/{argument}", arguments = listOf(
                         navArgument("argument") { type = NavType.StringType },

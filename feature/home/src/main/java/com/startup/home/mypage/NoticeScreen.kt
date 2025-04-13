@@ -1,15 +1,11 @@
 package com.startup.home.mypage
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,15 +18,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.startup.design_system.widget.actionbar.PageActionBar
-import com.startup.design_system.widget.actionbar.PageActionBarType
 import com.startup.domain.model.notice.Notice
 import com.startup.home.R
 import com.startup.home.mypage.model.NoticeScreenNavigationEvent
 import com.startup.home.mypage.model.NoticeViewState
-import com.startup.home.mypage.model.NoticeViewStateImpl
 import com.startup.ui.WalkieTheme
 import com.startup.ui.noRippleClickable
+import com.startup.webview.WalkieWebConstants
+import com.startup.webview.WebViewWithBackHandling
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -40,27 +35,18 @@ fun NoticeScreen(
     onNavigationEvent: (NoticeScreenNavigationEvent) -> Unit
 ) {
     val noticeList by noticeViewState.noticeList.collectAsState()
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = WalkieTheme.colors.white)
-    ) {
-        PageActionBar(
-            PageActionBarType.TitleActionBarType(
-                {},
-                title = stringResource(R.string.notice_title)
-            )
-        )
-        Column(modifier = Modifier.verticalScroll(state = rememberScrollState())) {
-            noticeList.forEach {
-                NoticeListItem(it) { item ->
-                    onNavigationEvent.invoke(NoticeScreenNavigationEvent.MoveToNoticeDetail(item))
-                }
-            }
-        }
-    }
+
+    WebViewWithBackHandling(
+        url = WalkieWebConstants.NOTICE_URL,
+        title = stringResource(R.string.notice_title),
+        onNavigationEvent = onNavigationEvent,
+        backEvent = NoticeScreenNavigationEvent.Back
+    )
 }
 
+/*
+ 추후 2차 스프린트에 활용 예정
+ */
 @Composable
 private fun NoticeListItem(
     item: Notice = Notice(
