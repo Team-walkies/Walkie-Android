@@ -3,15 +3,15 @@ package com.startup.home.egg.model
 import com.startup.common.base.BaseEvent
 import com.startup.common.base.BaseState
 import com.startup.common.base.UiEvent
+import com.startup.common.util.BaseUiState
 import kotlinx.coroutines.flow.StateFlow
 
 class GainEggViewStateImpl(
-    override val eggList: StateFlow<List<MyEggModel>>,
-) : GainEggViewState {
-}
+    override val eggUiState: StateFlow<BaseUiState<List<MyEggModel>>>,
+) : GainEggViewState
 
 interface GainEggViewState : BaseState {
-    val eggList: StateFlow<List<MyEggModel>>
+    val eggUiState: StateFlow<BaseUiState<List<MyEggModel>>>
 }
 
 sealed interface GainEggViewModelEvent : BaseEvent {
