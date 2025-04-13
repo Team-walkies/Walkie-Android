@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel
 import com.startup.common.util.Printer
 import com.startup.domain.provider.StepDataStore
+import com.startup.common.util.BaseUiState
 import com.startup.domain.usecase.GetGainEggList
 import com.startup.domain.usecase.UpdateWalkingEgg
 import com.startup.home.egg.model.GainEggViewModelEvent
@@ -12,6 +13,7 @@ import com.startup.home.egg.model.GainEggViewStateImpl
 import com.startup.home.egg.model.MyEggModel.Companion.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
@@ -35,10 +37,11 @@ class GainEggViewModel @Inject constructor(
             flow<Unit> { emit(Unit) },
             viewModelEvent.filter { it == GainEggViewModelEvent.FetchEggList }
         ).flatMapLatest {
-            getGainEggList.invoke(Unit)
-                .map { it.toUiModel() }.catch {
-                }
-        }.stateInViewModel(emptyList())
+            getGainEggList
+                .invoke(Unit)
+                .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
+                .catch {}
+        }.stateInViewModel(BaseUiState(isShowShimmer = true, data = emptyList()))
     )
     override val state: GainEggViewState get() = _state
 

@@ -7,22 +7,29 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.startup.common.extension.shimmerEffect
+import com.startup.common.extension.shimmerEffectGray200
 import com.startup.common.util.DateUtil
 import com.startup.design_system.widget.progress.ProgressSmall
 import com.startup.design_system.widget.tag.TagSmall
@@ -83,6 +90,7 @@ internal fun EggGridItemComponent(
                 contentDescription = stringResource(R.string.desc_egg),
                 modifier = Modifier
                     .align(Alignment.Center)
+                    .size(80.dp)
                     .padding(top = 4.dp),
             )
         }
@@ -115,11 +123,48 @@ internal fun EggGridItemComponent(
     }
 }
 
+@Composable
+internal fun SkeletonEggGridItemComponent() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .height(188.dp)
+            .clip(shape = RoundedCornerShape(20.dp))
+            .shimmerEffect()
+            .padding(bottom = 16.dp, top = 26.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Image(
+            painter = painterResource(R.drawable.egg_empty),
+            modifier = Modifier.size(80.dp),
+            contentDescription = stringResource(R.string.desc_egg_empty)
+        )
+        Box(
+            modifier = Modifier
+                .width(40.dp)
+                .height(20.dp)
+                .clip(shape = RoundedCornerShape(8.dp))
+                .shimmerEffectGray200()
+        ) {}
+        Box(
+            modifier = Modifier
+                .width(106.dp)
+                .height(20.dp)
+                .clip(shape = RoundedCornerShape(8.dp))
+                .shimmerEffectGray200()
+        ) {}
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun PreviewEggGridItemComponent() {
     WalkieTheme {
-        Row(horizontalArrangement = Arrangement.spacedBy(30.dp)) {
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.spacedBy(30.dp)
+        ) {
             EggGridItemComponent(
                 modifier = Modifier
                     .width(150.dp)
@@ -150,6 +195,18 @@ private fun PreviewEggGridItemComponent() {
                     obtainedDate = DateUtil.convertDateTimeFormat("2024-01-12 12:20:10")
                 )
             ) {}
+            LazyVerticalGrid(
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .fillMaxHeight(),
+                columns = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                items(6) {
+                    SkeletonEggGridItemComponent()
+                }
+            }
         }
     }
 }
