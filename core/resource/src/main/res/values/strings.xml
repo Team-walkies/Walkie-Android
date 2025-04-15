@@ -178,7 +178,7 @@
     <string name="permission_bottomsheet_subtitle">원활한 이용을 위해 권한을 허용해주세요</string>
     <string name="permission_notification_title">걸음 수가 채워지면\n알 부화 소식을 알려드릴게요!</string>
     <string name="permission_notification_subtitle">‘마이 > ‘푸시 알림’에서 관리할 수 있어요</string>
-    <string name="permission_bottomsheet_grant">허용하기</string>
+    <string name="permission_bottomsheet_check">확인했어요</string>
     <string name="permission_bottomsheet_later">나중에</string>
     <string name="permission_bottomsheet_notification">알림 받기</string>
     <string name="permission_activity_recognition">신체활동</string>

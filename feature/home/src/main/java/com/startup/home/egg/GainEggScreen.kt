@@ -171,8 +171,9 @@ private fun EmptyGainEggView() {
         )
         Spacer(modifier = Modifier.height(8.dp))
         Image(
+            modifier = Modifier.size(200.dp),
             painter = painterResource(R.drawable.egg_empty),
-            stringResource(R.string.desc_egg_empty)
+            contentDescription = stringResource(R.string.desc_egg_empty)
         )
     }
 }
@@ -202,7 +203,11 @@ private fun EggBottomModal(
 
 /** 알 detail 및 같이 걸을 알 선택할 수 있는 바텀 시트 View */
 @Composable
-private fun EggBottomModalContent(egg: MyEggModel, onClickCancel : ()-> Unit, uiEventSender: (GainEggUiEvent) -> Unit) {
+private fun EggBottomModalContent(
+    egg: MyEggModel,
+    onClickCancel: () -> Unit,
+    uiEventSender: (GainEggUiEvent) -> Unit
+) {
     Column(
         modifier = Modifier
             .wrapContentSize()
@@ -336,7 +341,7 @@ private fun PreviewBottomModal() {
                 eggKind = EggKind.Epic,
                 obtainedPosition = "대전시 유성구",
                 obtainedDate = DateUtil.convertDateTimeFormat("2024-01-12 12:20:10"),
-            ),{}, {}
+            ), {}, {}
         )
     }
 }
@@ -345,7 +350,9 @@ private fun PreviewBottomModal() {
 @Composable
 private fun PreviewGainEggScreen() {
     WalkieTheme {
-        GainEggScreen(GainEggViewStateImpl(eggList = MutableStateFlow(emptyList())), onNavigationEvent = {}) {}
+        GainEggScreen(
+            GainEggViewStateImpl(eggList = MutableStateFlow(emptyList())),
+            onNavigationEvent = {}) {}
     }
 }
 
