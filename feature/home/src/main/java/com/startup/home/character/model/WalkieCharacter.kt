@@ -10,29 +10,47 @@ import com.startup.home.character.CharacterRankKind
 data class WalkieCharacter(
     val characterId: Long,
     val characterKind: CharacterKind,
+    val rank: CharacterRankKind,
     @DrawableRes val characterImageResId: Int,
     @StringRes val characterNameResId: Int,
+    val picked: Boolean,
+    val count: Int
 ) {
+    fun isHatched(): Boolean = count > 0
+
     companion object {
+
         fun MyCharacterWithWalk.toUiModel(): WalkieCharacter {
-            return getTypeAndClassOfWalkieCharacter(characterId, type, clazz, rank)
+            return getTypeAndClassOfWalkieCharacter(characterId, type, clazz, rank, picked, count)
         }
 
-        fun MyCharacter.toUiModel() : WalkieCharacter {
-            return getTypeAndClassOfWalkieCharacter(characterId, type, clazz, rank)
+        fun MyCharacter.toUiModel(): WalkieCharacter {
+            return getTypeAndClassOfWalkieCharacter(characterId, type, characterClass, rank, picked, count)
         }
+
+        fun List<MyCharacter>.toUiModel(): List<WalkieCharacter> {
+            return map {
+                it.toUiModel()
+            }
+        }
+
         fun ofEmpty(): WalkieCharacter = WalkieCharacter(
             characterId = -1,
             characterNameResId = R.string.jellyfish_basic,
             characterImageResId = R.drawable.jelly_1,
-            characterKind = CharacterKind.Jellyfish
+            characterKind = CharacterKind.Jellyfish,
+            rank = CharacterRankKind.Normal,
+            picked = false,
+            count = 0
         )
 
-        fun getTypeAndClassOfWalkieCharacter(
+        private fun getTypeAndClassOfWalkieCharacter(
             characterId: Long,
             type: Int,
             clazz: Int,
             rank: Int,
+            picked: Boolean,
+            count: Int
         ): WalkieCharacter {
 
             val characterKind = if (type == 1) {
@@ -47,7 +65,10 @@ data class WalkieCharacter(
                 characterId = characterId,
                 characterKind = characterKind,
                 characterImageResId = characterData.imageResource,
-                characterNameResId = characterData.nameResId
+                characterNameResId = characterData.nameResId,
+                rank = characterRankKind,
+                picked = picked,
+                count = count
             )
         }
     }

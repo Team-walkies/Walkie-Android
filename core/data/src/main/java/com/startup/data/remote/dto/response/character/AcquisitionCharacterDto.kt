@@ -10,8 +10,6 @@ data class AcquisitionCharacterDto(
     val characterId: Long?,
     @SerializedName("characterClass")
     val characterClass: Int?,
-    @SerializedName("class")
-    val clazz: Int?,
     @SerializedName("count")
     val count: Int?,
     @SerializedName("picked")
@@ -24,7 +22,6 @@ data class AcquisitionCharacterDto(
     fun toDomain() = MyCharacter(
         characterId = characterId.orZero(),
         characterClass = characterClass.orZero(),
-        clazz = clazz.orZero(),
         count = count.orZero(),
         picked = picked.orFalse(),
         rank = rank.orZero(),
