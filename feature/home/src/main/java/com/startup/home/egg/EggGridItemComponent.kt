@@ -142,15 +142,17 @@ internal fun SkeletonEggGridItemComponent() {
         )
         Box(
             modifier = Modifier
-                .width(40.dp)
+                .fillMaxWidth()
                 .height(20.dp)
+                .padding(horizontal = 60.dp)
                 .clip(shape = RoundedCornerShape(8.dp))
                 .shimmerEffectGray200()
         ) {}
         Box(
             modifier = Modifier
-                .width(106.dp)
+                .fillMaxWidth()
                 .height(20.dp)
+                .padding(horizontal = 30.dp)
                 .clip(shape = RoundedCornerShape(8.dp))
                 .shimmerEffectGray200()
         ) {}

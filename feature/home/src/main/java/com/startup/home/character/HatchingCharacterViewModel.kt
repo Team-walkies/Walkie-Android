@@ -2,6 +2,7 @@ package com.startup.home.character
 
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel
+import com.startup.common.util.BaseUiState
 import com.startup.common.util.Printer
 import com.startup.domain.usecase.GetCurrentHatchedCharacter
 import com.startup.domain.usecase.UpdateWalkingCharacter
@@ -12,6 +13,7 @@ import com.startup.home.character.model.WalkieCharacter
 import com.startup.home.character.model.WalkieCharacter.Companion.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
@@ -30,27 +32,27 @@ class HatchingCharacterViewModel @Inject constructor(
 ) :
     BaseViewModel() {
     private val _state: HatchingCharacterViewStateImpl = HatchingCharacterViewStateImpl(
-        jellyfishCharacterList = merge(
+        jellyfishCharacterState = merge(
             flow<Unit> { emit(Unit) },
             viewModelEvent.filter { it == HatchingCharacterViewModelEvent.FetchCharacterList }
         ).flatMapLatest {
             getCurrentHatchedCharacter
                 .invoke(0)
-                .map { it.toUiModel() }
+                .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
                 .onEach { Printer.d("LMH", "Jelly $it") }
                 .catch { }
 
-        }.stateInViewModel(emptyList()),
-        dinoCharacterList = merge(
+        }.stateInViewModel(BaseUiState(isShowShimmer = true, data = emptyList())),
+        dinoCharacterState = merge(
             flow<Unit> { emit(Unit) },
             viewModelEvent.filter { it == HatchingCharacterViewModelEvent.FetchCharacterList }
         ).flatMapLatest {
             getCurrentHatchedCharacter
                 .invoke(1)
-                .map { it.toUiModel() }
+                .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
                 .onEach { Printer.d("LMH", "Dino $it") }
                 .catch { }
-        }.stateInViewModel(emptyList())
+        }.stateInViewModel(BaseUiState(isShowShimmer = true, data = emptyList()))
     )
     override val state: HatchingCharacterViewState get() = _state
 

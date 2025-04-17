@@ -2,17 +2,17 @@ package com.startup.home.character.model
 
 import com.startup.common.base.BaseEvent
 import com.startup.common.base.BaseState
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.startup.common.util.BaseUiState
 import kotlinx.coroutines.flow.StateFlow
 
 interface HatchingCharacterViewState : BaseState {
-    val jellyfishCharacterList: StateFlow<List<WalkieCharacter>>
-    val dinoCharacterList: StateFlow<List<WalkieCharacter>>
+    val jellyfishCharacterState: StateFlow<BaseUiState<List<WalkieCharacter>>>
+    val dinoCharacterState: StateFlow<BaseUiState<List<WalkieCharacter>>>
 }
 
 class HatchingCharacterViewStateImpl(
-    override val jellyfishCharacterList: StateFlow<List<WalkieCharacter>>,
-    override val dinoCharacterList: StateFlow<List<WalkieCharacter>>
+    override val jellyfishCharacterState: StateFlow<BaseUiState<List<WalkieCharacter>>>,
+    override val dinoCharacterState: StateFlow<BaseUiState<List<WalkieCharacter>>>
 ) : HatchingCharacterViewState
 
 

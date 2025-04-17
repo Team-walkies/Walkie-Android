@@ -48,6 +48,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.startup.common.base.NavigationEvent
+import com.startup.common.util.BaseUiState
 import com.startup.design_system.widget.actionbar.PageActionBar
 import com.startup.design_system.widget.actionbar.PageActionBarType
 import com.startup.design_system.widget.bottom_sheet.WalkieDragHandle
@@ -189,16 +190,16 @@ private fun CharacterContentByType(
     tabIndex: Int,
     onCharacterClick: (WalkieCharacter) -> Unit
 ) {
-    val dinoList by viewState.dinoCharacterList.collectAsStateWithLifecycle()
-    val jellyList by viewState.jellyfishCharacterList.collectAsStateWithLifecycle()
+    val dinoState by viewState.dinoCharacterState.collectAsStateWithLifecycle()
+    val jellyState by viewState.jellyfishCharacterState.collectAsStateWithLifecycle()
     when (tabIndex) {
         CharacterTabType.JELLYFISH -> JellyfishContent(
-            jellyList,
+            jellyState,
             onCharacterClick = onCharacterClick
         )
 
         CharacterTabType.DINO -> DinosaurContent(
-            dinoList,
+            dinoState,
             onCharacterClick = onCharacterClick
         )
     }
@@ -229,24 +230,24 @@ fun CharacterTab(
 
 @Composable
 fun JellyfishContent(
-    list: List<WalkieCharacter>,
+    state: BaseUiState<List<WalkieCharacter>>,
     onCharacterClick: (WalkieCharacter) -> Unit
 ) {
     CharacterGrid(
         description = stringResource(id = R.string.character_jellyfish_description),
-        characters = list,
+        charactersState = state,
         onCharacterClick = onCharacterClick,
     )
 }
 
 @Composable
 fun DinosaurContent(
-    list: List<WalkieCharacter>,
+    state: BaseUiState<List<WalkieCharacter>>,
     onCharacterClick: (WalkieCharacter) -> Unit
 ) {
     CharacterGrid(
         description = stringResource(id = R.string.character_dino_description),
-        characters = list,
+        charactersState = state,
         onCharacterClick = onCharacterClick,
     )
 }
@@ -254,7 +255,7 @@ fun DinosaurContent(
 @Composable
 fun CharacterGrid(
     description: String,
-    characters: List<WalkieCharacter>,
+    charactersState: BaseUiState<List<WalkieCharacter>>,
     onCharacterClick: (WalkieCharacter) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -269,7 +270,7 @@ fun CharacterGrid(
         )
 
         CharacterGridItems(
-            characters = characters,
+            charactersState = charactersState,
             onCharacterClick = onCharacterClick
         )
     }
@@ -277,35 +278,59 @@ fun CharacterGrid(
 
 @Composable
 private fun CharacterGridItems(
-    characters: List<WalkieCharacter>,
+    charactersState: BaseUiState<List<WalkieCharacter>>,
     onCharacterClick: (WalkieCharacter) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val rows = characters.chunked(2)
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(bottom = 48.dp)
-    ) {
-        rows.forEach { rowCharacters ->
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                rowCharacters.forEach { character ->
-                    Box(modifier = Modifier.weight(1f)) {
-                        CharacterItem(
-                            character = character,
-                            isSelected = character.picked,
-                            onClick = onCharacterClick
-                        )
+
+    if (charactersState.isShowShimmer) {
+        val rows = (0..7).chunked(2)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(bottom = 48.dp)
+        ) {
+            rows.forEach { rowCharacters ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    rowCharacters.forEach { character ->
+                        Box(modifier = Modifier.weight(1f)) {
+                            SkeletonCharacterComponent()
+                        }
                     }
                 }
+            }
+        }
+    } else {
+        val rows = charactersState.data.chunked(2)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(bottom = 48.dp)
+        ) {
+            rows.forEach { rowCharacters ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    rowCharacters.forEach { character ->
+                        Box(modifier = Modifier.weight(1f)) {
+                            CharacterItem(
+                                character = character,
+                                isSelected = character.picked,
+                                onClick = onCharacterClick
+                            )
+                        }
+                    }
 
-                // 마지막 행이 홀수 개일 경우 빈 공간 추가
-                if (rowCharacters.size == 1) {
-                    Box(modifier = Modifier.weight(1f))
+                    // 마지막 행이 홀수 개일 경우 빈 공간 추가
+                    if (rowCharacters.size == 1) {
+                        Box(modifier = Modifier.weight(1f))
+                    }
                 }
             }
         }
@@ -341,7 +366,7 @@ fun CharacterItem(
                 color = colors.gray100,
                 shape = RoundedCornerShape(20.dp)
             )
-            .padding(8.dp),
+            .padding(vertical = 12.dp, horizontal = 20.dp),
         contentAlignment = Alignment.Center
     ) {
         if (isSelected) {
@@ -349,7 +374,7 @@ fun CharacterItem(
                 painter = painterResource(R.drawable.ic_foot),
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 4.dp, end = 4.dp),
+                    .padding(end = 4.dp),
                 contentDescription = stringResource(R.string.desc_egg_play_icon),
                 tint = colors.blue300
             )
@@ -385,13 +410,13 @@ private fun CharacterItemContent(
                 .fillMaxWidth(0.6f) // 작은 기기 대응
                 .sizeIn(maxWidth = 120.dp, maxHeight = 120.dp)
         )
-        Spacer(modifier = Modifier.height(8.dp))
 
         if (!character.isHatched()) {
             Text(
                 text = stringResource(id = R.string.character_not_gain),
                 style = WalkieTheme.typography.head5.copy(color = colors.gray500),
             )
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = stringResource(id = R.string.character_gain_induction),
                 style = WalkieTheme.typography.body2.copy(color = colors.gray400),
@@ -401,6 +426,7 @@ private fun CharacterItemContent(
                 text = stringResource(id = character.characterNameResId),
                 style = WalkieTheme.typography.head5.copy(color = colors.gray700),
             )
+            Spacer(modifier = Modifier.height(4.dp))
             Row {
                 Text(
                     text = stringResource(R.string.format_int, character.count),
@@ -624,8 +650,18 @@ private fun PreviewHatchingCharacterScreen() {
     WalkieTheme {
         HatchingCharacterScreen(
             viewState = HatchingCharacterViewStateImpl(
-                dinoCharacterList = MutableStateFlow(emptyList()),
-                jellyfishCharacterList = MutableStateFlow(emptyList()),
+                dinoCharacterState = MutableStateFlow(
+                    BaseUiState(
+                        isShowShimmer = true,
+                        emptyList()
+                    )
+                ),
+                jellyfishCharacterState = MutableStateFlow(
+                    BaseUiState(
+                        isShowShimmer = true,
+                        emptyList()
+                    )
+                ),
             ),
             onSelectPartner = {},
             onNavigationEvent = {}
