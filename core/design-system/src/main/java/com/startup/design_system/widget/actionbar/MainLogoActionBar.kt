@@ -23,7 +23,11 @@ import com.startup.ui.WalkieTheme
 import com.startup.ui.noRippleClickable
 
 @Composable
-fun MainLogoActionBar(isExistAlarm: Boolean, onClickAlarm: () -> Unit) {
+fun MainLogoActionBar(
+    isShowAlarmIcon: Boolean = true,
+    isExistAlarm: Boolean,
+    onClickAlarm: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -44,28 +48,30 @@ fun MainLogoActionBar(isExistAlarm: Boolean, onClickAlarm: () -> Unit) {
             modifier = Modifier
                 .size(24.dp)
         ) {
-            Icon(
-                modifier = Modifier
-                    .size(24.dp)
-                    .noRippleClickable { onClickAlarm.invoke() },
-                painter = painterResource(R.drawable.ic_alert),
-                tint = WalkieTheme.colors.gray400,
-                contentDescription = null
-            )
-            if (isExistAlarm) {
-                Box(
-                    Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(end = 3.dp, top = 2.dp)
-                ) {
+            if (isShowAlarmIcon) {
+                Icon(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .noRippleClickable { onClickAlarm.invoke() },
+                    painter = painterResource(R.drawable.ic_alert),
+                    tint = WalkieTheme.colors.gray400,
+                    contentDescription = null
+                )
+                if (isExistAlarm) {
                     Box(
-                        modifier = Modifier
-                            .size(7.dp)
-                            .background(
-                                color = WalkieTheme.colors.red100,
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                    )
+                        Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(end = 3.dp, top = 2.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(7.dp)
+                                .background(
+                                    color = WalkieTheme.colors.red100,
+                                    shape = RoundedCornerShape(10.dp)
+                                )
+                        )
+                    }
                 }
             }
         }

@@ -323,11 +323,12 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                 }
             }
 
-            hatchingInfo?.let { event ->
-                if (event.isHatching) {
-                    val character = event.character
-                        ?: viewModel.state.currentWalkCharacter.collectAsState().value
-                    val eggKind = event.eggKind
+            hatchingInfo.let {
+                val hatchingInfoState by viewModel.hatchingInfo.collectAsStateWithLifecycle()
+
+                if (hatchingInfoState.data.isHatching) {
+                    val character = hatchingInfoState.data.character
+                    val eggKind = hatchingInfoState.data.eggKind
 
                     val characterName = stringResource(id = character.characterNameResId)
                     val allCharacters = CharacterFactory.getAllCharacters()
