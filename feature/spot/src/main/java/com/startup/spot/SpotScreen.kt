@@ -32,12 +32,14 @@ internal fun SpotScreen(
     uiEvent: (SpotUiEvent) -> Unit
 ) {
     val context = LocalContext.current
-    val webView = remember { WebView(context).apply {
-        layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-    } }
+    val webView = remember {
+        WebView(context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        }
+    }
     val haptic = LocalHapticFeedback.current
     webView.clearHistory()
     webView.clearCache(true)

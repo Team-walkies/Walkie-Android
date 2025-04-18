@@ -5,6 +5,7 @@ import com.startup.common.base.BaseState
 import com.startup.common.base.BaseViewModel
 import com.startup.common.base.UiEvent
 import com.startup.common.event.EggHatchingEvent
+import com.startup.common.util.BaseUiState
 import com.startup.common.util.Printer
 import com.startup.domain.model.egg.UpdateStepData
 import com.startup.domain.model.member.UserInfo
@@ -31,7 +32,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
@@ -54,42 +54,66 @@ class HomeViewModel @Inject constructor(
     private val _showActivityPermissionAlert = MutableStateFlow(false)
 
     private val _state = HomeViewStateImpl(
-        steps = stepCounter.observeSteps()
-            .stateInViewModel(0),
-        currentGainEggCount =
-        getGainEggCount.invoke(Unit)
-            .catch {
+        stepsUiState = stepCounter.observeSteps()
+            .map { BaseUiState(isShowShimmer = false, data = it) }
+            .stateInViewModel(BaseUiState(isShowShimmer = true, data = 0)),
 
-            }.stateInViewModel(0),
-        currentHatchedCharacterCount = getHatchedCharacterCount.invoke(Unit)
-            .catch {
+        currentGainEggCountUiState = getGainEggCount.invoke(Unit)
+            .map { BaseUiState(isShowShimmer = false, data = it) }
+            .catch { emit(BaseUiState(isShowShimmer = false, data = 0)) }
+            .stateInViewModel(BaseUiState(isShowShimmer = true, data = 0)),
 
-            }.stateInViewModel(0),
-        userInfo = getMyData.invoke(Unit)
-            .catch {
+        currentHatchedCharacterCountUiState = getHatchedCharacterCount.invoke(Unit)
+            .map { BaseUiState(isShowShimmer = false, data = it) }
+            .catch { emit(BaseUiState(isShowShimmer = false, data = 0)) }
+            .stateInViewModel(BaseUiState(isShowShimmer = true, data = 0)),
 
-            }.stateInViewModel(null),
-        currentWalkEgg = getCurrentWalkEgg.invoke(Unit)
-            .map { it.toUiModel() }
-            .catch { }
+        userInfoUiState = getMyData.invoke(Unit)
+            .map { BaseUiState(isShowShimmer = false, data = it as UserInfo?) }
+            .catch { emit(BaseUiState(isShowShimmer = false, data = null)) }
+            .stateInViewModel(BaseUiState(isShowShimmer = true, data = null)),
+
+        currentWalkEggUiState = getCurrentWalkEgg.invoke(Unit)
+            .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
+            .catch {
+                emit(
+                    BaseUiState(
+                        isShowShimmer = false, data = MyEggModel(
+                            characterId = 0,
+                            eggKind = EggKind.Empty,
+                            obtainedDate = "",
+                            obtainedPosition = "",
+                            eggId = 0,
+                            play = false,
+                            nowStep = 0,
+                            needStep = 0
+                        )
+                    )
+                )
+            }
             .stateInViewModel(
-                MyEggModel(
-                    characterId = 0,
-                    eggKind = EggKind.Empty,
-                    obtainedDate = "",
-                    obtainedPosition = "",
-                    eggId = 0,
-                    play = false,
-                    nowStep = 0,
-                    needStep = 0
+                BaseUiState(
+                    isShowShimmer = true, data = MyEggModel(
+                        characterId = 0,
+                        eggKind = EggKind.Empty,
+                        obtainedDate = "",
+                        obtainedPosition = "",
+                        eggId = 0,
+                        play = false,
+                        nowStep = 0,
+                        needStep = 0
+                    )
                 )
             ),
-        currentWalkCharacter = getCurrentWalkCharacter.invoke(Unit)
-            .map { it.toUiModel() }
-            .catch { }
-            .stateInViewModel(WalkieCharacter.ofEmpty()),
-        showActivityPermissionAlert = _showActivityPermissionAlert.stateInViewModel(false)
+
+        currentWalkCharacterUiState = getCurrentWalkCharacter.invoke(Unit)
+            .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
+            .catch { emit(BaseUiState(isShowShimmer = false, data = WalkieCharacter.ofEmpty())) }
+            .stateInViewModel(BaseUiState(isShowShimmer = true, data = WalkieCharacter.ofEmpty())),
+
+        showActivityPermissionAlert = _showActivityPermissionAlert.stateInViewModel(false),
     )
+
     override val state: HomeViewState
         get() = _state
 
@@ -100,11 +124,20 @@ class HomeViewModel @Inject constructor(
     )
     val uiEventFlow: SharedFlow<UiEvent> = _uiEventFlow.asSharedFlow()
 
-    private val _hatchingInfo = MutableStateFlow<HatchingAnimationCharacterData?>(null)
-    val hatchingInfo: StateFlow<HatchingAnimationCharacterData?> = _hatchingInfo
+    private val _hatchingInfo = MutableStateFlow(
+        BaseUiState(
+            isShowShimmer = false,
+            data = HatchingAnimationCharacterData()
+        )
+    )
+    val hatchingInfo: StateFlow<BaseUiState<HatchingAnimationCharacterData>> = _hatchingInfo
+
 
     fun onHatchingAnimationDismissed() {
-        _hatchingInfo.value = null
+        _hatchingInfo.value = BaseUiState(
+            isShowShimmer = false,
+            data = HatchingAnimationCharacterData(isHatching = false)
+        )
     }
 
     fun emitUiEvent(event: UiEvent) {
@@ -123,13 +156,19 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             EggHatchingEvent.hatchingAnimationFlow.collect { isHatching ->
                 if (isHatching) {
-                    _hatchingInfo.value = HatchingAnimationCharacterData(
-                        isHatching = true,
-                        character = _state.currentWalkCharacter.value,
-                        eggKind = _state.currentWalkEgg.value.eggKind
+                    _hatchingInfo.value = BaseUiState(
+                        isShowShimmer = false,
+                        data = HatchingAnimationCharacterData(
+                            isHatching = true,
+                            character = _state.currentWalkCharacterUiState.value.data,
+                            eggKind = _state.currentWalkEggUiState.value.data.eggKind
+                        )
                     )
                 } else {
-                    _hatchingInfo.value = null
+                    _hatchingInfo.value = BaseUiState(
+                        isShowShimmer = false,
+                        data = HatchingAnimationCharacterData(isHatching = false)
+                    )
                 }
             }
         }
@@ -137,13 +176,13 @@ class HomeViewModel @Inject constructor(
 
     private fun processUserInfo() {
         viewModelScope.launch {
-            _state.userInfo
-                .filterNotNull()
-                .take(1)
-                .catch { }
-                .collect { userInfo ->
-                    Printer.e("JUNWOO", "eggId : ${userInfo.eggId}")
-                    updateStepProgress(userInfo)
+            _state.userInfoUiState
+                .collect { uiState ->
+                    val userInfo = uiState.data
+                    if (!uiState.isShowShimmer && userInfo != null) {
+                        Printer.e("JUNWOO", "eggId : ${userInfo.eggId}")
+                        updateStepProgress(userInfo)
+                    }
                 }
         }
     }
@@ -196,12 +235,12 @@ class HomeViewModel @Inject constructor(
 
     private fun setupTargetSteps() {
         viewModelScope.launch {
-            _state.currentWalkEgg
-                .filter { it.needStep > 0 }
+            _state.currentWalkEggUiState
+                .filter { it.data.needStep > 0 }
                 .take(1)
                 .collect { currentEgg ->
-                    dataStore.setTargetStep(target = currentEgg.needStep)
-                    Printer.e("JUNWOO", "Target step set: ${currentEgg.needStep}")
+                    dataStore.setTargetStep(target = currentEgg.data.needStep)
+                    Printer.e("JUNWOO", "Target step set: ${currentEgg.data.needStep}")
                 }
         }
     }
@@ -226,27 +265,27 @@ class HomeViewModel @Inject constructor(
 }
 
 interface HomeViewState : BaseState {
-    val steps: StateFlow<Int>
-    val currentHatchedCharacterCount: StateFlow<Int>
-    val currentGainEggCount: StateFlow<Int>
-    val userInfo: StateFlow<UserInfo?>
-    val currentWalkEgg: StateFlow<MyEggModel>
-    val currentWalkCharacter: StateFlow<WalkieCharacter>
+    val stepsUiState: StateFlow<BaseUiState<Int>>
+    val currentHatchedCharacterCountUiState: StateFlow<BaseUiState<Int>>
+    val currentGainEggCountUiState: StateFlow<BaseUiState<Int>>
+    val userInfoUiState: StateFlow<BaseUiState<UserInfo?>>
+    val currentWalkEggUiState: StateFlow<BaseUiState<MyEggModel>>
+    val currentWalkCharacterUiState: StateFlow<BaseUiState<WalkieCharacter>>
     val showActivityPermissionAlert: StateFlow<Boolean>
 }
 
 class HomeViewStateImpl(
-    override val steps: StateFlow<Int>,
-    override val currentHatchedCharacterCount: StateFlow<Int>,
-    override val currentGainEggCount: StateFlow<Int>,
-    override val userInfo: StateFlow<UserInfo?>,
-    override val currentWalkEgg: StateFlow<MyEggModel>,
-    override val currentWalkCharacter: StateFlow<WalkieCharacter>,
-    override val showActivityPermissionAlert: StateFlow<Boolean>
+    override val stepsUiState: StateFlow<BaseUiState<Int>>,
+    override val currentHatchedCharacterCountUiState: StateFlow<BaseUiState<Int>>,
+    override val currentGainEggCountUiState: StateFlow<BaseUiState<Int>>,
+    override val userInfoUiState: StateFlow<BaseUiState<UserInfo?>>,
+    override val currentWalkEggUiState: StateFlow<BaseUiState<MyEggModel>>,
+    override val currentWalkCharacterUiState: StateFlow<BaseUiState<WalkieCharacter>>,
+    override val showActivityPermissionAlert: StateFlow<Boolean>,
 ) : HomeViewState
 
 data class HatchingAnimationCharacterData(
-    val isHatching: Boolean,
-    val character: WalkieCharacter? = null,
+    val isHatching: Boolean = false,
+    val character: WalkieCharacter = WalkieCharacter.ofEmpty(),
     val eggKind: EggKind = EggKind.Empty
 )

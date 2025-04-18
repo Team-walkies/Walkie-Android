@@ -45,7 +45,9 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.startup.common.extension.moveToAppDetailSetting
-import com.startup.common.util.Printer
+import com.startup.common.extension.shimmerEffect
+import com.startup.common.extension.shimmerEffectGray200
+import com.startup.common.util.BaseUiState
 import com.startup.common.util.formatWithLocale
 import com.startup.design_system.widget.actionbar.MainLogoActionBar
 import com.startup.design_system.widget.permission.PermissionInduction
@@ -60,7 +62,6 @@ import com.startup.home.egg.model.MyEggModel
 import com.startup.home.menu.HistoryItemModel
 import com.startup.ui.WalkieTheme
 import com.startup.ui.noRippleClickable
-import kotlinx.coroutines.flow.map
 import withBold
 import withUnderline
 
@@ -76,7 +77,7 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            MainLogoActionBar(isExistAlarm = false) {
+            MainLogoActionBar(isShowAlarmIcon = false, isExistAlarm = false) {
                 onNavigationEvent.invoke(HomeScreenNavigationEvent.MoveToNotification)
             }
         },
@@ -100,6 +101,7 @@ fun HomeScreen(
     }
 }
 
+
 @Composable
 private fun HomeContent(
     viewState: HomeViewState,
@@ -114,9 +116,11 @@ private fun HomeContent(
     val availableHeight = screenHeightDp - topPadding - 50.dp
     val minRequiredHeight = 431.dp + 18.dp + 180.dp
     val needsScroll = minRequiredHeight > availableHeight
-    val stepCount by viewState.steps.collectAsStateWithLifecycle()
-    val myEggModel by viewState.currentWalkEgg.collectAsStateWithLifecycle()
-    val walkieCharacterWithWalk by viewState.currentWalkCharacter.collectAsStateWithLifecycle()
+
+    val stepCountState by viewState.stepsUiState.collectAsStateWithLifecycle()
+    val myEggModelState by viewState.currentWalkEggUiState.collectAsStateWithLifecycle()
+    val walkieCharacterState by viewState.currentWalkCharacterUiState.collectAsStateWithLifecycle()
+
     Column(
         modifier = Modifier
             .background(color = WalkieTheme.colors.white)
@@ -127,38 +131,35 @@ private fun HomeContent(
             )
             .then(if (needsScroll) Modifier.verticalScroll(scrollState) else Modifier)
             .padding(bottom = 50.dp)
-
     ) {
         Spacer(modifier = Modifier.height(8.dp))
 
-
         if (!needsScroll) {
-            // 충분히 큰 화면: 남은 공간을 모두 차지
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
             ) {
                 EggAndPartnerSection(
-                    stepCount = stepCount,
-                    eggModel = myEggModel,
+                    stepCountState = stepCountState,
+                    eggModelState = myEggModelState,
+                    walkieCharacterState = walkieCharacterState,
                     onNavigationEvent = onNavigationEvent,
-                    walkieCharacter = walkieCharacterWithWalk,
                     useFixedHeight = false
                 )
             }
         } else {
-            // 작은 화면: 고정 높이 사용 (스크롤 필요)
             EggAndPartnerSection(
-                stepCount = stepCount,
-                eggModel = myEggModel,
+                stepCountState = stepCountState,
+                eggModelState = myEggModelState,
+                walkieCharacterState = walkieCharacterState,
                 onNavigationEvent = onNavigationEvent,
-                walkieCharacter = walkieCharacterWithWalk,
                 useFixedHeight = true
             )
         }
 
         Spacer(modifier = Modifier.height(18.dp))
+
         MyHistorySection(
             viewState = viewState,
             onNavigationEvent = onNavigationEvent
@@ -168,9 +169,9 @@ private fun HomeContent(
 
 @Composable
 private fun EggAndPartnerSection(
-    stepCount: Int,
-    eggModel: MyEggModel,
-    walkieCharacter: WalkieCharacter,
+    stepCountState: BaseUiState<Int>,
+    eggModelState: BaseUiState<MyEggModel>,
+    walkieCharacterState: BaseUiState<WalkieCharacter>,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
     useFixedHeight: Boolean
 ) {
@@ -198,23 +199,38 @@ private fun EggAndPartnerSection(
             ) {
                 EggLayout(
                     modifier = Modifier.fillMaxSize(),
-                    step = stepCount,
-                    eggModel = eggModel,
+                    stepCountState = stepCountState,
+                    eggModelState = eggModelState,
                     onNavigationEvent = onNavigationEvent
                 )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            PartnerInfoBox(stringResource(walkieCharacter.characterNameResId))
+
+            if (walkieCharacterState.isShowShimmer) {
+                Box(
+                    modifier = Modifier
+                        .height(52.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(WalkieTheme.colors.gray100)
+                        .shimmerEffect()
+                )
+            } else {
+                PartnerInfoBox(stringResource(walkieCharacterState.data.characterNameResId))
+            }
         }
-        Image(
-            modifier = Modifier
-                .size(120.dp)
-                .align(Alignment.BottomEnd)
-                .offset(x = (-8).dp),
-            painter = painterResource(walkieCharacter.characterImageResId),
-            contentDescription = stringResource(R.string.desc_partner)
-        )
+
+        if (!walkieCharacterState.isShowShimmer) {
+            Image(
+                modifier = Modifier
+                    .size(120.dp)
+                    .align(Alignment.BottomEnd)
+                    .offset(x = (-8).dp),
+                painter = painterResource(walkieCharacterState.data.characterImageResId),
+                contentDescription = stringResource(R.string.desc_partner)
+            )
+        }
     }
 }
 
@@ -242,43 +258,95 @@ private fun MyHistorySection(
     viewState: HomeViewState,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit
 ) {
-    val eggCount by viewState.currentGainEggCount.collectAsStateWithLifecycle()
-    val characterCount by viewState.currentHatchedCharacterCount.collectAsStateWithLifecycle()
-    val recordedSpotCount by viewState.userInfo.map { it?.recordedSpot ?: 0 }
-        .collectAsStateWithLifecycle(0)
-    Printer.e("LMH", "MyHistorySection $eggCount, $characterCount, $recordedSpotCount")
-    Text(
-        text = stringResource(R.string.home_my_history),
-        style = WalkieTheme.typography.head4,
-        color = WalkieTheme.colors.gray700
-    )
+    val eggCountState by viewState.currentGainEggCountUiState.collectAsStateWithLifecycle()
+    val characterCountState by viewState.currentHatchedCharacterCountUiState.collectAsStateWithLifecycle()
+    val userInfoState by viewState.userInfoUiState.collectAsStateWithLifecycle()
+
+    if (eggCountState.isShowShimmer) {
+        SkeletonHistoryTitleText()
+    } else {
+        Text(
+            text = stringResource(R.string.home_my_history),
+            style = WalkieTheme.typography.head4,
+            color = WalkieTheme.colors.gray700
+        )
+    }
+
     Spacer(modifier = Modifier.height(8.dp))
+
+    val userData = userInfoState.data
+    val spotCount = if (!userInfoState.isShowShimmer && userData != null) {
+        userData.recordedSpot
+    } else {
+        0
+    }
+
     HistoryItems(
-        eggCount = eggCount,
-        characterCount = characterCount,
-        spotCount = recordedSpotCount,
-        onNavigationEvent
+        eggCountState = eggCountState,
+        characterCountState = characterCountState,
+        spotCountState = if (userInfoState.isShowShimmer) {
+            BaseUiState(true, 0)
+        } else {
+            BaseUiState(false, spotCount)
+        },
+        onNavigationEvent = onNavigationEvent
     )
 }
 
+
 @Composable
 private fun HistoryItems(
-    eggCount: Int,
-    characterCount: Int,
-    spotCount: Int,
+    eggCountState: BaseUiState<Int>,
+    characterCountState: BaseUiState<Int>,
+    spotCountState: BaseUiState<Int>,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        getDefaultHistoryMenu(
-            eggCount = eggCount,
-            characterCount = characterCount,
-            spotCount = spotCount
-        ).take(3).forEach { item ->
+        val historyItems =
+            if (eggCountState.isShowShimmer || characterCountState.isShowShimmer || spotCountState.isShowShimmer) {
+                listOf(
+                    BaseUiState(
+                        true, HistoryItemModel(
+                            myHistoryKind = HistoryItemModel.MyHistoryKind.GainEgg,
+                            thumbnailDrawable = R.drawable.img_gain_eggs,
+                            titleString = R.string.home_gain_eggs,
+                            unitString = R.string.quantity_string,
+                            count = 0
+                        )
+                    ),
+                    BaseUiState(
+                        true, HistoryItemModel(
+                            myHistoryKind = HistoryItemModel.MyHistoryKind.GainCharacter,
+                            thumbnailDrawable = R.drawable.img_hatching_characters,
+                            titleString = R.string.home_hatching_characters,
+                            unitString = R.string.group_characters_string,
+                            count = 0
+                        )
+                    ),
+                    BaseUiState(
+                        true, HistoryItemModel(
+                            myHistoryKind = HistoryItemModel.MyHistoryKind.SpotArchive,
+                            thumbnailDrawable = R.drawable.img_spot_history,
+                            titleString = R.string.home_spot_history,
+                            unitString = R.string.quantity_string,
+                            count = 0
+                        )
+                    )
+                )
+            } else {
+                getDefaultHistoryMenu(
+                    eggCount = eggCountState.data,
+                    characterCount = characterCountState.data,
+                    spotCount = spotCountState.data
+                ).map { BaseUiState(false, it) }
+            }
+
+        historyItems.take(3).forEach { itemState ->
             HistoryItem(
-                item = item,
+                itemState = itemState,
                 modifier = Modifier.weight(1f),
             ) { myHistoryKind ->
                 when (myHistoryKind) {
@@ -331,7 +399,7 @@ fun getDefaultHistoryMenu(
 
 @Composable
 private fun HistoryItem(
-    item: HistoryItemModel,
+    itemState: BaseUiState<HistoryItemModel>,
     modifier: Modifier = Modifier,
     onClickItem: (HistoryItemModel.MyHistoryKind) -> Unit
 ) {
@@ -339,45 +407,76 @@ private fun HistoryItem(
         modifier = modifier
             .padding(horizontal = 4.dp)
             .noRippleClickable {
-                onClickItem.invoke(item.myHistoryKind)
+                if (!itemState.isShowShimmer) {
+                    onClickItem.invoke(itemState.data.myHistoryKind)
+                }
             },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // 비율을 유지하면서 너비에 맞춰 이미지 표시
         val aspectRatio = 69f / 104f
-        Image(
-            painter = painterResource(item.thumbnailDrawable),
-            contentDescription = "",
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f / aspectRatio)
-                .clip(RoundedCornerShape(16.dp)),
-            contentScale = ContentScale.Crop
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            modifier = Modifier.height(20.dp),
-            text = stringResource(item.titleString),
-            style = WalkieTheme.typography.head6,
-            color = WalkieTheme.colors.gray700
-        )
-        Text(
-            modifier = Modifier.height(20.dp),
-            text = stringResource(item.unitString, item.count),
-            style = WalkieTheme.typography.body2,
-            color = WalkieTheme.colors.gray500
-        )
+
+        if (itemState.isShowShimmer) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f / aspectRatio)
+                    .clip(RoundedCornerShape(16.dp))
+                    .shimmerEffect()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(20.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .shimmerEffectGray200()
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+        } else {
+            Image(
+                painter = painterResource(itemState.data.thumbnailDrawable),
+                contentDescription = "",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f / aspectRatio)
+                    .clip(RoundedCornerShape(16.dp)),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                modifier = Modifier.height(20.dp),
+                text = stringResource(itemState.data.titleString),
+                style = WalkieTheme.typography.head6,
+                color = WalkieTheme.colors.gray700
+            )
+            Text(
+                modifier = Modifier.height(20.dp),
+                text = stringResource(itemState.data.unitString, itemState.data.count),
+                style = WalkieTheme.typography.body2,
+                color = WalkieTheme.colors.gray500
+            )
+        }
     }
 }
 
 @Composable
 fun EggLayout(
     modifier: Modifier = Modifier,
-    step: Int,
-    eggModel: MyEggModel,
+    stepCountState: BaseUiState<Int>,
+    eggModelState: BaseUiState<MyEggModel>,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
 ) {
-    val eggAttribute = getEggLayoutModel(eggModel.eggKind)
+    val eggAttribute = if (!eggModelState.isShowShimmer) {
+        getEggLayoutModel(eggModelState.data.eggKind)
+    } else {
+        getEggLayoutModel(EggKind.Empty)
+    }
 
     Box(
         modifier = modifier
@@ -391,14 +490,23 @@ fun EggLayout(
             ),
         contentAlignment = Alignment.Center
     ) {
-        EggContent(
-            step = step,
-            eggModel = eggModel,
-            eggAttribute = eggAttribute,
-            onNavigationEvent = onNavigationEvent
-        )
+        if (stepCountState.isShowShimmer || eggModelState.isShowShimmer) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .shimmerEffect()
+            )
+        } else {
+            EggContent(
+                step = stepCountState.data,
+                eggModel = eggModelState.data,
+                eggAttribute = eggAttribute,
+                onNavigationEvent = onNavigationEvent
+            )
+        }
     }
 }
+
 
 @Composable
 private fun EggContent(
@@ -461,7 +569,6 @@ private fun EggContent(
                     contentDescription = stringResource(R.string.desc_empty_egg),
                 )
 
-                // 알 선택 텍스트
                 if (eggModel.eggKind == EggKind.Empty) {
                     Text(
                         text = stringResource(R.string.home_choice_egg).withUnderline(),
@@ -524,4 +631,15 @@ private fun StepInformation(step: Int) {
             )
         }
     }
+}
+
+@Composable
+fun SkeletonHistoryTitleText() {
+    Box(
+        modifier = Modifier
+            .width(104.dp)
+            .height(20.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .shimmerEffect()
+    )
 }
