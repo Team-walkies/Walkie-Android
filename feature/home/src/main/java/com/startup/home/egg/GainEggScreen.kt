@@ -308,7 +308,13 @@ private fun EggBottomModalContent(
         Box(
             modifier = Modifier.noRippleClickable {
                 if (!egg.play) {
-                    uiEventSender.invoke(GainEggUiEvent.OnChangedClickWalkEgg(egg.eggId))
+                    uiEventSender.invoke(
+                        GainEggUiEvent.OnChangedClickWalkEgg(
+                            eggId = egg.eggId,
+                            needStep = egg.needStep,
+                            nowStep = egg.nowStep
+                        )
+                    )
                     onClickCancel.invoke()
                 }
             }

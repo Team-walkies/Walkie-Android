@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -194,9 +195,14 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun setupTargetSteps() {
-        // todo fetching or 로컬에 저장
         viewModelScope.launch {
-            dataStore.setTargetStep(target = 20)
+            _state.currentWalkEgg
+                .filter { it.needStep > 0 }
+                .take(1)
+                .collect { currentEgg ->
+                    dataStore.setTargetStep(target = currentEgg.needStep)
+                    Printer.e("JUNWOO", "Target step set: ${currentEgg.needStep}")
+                }
         }
     }
 
