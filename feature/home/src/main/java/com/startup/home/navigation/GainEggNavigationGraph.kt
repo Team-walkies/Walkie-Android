@@ -40,7 +40,11 @@ fun GainEggNavigationGraph(
             ) { uiEvent ->
                 when (uiEvent) {
                     is GainEggUiEvent.OnChangedClickWalkEgg -> {
-                        gainEggViewModel.updateEgg(uiEvent.eggId)
+                        gainEggViewModel.updateEgg(
+                            eggId = uiEvent.eggId,
+                            needStep = uiEvent.needStep,
+                            nowStep = uiEvent.nowStep
+                        )
                     }
                 }
             }

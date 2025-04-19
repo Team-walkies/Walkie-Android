@@ -2,6 +2,8 @@ package com.startup.home.egg
 
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel
+import com.startup.common.util.Printer
+import com.startup.domain.provider.StepDataStore
 import com.startup.domain.usecase.GetGainEggList
 import com.startup.domain.usecase.UpdateWalkingEgg
 import com.startup.home.egg.model.GainEggViewModelEvent
@@ -23,8 +25,10 @@ import javax.inject.Inject
 @HiltViewModel
 class GainEggViewModel @Inject constructor(
     getGainEggList: GetGainEggList,
-    private val updateWalkingEgg: UpdateWalkingEgg
+    private val updateWalkingEgg: UpdateWalkingEgg,
+    private val dataStore: StepDataStore
 ) : BaseViewModel() {
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _state = GainEggViewStateImpl(
         merge(
@@ -38,10 +42,19 @@ class GainEggViewModel @Inject constructor(
     )
     override val state: GainEggViewState get() = _state
 
-    fun updateEgg(eggId: Long) {
+    fun updateEgg(eggId: Long, needStep: Int, nowStep: Int) {
         updateWalkingEgg.invoke(eggId)
             .onEach {
                 notifyViewModelEvent(GainEggViewModelEvent.FetchEggList)
+
+                if (needStep > 0) {
+                    dataStore.setTargetStep(target = needStep)
+                    dataStore.saveCurrentSteps(steps = nowStep) // 알이 변경되었으므로 걸음수를 eggModel의 nowStep으로 초기화
+                    Printer.d(
+                        "JUNWOO",
+                        "Target step set: $needStep, Current steps set to: $nowStep"
+                    )
+                }
             }.catch {
 
             }.launchIn(viewModelScope)

@@ -19,5 +19,6 @@ sealed interface GainEggViewModelEvent : BaseEvent {
 }
 
 sealed interface GainEggUiEvent : UiEvent {
-    data class OnChangedClickWalkEgg(val eggId: Long) : GainEggUiEvent
+    data class OnChangedClickWalkEgg(val eggId: Long, val needStep: Int, val nowStep: Int) :
+        GainEggUiEvent
 }
