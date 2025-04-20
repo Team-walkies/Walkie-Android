@@ -48,10 +48,15 @@ object DateUtil {
         return today.minusDays(today.dayOfWeek.value.toLong() % 7)
     }
 
-    fun matchWeekdayInSameWeekUntilToday(from: LocalDate, to: LocalDate, today: LocalDate = LocalDate.now()): LocalDate {
-        val fromDayOfWeek = from.dayOfWeek.value
-        val toStartOfWeek = to.minusDays((to.dayOfWeek.value - 1).toLong())
-        val aligned = toStartOfWeek.plusDays((fromDayOfWeek - 1).toLong())
+    fun matchWeekdayInSameWeekUntilToday(
+        from: LocalDate,
+        to: LocalDate,
+        today: LocalDate = LocalDate.now()
+    ): LocalDate {
+        val fromDayOfWeek = from.dayOfWeek.value % 7
+        val toStartOfWeek = getStartOfWeek(to)
+        Printer.e("LMH", "from $fromDayOfWeek startWeek $toStartOfWeek")
+        val aligned = toStartOfWeek.plusDays((fromDayOfWeek).toLong())
         return if (aligned.isAfter(today)) today else aligned
     }
 

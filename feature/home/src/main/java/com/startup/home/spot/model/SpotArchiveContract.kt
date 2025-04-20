@@ -2,25 +2,21 @@ package com.startup.home.spot.model
 
 import com.startup.common.base.BaseState
 import com.startup.common.base.UiEvent
+import com.startup.common.util.BaseUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import java.time.LocalDate
 
 interface SpotArchiveViewState : BaseState {
     val currentSelectedDate: StateFlow<CalendarModel>
-    val eventList: StateFlow<Map<String, List<ReviewModel>>>
+    val eventList: StateFlow<Map<String, BaseUiState<List<ReviewModel>>>>
 }
 
 class SpotArchiveViewStateImpl : SpotArchiveViewState {
     override val currentSelectedDate: MutableStateFlow<CalendarModel> =
         MutableStateFlow(CalendarModel(LocalDate.now(), isSpecificDate = true))
-    override val eventList: MutableStateFlow<Map<String, List<ReviewModel>>> =
+    override val eventList: MutableStateFlow<Map<String, BaseUiState<List<ReviewModel>>>> =
         MutableStateFlow(mapOf())
-
-    fun clearEventList() {
-        eventList.update { mapOf() }
-    }
 }
 
 sealed interface SpotArchiveUiEvent : UiEvent {

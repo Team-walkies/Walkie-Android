@@ -2,6 +2,7 @@ package com.startup.home.spot
 
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel
+import com.startup.common.util.BaseUiState
 import com.startup.common.util.DateUtil
 import com.startup.common.util.DateUtil.getStartOfWeek
 import com.startup.common.util.Printer
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -69,6 +71,7 @@ class SpotArchiveViewModel @Inject constructor(
         )
         fetchWeeklyReviewList(date.date, weeksToFetch)
         _state.currentSelectedDate.update { date }
+        Printer.e("LMH", "WEEK CHANGED $date")
     }
 
     private fun fetchWeeklyReviewList(
@@ -102,6 +105,19 @@ class SpotArchiveViewModel @Inject constructor(
         viewModelScope.launch {
             getRangeOfWeekReviewList
                 .invoke(startDateStr to endDateStr)
+                .onStart {
+                    _state.eventList.value = _state.eventList.value
+                        .filterKeys { it in weeksToLoad }
+                        .toMutableMap()
+                        .apply {
+                            putAll(weeksToFetch.map {
+                                getStartOfWeek(it.first).toString() to BaseUiState(
+                                    isShowShimmer = true,
+                                    emptyList()
+                                )
+                            })
+                        }
+                }
                 .map { it.map { domainModel -> domainModel.toUiModel() } }
                 .onEach { fullEventList ->
                     Printer.d("LMH", "EVENT!! $fullEventList")
@@ -116,7 +132,11 @@ class SpotArchiveViewModel @Inject constructor(
                         .filterKeys { it in weeksToLoad }
                         .toMutableMap()
                         .apply {
-                            putAll(grouped)
+                            putAll(grouped.map {
+                                it.key to BaseUiState(isShowShimmer = false, it.value)
+                            } + filter { !grouped.keys.contains(it.key) }
+                                .map { it.key to BaseUiState(isShowShimmer = false, it.value.data) }
+                            )
                         }
                     Printer.d("LMH", "after filtering event Map ${_state.eventList.value.entries.toList()}")
                 }

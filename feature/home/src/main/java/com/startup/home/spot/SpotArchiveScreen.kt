@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -29,11 +30,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.startup.common.extension.shimmerEffect
+import com.startup.common.extension.shimmerEffectGray200
 import com.startup.common.util.DateUtil
 import com.startup.common.util.DateUtil.getStartOfWeek
 import com.startup.design_system.widget.actionbar.PageActionBar
@@ -63,22 +67,25 @@ internal fun SpotArchiveScreen(
     }
     val selectedDate by state.currentSelectedDate.collectAsStateWithLifecycle()
     val reviews by state.eventList.map { eventMap ->
-        eventMap["${getStartOfWeek(selectedDate.date)}"]?.filter { it.date == selectedDate.date } ?: emptyList()
+        eventMap["${getStartOfWeek(selectedDate.date)}"]?.data?.filter { it.date == selectedDate.date } ?: emptyList()
     }.collectAsStateWithLifecycle(emptyList())
+    val isShimmer by state.eventList.map { it["${getStartOfWeek(selectedDate.date)}"]?.isShowShimmer ?: false }
+        .collectAsStateWithLifecycle(true)
+
     val eventList by state.eventList.map { eventMap ->
-        eventMap["${getStartOfWeek(selectedDate.date)}"] ?: emptyList()
+        eventMap.entries.flatMap { it.value.data }
     }.collectAsStateWithLifecycle(emptyList())
     var selectedOptionOfReview: ReviewModel? by remember {
         mutableStateOf(null)
     }
+
     val today = LocalDate.now()
-    var displayDateWeekFirstDay: LocalDate by remember { mutableStateOf(getStartOfWeek(today = today)) }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(color = WalkieTheme.colors.white)
     ) {
-        PageActionBar(PageActionBarType.JustBackActionBarType({ uiEventSender.invoke(SpotArchiveUiEvent.OnBack) }))
+        PageActionBar(PageActionBarType.JustBackActionBarType { uiEventSender.invoke(SpotArchiveUiEvent.OnBack) })
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -87,7 +94,7 @@ internal fun SpotArchiveScreen(
         ) {
             Text(
                 modifier = Modifier.padding(vertical = 1.dp),
-                text = DateUtil.convertDateTimeFormat(displayDateWeekFirstDay),
+                text = DateUtil.convertDateTimeFormat(selectedDate.date),
                 style = WalkieTheme.typography.head2.copy(color = WalkieTheme.colors.gray700)
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -109,8 +116,6 @@ internal fun SpotArchiveScreen(
                         )
                         .padding(vertical = 8.dp, horizontal = 12.dp)
                         .noRippleClickable {
-                            val weekFirstDay = getStartOfWeek(today)
-                            displayDateWeekFirstDay = weekFirstDay
                             uiEventSender.invoke(SpotArchiveUiEvent.OnDateChanged(CalendarModel(today, true)))
                         },
                     text = stringResource(R.string.date_today),
@@ -120,12 +125,11 @@ internal fun SpotArchiveScreen(
         }
         Spacer(modifier = Modifier.height(12.dp))
         WalkieWeekCalendar(
+            selectDate = selectedDate,
             events = eventList.map { it.date },
             onWeekChanged = {
-                displayDateWeekFirstDay = getStartOfWeek(it)
                 uiEventSender.invoke(SpotArchiveUiEvent.OnDateChanged(CalendarModel(it, false)))
             },
-            selectDate = selectedDate,
             onDateSelected = {
                 uiEventSender.invoke(SpotArchiveUiEvent.OnDateChanged(CalendarModel(it, false)))
             },
@@ -135,32 +139,47 @@ internal fun SpotArchiveScreen(
         Spacer(modifier = Modifier.height(11.dp))
         HorizontalDivider(thickness = 4.dp, color = WalkieTheme.colors.gray50)
         Spacer(modifier = Modifier.height(12.dp))
-        if (reviews.isEmpty()) {
-            EmptyReviewView()
-        } else {
+
+        if (isShimmer) {
             LazyColumn(
                 modifier = Modifier
                     .padding(horizontal = 16.dp),
             ) {
-                item {
-                    Row {
-                        Text(
-                            text = stringResource(R.string.calendar_review_title),
-                            style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "${reviews.size}",
-                            style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
-                        )
-                    }
-                }
+                item { SkeletonHistoryTitle() }
                 item { Spacer(modifier = Modifier.height(12.dp)) }
-                items(reviews) { item ->
-                    ReviewItem(item) {
-                        selectedOptionOfReview = it
-                    }
+                items(4) {
+                    SkeletonReviewItem()
                     Spacer(modifier = Modifier.height(40.dp))
+                }
+            }
+        } else {
+            if (reviews.isEmpty()) {
+                EmptyReviewView()
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp),
+                ) {
+                    item {
+                        Row {
+                            Text(
+                                text = stringResource(R.string.calendar_review_title),
+                                style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "${reviews.size}",
+                                style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
+                            )
+                        }
+                    }
+                    item { Spacer(modifier = Modifier.height(12.dp)) }
+                    items(reviews) { item ->
+                        ReviewItem(item) {
+                            selectedOptionOfReview = it
+                        }
+                        Spacer(modifier = Modifier.height(40.dp))
+                    }
                 }
             }
         }
@@ -172,29 +191,29 @@ internal fun SpotArchiveScreen(
                 isCalendarBottomModalShow = false
             },
             onSelectDay = {
-                val weekFirstDay = getStartOfWeek(it)
-                displayDateWeekFirstDay = weekFirstDay
                 uiEventSender.invoke(SpotArchiveUiEvent.OnDateChanged(CalendarModel(it, true)))
                 isCalendarBottomModalShow = false
             },
             sheetState = monthCalendarSheetState
         )
     }
-    selectedOptionOfReview?.let {
-        BottomSheetReviewOption(
-            onClickCancel = {
-                selectedOptionOfReview = null
-            },
-            onClickDelete = {
-                uiEventSender.invoke(SpotArchiveUiEvent.OnDeleteReview(review = it))
-                selectedOptionOfReview = null
-            },
-            onClickModify = {
-                uiEventSender.invoke(SpotArchiveUiEvent.OnModifyReview(review = it))
-                selectedOptionOfReview = null
-            },
-            sheetState = optionSheetState
-        )
+    if (selectedOptionOfReview != null) {
+        selectedOptionOfReview?.let {
+            BottomSheetReviewOption(
+                onClickCancel = {
+                    selectedOptionOfReview = null
+                },
+                onClickDelete = {
+                    uiEventSender.invoke(SpotArchiveUiEvent.OnDeleteReview(review = it))
+                    selectedOptionOfReview = null
+                },
+                onClickModify = {
+                    uiEventSender.invoke(SpotArchiveUiEvent.OnModifyReview(review = it))
+                    selectedOptionOfReview = null
+                },
+                sheetState = optionSheetState
+            )
+        }
     }
 }
 
@@ -356,6 +375,123 @@ private fun ReviewItem(reviewModel: ReviewModel, onClickOption: (ReviewModel) ->
 }
 
 @Composable
+private fun SkeletonReviewItem() {
+    Column(
+        modifier = Modifier
+            .background(color = WalkieTheme.colors.white)
+            .fillMaxWidth()
+    ) {
+        // 프로필 영역
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(CircleShape)
+                    .shimmerEffect()
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Box(
+                modifier = Modifier
+                    .size(100.dp, 20.dp)
+                    .clip(shape = RoundedCornerShape(8.dp))
+                    .shimmerEffect()
+            )
+            Spacer(modifier = Modifier.weight(1F))
+            Icon(
+                modifier = Modifier
+                    .size(24.dp),
+                painter = painterResource(R.drawable.ic_more),
+                contentDescription = stringResource(R.string.desc_calendar_review_option),
+                tint = WalkieTheme.colors.gray400
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        // 리뷰 영역
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    1.dp,
+                    color = WalkieTheme.colors.gray200,
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .background(color = WalkieTheme.colors.white, shape = RoundedCornerShape(12.dp))
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(20.dp)
+                    .padding(horizontal = 74.dp)
+                    .clip(shape = RoundedCornerShape(8.dp))
+                    .shimmerEffect()
+            )
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 12.dp),
+                thickness = 1.dp,
+                color = WalkieTheme.colors.gray200
+            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Box(
+                    modifier = Modifier
+                        .weight(1F)
+                        .height(20.dp)
+                        .padding(horizontal = 10.dp)
+                        .clip(shape = RoundedCornerShape(8.dp))
+                        .shimmerEffect()
+                )
+                Box(
+                    modifier = Modifier
+                        .weight(1F)
+                        .height(20.dp)
+                        .padding(horizontal = 10.dp)
+                        .clip(shape = RoundedCornerShape(8.dp))
+                        .shimmerEffect()
+                )
+                Box(
+                    modifier = Modifier
+                        .weight(1F)
+                        .height(20.dp)
+                        .padding(horizontal = 10.dp)
+                        .clip(shape = RoundedCornerShape(8.dp))
+                        .shimmerEffect()
+                )
+            }
+        }
+        SkeletonRatingWithReviewComponent()
+    }
+}
+
+@Composable
+private fun SkeletonRatingWithReviewComponent() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+            .clip(shape = RoundedCornerShape(12.dp))
+            .shimmerEffect()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.Start,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(80.dp, 20.dp)
+                .clip(shape = RoundedCornerShape(8.dp))
+                .shimmerEffectGray200()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(20.dp)
+                .clip(shape = RoundedCornerShape(8.dp))
+                .shimmerEffectGray200(),
+        )
+    }
+}
+
+
+@Composable
 private fun RatingWithReviewComponent(content: String, rating: Int) {
     Column(
         modifier = Modifier
@@ -397,14 +533,37 @@ private fun PreviewReviewItem() {
     }
 }
 
+@Composable
+private fun SkeletonHistoryTitle() {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.calendar_review_title),
+            style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Box(
+            modifier = Modifier
+                .size(20.dp)
+                .clip(shape = RoundedCornerShape(8.dp))
+                .shimmerEffect()
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun PreviewSkeleton() {
+    WalkieTheme {
+        SkeletonReviewItem()
+    }
+}
 
 @Composable
 @Preview
 private fun PreviewSpotArchiveScreen() {
     WalkieTheme {
         SpotArchiveScreen(
-            SpotArchiveViewStateImpl(),
-            {}
-        )
+            SpotArchiveViewStateImpl()
+        ) {}
     }
 }

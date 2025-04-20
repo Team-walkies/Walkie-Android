@@ -39,7 +39,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-
 @Composable
 internal fun WalkieWeekCalendar(
     selectDate: CalendarModel,
@@ -50,7 +49,7 @@ internal fun WalkieWeekCalendar(
 ) {
     val latestSelectDate by rememberUpdatedState(newValue = selectDate)
     val today = LocalDate.now()
-    val currentWeekFirstDay = getStartOfWeek(selectDate.date)
+    val currentWeekFirstDay = getStartOfWeek(latestSelectDate.date)
     val pagerState = rememberPagerState(
         initialPage = Int.MAX_VALUE,
         pageCount = { Int.MAX_VALUE }
@@ -75,10 +74,12 @@ internal fun WalkieWeekCalendar(
             .map { (page, _) -> page }
             .distinctUntilChanged()
             .collect { page ->
-                Printer.e("LMH", "PAGE! $page, ${latestSelectDate.isSpecificDate}")
+                Printer.e("LMH", "PAGE! $page, $latestSelectDate")
                 if (!latestSelectDate.isSpecificDate) {
                     val weekChangeOfToDay =
-                        today.plusWeeks((page.toLong() + 1) - Int.MAX_VALUE.toLong())
+                        today.plusWeeks((page.toLong() + 1) - (Int.MAX_VALUE.toLong()))
+
+
                     val latestWeekFirstDay = getStartOfWeek(latestSelectDate.date)
                     if (!latestWeekFirstDay.isEqual(getStartOfWeek(weekChangeOfToDay))) {
                         val alignWeekDate = matchWeekdayInSameWeekUntilToday(
@@ -104,7 +105,7 @@ internal fun WalkieWeekCalendar(
         WeeklyView(
             startOfWeek = startOfWeek,
             today = today,
-            selectedDate = selectDate.date,
+            selectedDate = latestSelectDate.date,
             events = events,
             onDateSelected = { date ->
                 onDateSelected(date)
