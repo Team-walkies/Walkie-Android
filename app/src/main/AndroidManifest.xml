@@ -63,16 +63,19 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Walkie" />
 
         <activity
             android:name="com.startup.home.HomeActivity"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Walkie" />
 
         <activity
             android:name=".splash.SplashActivity"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Walkie.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -95,14 +98,17 @@
         <activity
             android:name=".login.LoginActivity"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Walkie" />
         <activity
             android:name="com.startup.spot.SpotActivity"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Walkie" />
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
