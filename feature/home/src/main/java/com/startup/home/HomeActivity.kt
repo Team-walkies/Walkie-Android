@@ -270,6 +270,8 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                                     MainScreenNavigationEvent.MoveToSpotActivity -> {
                                         spotModuleNavigator.navigateSpotView(context = this@HomeActivity)
                                     }
+
+                                    else -> {}
                                 }
                             },
                         )
@@ -283,7 +285,20 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                         HomeNavigationGraph(
                             destinationRoute = navBackStackEntry.arguments?.getString("destination")
                                 .orEmpty(),
-                            navController
+                            navController,
+                            onNavigationEvent = {
+                                when (it) {
+                                    is MainScreenNavigationEvent.MoveToSpotModifyActivity -> {
+                                        spotModuleNavigator.navigateSpotModifyView(
+                                            launcher = it.launcher,
+                                            activity = this@HomeActivity,
+                                            intentBuilder = it.intent
+                                        )
+                                    }
+
+                                    else -> {}
+                                }
+                            }
                         )
                     }
                     composable(

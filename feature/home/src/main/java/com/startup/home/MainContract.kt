@@ -1,10 +1,13 @@
 package com.startup.home
 
+import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
 import com.startup.common.base.ScreenNavigationEvent
 import com.startup.common.base.UiEvent
 
 sealed interface MainScreenNavigationEvent : ScreenNavigationEvent {
     data object MoveToLoginActivity : MainScreenNavigationEvent
+    data class MoveToSpotModifyActivity(val launcher : ActivityResultLauncher<Intent>, val intent: Intent.() -> Intent): MainScreenNavigationEvent
     data object MoveToSpotActivity : MainScreenNavigationEvent
 }
 

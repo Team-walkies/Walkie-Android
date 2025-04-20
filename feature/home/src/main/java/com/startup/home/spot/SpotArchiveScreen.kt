@@ -1,5 +1,8 @@
 package com.startup.home.spot
 
+import android.app.Activity.RESULT_OK
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -40,6 +43,7 @@ import com.startup.common.extension.shimmerEffect
 import com.startup.common.extension.shimmerEffectGray200
 import com.startup.common.util.DateUtil
 import com.startup.common.util.DateUtil.getStartOfWeek
+import com.startup.common.util.ExtraConst
 import com.startup.design_system.widget.actionbar.PageActionBar
 import com.startup.design_system.widget.actionbar.PageActionBarType
 import com.startup.design_system.widget.review.RatingSmallView
@@ -79,6 +83,13 @@ internal fun SpotArchiveScreen(
         mutableStateOf(null)
     }
 
+    // 장소
+    val modifyReviewLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                uiEventSender.invoke(SpotArchiveUiEvent.RefreshReviewList)
+            }
+        }
     val today = LocalDate.now()
     Column(
         modifier = Modifier
@@ -208,8 +219,11 @@ internal fun SpotArchiveScreen(
                     selectedOptionOfReview = null
                 },
                 onClickModify = {
-                    uiEventSender.invoke(SpotArchiveUiEvent.OnModifyReview(review = it))
                     selectedOptionOfReview = null
+                    uiEventSender.invoke(SpotArchiveUiEvent.OnModifyReview(modifyReviewLauncher) {
+                        putExtra(ExtraConst.EXTRA_REVIEW_ID, it.reviewId)
+                        putExtra(ExtraConst.EXTRA_SPOT_ID, it.spotId)
+                    })
                 },
                 sheetState = optionSheetState
             )

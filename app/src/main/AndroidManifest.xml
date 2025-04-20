@@ -106,6 +106,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Walkie" />
         <activity
+            android:name="com.startup.spot.modify.ModifyReviewActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Walkie" />
+
+        <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true"
             android:screenOrientation="portrait">

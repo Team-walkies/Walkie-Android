@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SpotViewModel @Inject constructor(
-    getSpotWebViewParams: GetSpotWebViewParams,
+    private val getSpotWebViewParams: GetSpotWebViewParams,
     private val logout: LocalLogout,
     private val stepDataStore: StepDataStore
 ) :
@@ -26,7 +26,7 @@ class SpotViewModel @Inject constructor(
 
     private var spotStepStartValue = 0
 
-    init {
+    private fun fetchLoadUrlParams() {
         getSpotWebViewParams.invoke(Unit)
             .onEach {
                 Printer.e("LMH", "GET $it")
@@ -76,6 +76,9 @@ class SpotViewModel @Inject constructor(
                     viewModelScope.launch {
                         spotStepStartValue = stepDataStore.getCurrentSteps()
                     }
+                }
+                SpotUiEvent.LoadWebViewParams -> {
+                    fetchLoadUrlParams()
                 }
             }
         }

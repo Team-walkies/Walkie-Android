@@ -1,4 +1,4 @@
-package com.startup.spot
+package com.startup.spot.modify
 
 import android.os.Bundle
 import android.webkit.CookieManager
@@ -8,6 +8,9 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.startup.common.base.BaseActivity
 import com.startup.navigation.LoginModuleNavigator
+import com.startup.spot.ModifyReviewEvent
+import com.startup.spot.ModifyReviewNavigationEvent
+import com.startup.spot.ModifyReviewUiEvent
 import com.startup.ui.WalkieTheme
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -20,8 +23,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
-class SpotActivity : BaseActivity<SpotUiEvent, SpotNavigationEvent>() {
-    override val viewModel: SpotViewModel by viewModels<SpotViewModel>()
+class ModifyReviewActivity : BaseActivity<ModifyReviewUiEvent, ModifyReviewNavigationEvent>() {
+    override val viewModel: ModifyReviewViewModel by viewModels<ModifyReviewViewModel>()
     private val loginModuleNavigator: LoginModuleNavigator by lazy {
         EntryPointAccessors.fromApplication(
             applicationContext,
@@ -35,8 +38,8 @@ class SpotActivity : BaseActivity<SpotUiEvent, SpotNavigationEvent>() {
             WebView.setWebContentsDebuggingEnabled(true)
             WalkieTheme {
                 CookieManager.getInstance().removeAllCookies(null)
-                SpotScreen(
-                    event = viewModel.event.filterIsInstance<SpotEvent>(),
+                ModifySpotScreen(
+                    event = viewModel.event.filterIsInstance<ModifyReviewEvent>(),
                     uiEvent = ::handleUiEvent
                 )
                 handleNavigationEvent(viewModel.event.filterIsInstance())
@@ -44,23 +47,24 @@ class SpotActivity : BaseActivity<SpotUiEvent, SpotNavigationEvent>() {
         }
     }
 
-    override fun handleNavigationEvent(navigationEventFlow: Flow<SpotNavigationEvent>) {
+    override fun handleNavigationEvent(navigationEventFlow: Flow<ModifyReviewNavigationEvent>) {
         navigationEventFlow.onEach {
             when (it) {
-                SpotNavigationEvent.FinishSpotActivity -> {
-                    setResult(RESULT_OK) // -1
+                ModifyReviewNavigationEvent.FinishWithModifyActivity -> {
+                    setResult(RESULT_OK)
                     finish()
                 }
 
-                SpotNavigationEvent.Logout -> {
-                    loginModuleNavigator.navigateLoginView(context = this)
+                ModifyReviewNavigationEvent.Finish -> {
+                    setResult(RESULT_CANCELED)
                     finish()
                 }
             }
         }.launchIn(lifecycleScope)
     }
 
-    override fun handleUiEvent(uiEvent: SpotUiEvent) {
+
+    override fun handleUiEvent(uiEvent: ModifyReviewUiEvent) {
         viewModel.notifyViewModelEvent(uiEvent)
     }
 
