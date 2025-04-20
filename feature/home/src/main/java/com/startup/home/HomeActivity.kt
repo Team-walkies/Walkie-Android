@@ -19,10 +19,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -34,6 +34,7 @@ import com.startup.common.base.BaseActivity
 import com.startup.common.base.NavigationEvent
 import com.startup.common.base.UiEvent
 import com.startup.common.util.OsVersions
+import com.startup.common.util.UsePermissionHelper
 import com.startup.design_system.widget.modal.PrimaryTwoButtonModal
 import com.startup.home.character.model.CharacterFactory
 import com.startup.home.main.HomeViewModel
@@ -88,6 +89,10 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
         when (uiEvent) {
             is PermissionUiEvent.ShowActivityRecognitionAlert -> {
                 viewModel.setActivityPermissionAlertState(uiEvent.show)
+            }
+
+            is PermissionUiEvent.ShowBackgroundLocationAlert -> {
+                viewModel.setBackgroundLocationPermssionAlertState(uiEvent.show)
             }
         }
     }
@@ -153,9 +158,43 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
         val permissionStates = permissionManager.permissionStates
 
         if (permissionUiState.showPermissionSettingsDialog) {
+            val activityPermissionGranted = UsePermissionHelper.isGrantedPermissions(
+                this@HomeActivity,
+                *UsePermissionHelper.getTypeOfPermission(UsePermissionHelper.Permission.ACTIVITY_RECOGNITION)
+            )
+
+            val locationPermissionGranted = UsePermissionHelper.isGrantedPermissions(
+                this@HomeActivity,
+                *UsePermissionHelper.getTypeOfPermission(UsePermissionHelper.Permission.FOREGROUND_LOCATION)
+            )
+
+            val bothPermissionsDenied = !activityPermissionGranted && !locationPermissionGranted
+            val onlyActivityDenied = !activityPermissionGranted && locationPermissionGranted
+            val onlyLocationDenied = activityPermissionGranted && !locationPermissionGranted
+
+            val titleResId = when {
+                bothPermissionsDenied -> R.string.permission_essential_dialog_title
+                onlyActivityDenied -> R.string.permission_activity_recognition_title
+                onlyLocationDenied -> R.string.permission_location_dialog_title
+                else -> R.string.permission_essential_dialog_title
+            }
+
+            val messageResId = when {
+                bothPermissionsDenied -> R.string.permission_essential_dialog_message
+                onlyActivityDenied -> R.string.permission_activity_recognition_message
+                onlyLocationDenied -> R.string.permission_location_dialog_message
+                else -> R.string.permission_essential_dialog_message
+            }
+
+            val textAlign = when {
+                bothPermissionsDenied || onlyActivityDenied -> TextAlign.Center
+                onlyLocationDenied -> TextAlign.Start
+                else -> TextAlign.Center
+            }
+
             PrimaryTwoButtonModal(
-                title = stringResource(R.string.permission_dialog_title),
-                subTitle = stringResource(R.string.permission_dialog_message),
+                title = stringResource(titleResId),
+                subTitle = stringResource(messageResId),
                 negativeText = stringResource(R.string.permission_dialog_negative),
                 positiveText = stringResource(R.string.permission_dialog_positive),
                 onClickNegative = {
@@ -163,7 +202,8 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                 },
                 onClickPositive = {
                     permissionManager.closePermissionSettingsDialog(goToSettings = true)
-                }
+                },
+                textAlign = textAlign
             )
         }
 

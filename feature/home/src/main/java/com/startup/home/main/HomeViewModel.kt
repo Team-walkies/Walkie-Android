@@ -52,6 +52,7 @@ class HomeViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     private val _showActivityPermissionAlert = MutableStateFlow(false)
+    private val _showBackgroundLocationPermissionAlert = MutableStateFlow(false)
 
     private val _state = HomeViewStateImpl(
         stepsUiState = stepCounter.observeSteps()
@@ -110,8 +111,8 @@ class HomeViewModel @Inject constructor(
             .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
             .catch { emit(BaseUiState(isShowShimmer = false, data = WalkieCharacter.ofEmpty())) }
             .stateInViewModel(BaseUiState(isShowShimmer = true, data = WalkieCharacter.ofEmpty())),
-
         showActivityPermissionAlert = _showActivityPermissionAlert.stateInViewModel(false),
+        showBackgroundPermissionAlert = _showBackgroundLocationPermissionAlert.stateInViewModel(false)
     )
 
     override val state: HomeViewState
@@ -262,6 +263,10 @@ class HomeViewModel @Inject constructor(
     fun setActivityPermissionAlertState(show: Boolean) {
         _showActivityPermissionAlert.value = show
     }
+
+    fun setBackgroundLocationPermssionAlertState(show: Boolean){
+        _showBackgroundLocationPermissionAlert.value = show
+    }
 }
 
 interface HomeViewState : BaseState {
@@ -272,6 +277,7 @@ interface HomeViewState : BaseState {
     val currentWalkEggUiState: StateFlow<BaseUiState<MyEggModel>>
     val currentWalkCharacterUiState: StateFlow<BaseUiState<WalkieCharacter>>
     val showActivityPermissionAlert: StateFlow<Boolean>
+    val showBackgroundPermissionAlert: StateFlow<Boolean>
 }
 
 class HomeViewStateImpl(
@@ -282,6 +288,7 @@ class HomeViewStateImpl(
     override val currentWalkEggUiState: StateFlow<BaseUiState<MyEggModel>>,
     override val currentWalkCharacterUiState: StateFlow<BaseUiState<WalkieCharacter>>,
     override val showActivityPermissionAlert: StateFlow<Boolean>,
+    override val showBackgroundPermissionAlert: StateFlow<Boolean>
 ) : HomeViewState
 
 data class HatchingAnimationCharacterData(

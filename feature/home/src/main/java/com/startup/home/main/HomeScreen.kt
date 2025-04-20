@@ -26,7 +26,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,11 +50,13 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.startup.common.extension.moveToAppDetailSetting
+import com.startup.common.extension.moveToLocationPermissionSetting
 import com.startup.common.extension.shimmerEffect
 import com.startup.common.extension.shimmerEffectGray200
 import com.startup.common.util.BaseUiState
 import com.startup.common.util.formatWithLocale
 import com.startup.design_system.widget.actionbar.MainLogoActionBar
+import com.startup.design_system.widget.modal.PrimaryTwoButtonModal
 import com.startup.design_system.widget.permission.PermissionInduction
 import com.startup.design_system.widget.speechbubble.SpeechBubble
 import com.startup.home.HomeScreenNavigationEvent
@@ -65,6 +72,13 @@ import com.startup.ui.noRippleClickable
 import withBold
 import withUnderline
 
+data class HomePermissionState(
+    val showActivityRecognitionAlert: Boolean = false,
+    val showBackgroundLocationAlert: Boolean = false
+)
+
+val LocalHomePermissionState = compositionLocalOf { HomePermissionState() }
+
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
@@ -72,31 +86,29 @@ fun HomeScreen(
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit
 ) {
     val scrollState = rememberScrollState()
-    val context = LocalContext.current
     val showActivityRecognitionAlert by state.showActivityPermissionAlert.collectAsStateWithLifecycle()
+    val showBackgroundLocationAlert by state.showBackgroundPermissionAlert.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            MainLogoActionBar(isShowAlarmIcon = false, isExistAlarm = false) {
-                onNavigationEvent.invoke(HomeScreenNavigationEvent.MoveToNotification)
-            }
-        },
-        containerColor = WalkieTheme.colors.white
-    ) { paddingValues ->
-        HomeContent(
-            paddingValues = paddingValues,
-            scrollState = scrollState,
-            viewState = viewModel.state,
-            onNavigationEvent = onNavigationEvent
-        )
+    val permissionState = HomePermissionState(
+        showActivityRecognitionAlert = showActivityRecognitionAlert,
+        showBackgroundLocationAlert = showBackgroundLocationAlert
+    )
 
-        if (showActivityRecognitionAlert) {
-            PermissionInduction(
-                title = R.string.permission_activity_recognition_alert,
-                modifier = Modifier.padding(top = 68.dp)
-            ) {
-                context.moveToAppDetailSetting()
-            }
+    CompositionLocalProvider(LocalHomePermissionState provides permissionState) {
+        Scaffold(
+            topBar = {
+                MainLogoActionBar(isExistAlarm = false, isShowAlarmIcon = false) {
+                    onNavigationEvent.invoke(HomeScreenNavigationEvent.MoveToNotification)
+                }
+            },
+            containerColor = WalkieTheme.colors.white
+        ) { paddingValues ->
+            HomeContent(
+                paddingValues = paddingValues,
+                scrollState = scrollState,
+                viewState = viewModel.state,
+                onNavigationEvent = onNavigationEvent
+            )
         }
     }
 }
@@ -175,6 +187,10 @@ private fun EggAndPartnerSection(
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
     useFixedHeight: Boolean
 ) {
+
+    val permissionState = LocalHomePermissionState.current
+    val context = LocalContext.current
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -220,15 +236,93 @@ private fun EggAndPartnerSection(
                 PartnerInfoBox(stringResource(walkieCharacterState.data.characterNameResId))
             }
         }
-
         if (!walkieCharacterState.isShowShimmer) {
-            Image(
+            Column(
                 modifier = Modifier
-                    .size(120.dp)
                     .align(Alignment.BottomEnd)
                     .offset(x = (-8).dp),
-                painter = painterResource(walkieCharacterState.data.characterImageResId),
-                contentDescription = stringResource(R.string.desc_partner)
+            ) {
+
+                PermissionSection(
+                    showPermission = permissionState.showActivityRecognitionAlert,
+                    permissionTitle = R.string.permission_activity_recognition_alert,
+                    dialogTitleResId = R.string.permission_activity_recognition_title,
+                    dialogMessageResId = R.string.permission_activity_recognition_message,
+                    textAlign = TextAlign.Center,
+                    onPositiveClick = { context.moveToAppDetailSetting() },
+                    modifier = Modifier.padding(top = 4.dp, start = 16.dp, end = 8.dp)
+                )
+
+                PermissionSection(
+                    showPermission = permissionState.showBackgroundLocationAlert,
+                    permissionTitle = R.string.permission_background_location_alert,
+                    dialogTitleResId = R.string.permission_location_dialog_title,
+                    dialogMessageResId = R.string.permission_location_dialog_message,
+                    textAlign = TextAlign.Start,
+                    onPositiveClick = { context.moveToLocationPermissionSetting() },
+                    modifier = Modifier.padding(top = 4.dp, start = 16.dp, end = 8.dp)
+                )
+
+                Row(
+                    modifier = Modifier.align(alignment = Alignment.End),
+                ) {
+                    if (permissionState.showBackgroundLocationAlert || permissionState.showActivityRecognitionAlert) {
+                        Image(
+                            modifier = Modifier
+                                .width(35.dp)
+                                .height(21.dp),
+                            painter = painterResource(R.drawable.permission_speech_bubble_tail),
+                            contentDescription = null
+                        )
+                    }
+                    Image(
+                        modifier = Modifier
+                            .size(120.dp)
+                            .offset(x = (-8).dp),
+                        painter = painterResource(walkieCharacterState.data.characterImageResId),
+                        contentDescription = stringResource(R.string.desc_partner)
+                    )
+                }
+
+            }
+        }
+    }
+}
+
+@Composable
+fun PermissionSection(
+    showPermission: Boolean,
+    permissionTitle: Int,
+    dialogTitleResId: Int,
+    dialogMessageResId: Int,
+    textAlign: TextAlign,
+    onPositiveClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    if (showPermission) {
+        var showDialog by remember { mutableStateOf(false) }
+
+        PermissionInduction(
+            title = permissionTitle,
+            modifier = modifier
+        ) {
+            showDialog = true
+        }
+
+        if (showDialog) {
+            PrimaryTwoButtonModal(
+                title = stringResource(dialogTitleResId),
+                subTitle = stringResource(dialogMessageResId),
+                negativeText = stringResource(R.string.permission_dialog_negative),
+                positiveText = stringResource(R.string.permission_dialog_positive),
+                onClickNegative = {
+                    showDialog = false
+                },
+                onClickPositive = {
+                    onPositiveClick()
+                    showDialog = false
+                },
+                textAlign = textAlign
             )
         }
     }
@@ -515,6 +609,8 @@ private fun EggContent(
     eggAttribute: EggLayoutModel,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
 ) {
+    val permissionState = LocalHomePermissionState.current
+
     Box(modifier = Modifier.fillMaxSize()) {
         StepInformation(step = step)
 
@@ -569,7 +665,11 @@ private fun EggContent(
                     contentDescription = stringResource(R.string.desc_empty_egg),
                 )
 
-                if (eggModel.eggKind == EggKind.Empty) {
+                // 알 선택 텍스트
+                if (eggModel.eggKind == EggKind.Empty &&
+                    !permissionState.showActivityRecognitionAlert &&
+                    !permissionState.showBackgroundLocationAlert
+                ) {
                     Text(
                         text = stringResource(R.string.home_choice_egg).withUnderline(),
                         style = WalkieTheme.typography.head5,
