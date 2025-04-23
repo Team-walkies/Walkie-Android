@@ -3,11 +3,7 @@ plugins {
 }
 
 android {
-    group = "team.walkie"
     namespace = "com.startup.resource"
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 dependencies {

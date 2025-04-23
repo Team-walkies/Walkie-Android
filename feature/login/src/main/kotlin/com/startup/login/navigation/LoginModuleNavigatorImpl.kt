@@ -1,9 +1,9 @@
-package com.startup.walkie.navigation
+package com.startup.login.navigation
 
 import android.content.Context
 import android.content.Intent
 import com.startup.navigation.LoginModuleNavigator
-import com.startup.walkie.login.LoginActivity
+import com.startup.login.login.LoginActivity
 import javax.inject.Inject
 
 class LoginModuleNavigatorImpl @Inject constructor() : LoginModuleNavigator {

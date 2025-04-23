@@ -1,4 +1,4 @@
-package com.startup.walkie.login
+package com.startup.login.login
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
@@ -41,10 +41,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.startup.design_system.widget.toast.ShowToast
 import com.startup.login.R
-import com.startup.ui.WalkieTheme
-import com.startup.ui.noRippleClickable
-import com.startup.walkie.login.model.LoginUiEvent
-import com.startup.walkie.login.model.OnBoardingPagerItem
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
+import com.startup.login.login.model.LoginUiEvent
+import com.startup.login.login.model.OnBoardingPagerItem
 import kotlinx.coroutines.delay
 
 @Composable

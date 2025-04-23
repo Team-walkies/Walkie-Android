@@ -67,8 +67,8 @@ import com.startup.home.egg.getEggLayoutModel
 import com.startup.home.egg.model.EggKind
 import com.startup.home.egg.model.MyEggModel
 import com.startup.home.menu.HistoryItemModel
-import com.startup.ui.WalkieTheme
-import com.startup.ui.noRippleClickable
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
 import withBold
 import withUnderline
 

@@ -32,7 +32,7 @@ import com.startup.home.mypage.model.MyInfoUIEvent
 import com.startup.home.mypage.model.PushSettingUIEvent
 import com.startup.home.mypage.model.UnlinkUiEvent
 import com.startup.home.notification.NotificationListScreen
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 
 @Composable
 fun MyPageNavigationGraph(

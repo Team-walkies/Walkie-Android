@@ -9,7 +9,6 @@ android {
     buildFeatures.buildConfig = true
 
     defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "BASE_URL", getProperty("BASE_URL"))
     }
 }

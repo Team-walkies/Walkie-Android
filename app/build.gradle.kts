@@ -21,13 +21,62 @@ android {
         manifestPlaceholders["NATIVE_APP_KEY"] = nativeAppKey?.trim('"') ?: ""
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("$rootDir/app/keystore/walkie_key.jks")
+            storePassword = properties.getProperty("RELEASE_STORE_PASSWORD") as String
+            keyAlias = properties.getProperty("RELEASE_KEY_ALIAS") as String
+            keyPassword = properties.getProperty("RELEASE_KEY_PASSWORD") as String
+        }
+    }
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android.txt"),
+                "$projectDir/proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.getByName("release")
+        }
+        getByName("debug") {
+            isMinifyEnabled = false
+        }
+    }
     buildFeatures {
         buildConfig = true
     }
 
-    buildTypes {
-        release {
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+    applicationVariants.all {
+        val variant = this
+        val appName = "walkie"
+        val buildTypeName = variant.buildType.name
+        val versionName = variant.versionName
+        val versionCode = variant.versionCode
+        variant.outputs.mapNotNull { it as? com.android.build.gradle.internal.api.BaseVariantOutputImpl }.forEach { output ->
+            output.outputFileName = "${appName}_${buildTypeName}_v${versionName}(${versionCode}).apk"
+        }
+    }
+    afterEvaluate {
+        tasks.named("bundleRelease").configure {
+            doLast {
+                val releaseDir = File(rootDir, "app/release")
+                val aabFile = releaseDir.walkTopDown()
+                    .firstOrNull { it.isFile && it.extension == "aab" }
+
+                if (aabFile != null) {
+                    val versionName = android.defaultConfig.versionName
+                    val versionCode = android.defaultConfig.versionCode
+                    val newFileName = "walkie_release_v${versionName}(${versionCode}).aab"
+                    val renamed = aabFile.renameTo(File(aabFile.parentFile, newFileName))
+                    if (renamed) {
+                        println("✅ AAB 파일 이름 변경 완료: $newFileName")
+                    } else {
+                        println("⚠️ AAB 파일 이름 변경 실패")
+                    }
+                } else {
+                    println("⚠️ AAB 파일을 찾지 못했습니다. 경로: ${releaseDir.absolutePath}")
+                }
+            }
         }
     }
 }
@@ -38,6 +87,7 @@ dependencies {
     implementation(project(":feature:login"))
     implementation(project(":feature:spot"))
     implementation(project(":feature:stepcounter"))
+    implementation(project(":core:common"))
     implementation(project(":core:design-system"))
     implementation(project(":core:data"))
     implementation(project(":core:resource"))

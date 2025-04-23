@@ -1,4 +1,4 @@
-package com.startup.walkie.navigation
+package com.startup.login.navigation
 
 sealed class LoginScreenNav(val route: String) {
     data object Onboarding : LoginScreenNav("onboarding")

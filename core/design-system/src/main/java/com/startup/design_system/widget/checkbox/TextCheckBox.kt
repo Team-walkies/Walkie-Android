@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 
 @Composable
 fun TextCheckBox(text: String, checked: Boolean, onCheckedChanged: (Boolean) -> Unit) {

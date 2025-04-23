@@ -6,6 +6,7 @@
 .gradle/
 build/
 
+*.dm
 # Local configuration file (sdk path, etc)
 local.properties
 
@@ -18,6 +19,7 @@ captures/
 .cxx/
 *.apk
 output.json
+output-metadata.json
 
 # IntelliJ
 *.iml

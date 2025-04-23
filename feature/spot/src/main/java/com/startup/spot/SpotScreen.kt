@@ -22,7 +22,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.startup.common.util.Printer
 import com.startup.common.util.UsePermissionHelper
 import com.startup.common.util.rememberPermissionRequestDelegator
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 

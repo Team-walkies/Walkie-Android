@@ -23,8 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.startup.design_system.R
-import com.startup.ui.WalkieTheme
-import com.startup.ui.noRippleClickable
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
 
 @Composable
 fun PermissionInduction(@StringRes title: Int, modifier: Modifier, onClick: () -> Unit) {

@@ -35,8 +35,8 @@ import com.startup.design_system.widget.progress.ProgressSmall
 import com.startup.design_system.widget.tag.TagSmall
 import com.startup.home.R
 import com.startup.home.egg.model.MyEggModel
-import com.startup.ui.WalkieTheme
-import com.startup.ui.noRippleClickable
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
 import com.startup.home.egg.model.EggKind
 import java.text.NumberFormat
 import java.util.Locale

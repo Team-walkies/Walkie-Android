@@ -35,7 +35,7 @@ import com.startup.common.util.UsePermissionHelper
 import com.startup.common.util.rememberPermissionRequestDelegator
 import com.startup.design_system.widget.button.PrimaryButton
 import com.startup.home.R
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 
 data class PermissionState(
     val type: UsePermissionHelper.Permission,

@@ -17,7 +17,7 @@ import com.startup.common.util.UsePermissionHelper
 import com.startup.home.HomeActivity
 import com.startup.home.R
 import com.startup.home.main.HomeViewModel
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 
 
 /**

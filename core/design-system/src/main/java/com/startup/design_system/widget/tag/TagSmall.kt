@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.startup.ui.WalkieTheme
-import com.startup.ui.dropCustomShadow
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.dropCustomShadow
 
 @Composable
 fun TagSmall(text: String, textColor: Color) {

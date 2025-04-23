@@ -59,9 +59,9 @@ import com.startup.home.character.model.CharacterKind
 import com.startup.home.character.model.HatchingCharacterViewState
 import com.startup.home.character.model.HatchingCharacterViewStateImpl
 import com.startup.home.character.model.WalkieCharacter
-import com.startup.ui.WalkieTheme
-import com.startup.ui.WalkieTheme.colors
-import com.startup.ui.noRippleClickable
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme.colors
+import com.startup.design_system.ui.noRippleClickable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 

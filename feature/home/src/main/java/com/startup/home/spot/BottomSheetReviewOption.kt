@@ -23,8 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.startup.design_system.widget.bottom_sheet.WalkieDragHandle
 import com.startup.home.R
-import com.startup.ui.WalkieTheme
-import com.startup.ui.noRippleClickable
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
 
 
 @OptIn(ExperimentalMaterial3Api::class)

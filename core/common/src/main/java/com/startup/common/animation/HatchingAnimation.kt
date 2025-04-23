@@ -48,7 +48,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.startup.common.R
 import com.startup.common.util.OsVersions
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

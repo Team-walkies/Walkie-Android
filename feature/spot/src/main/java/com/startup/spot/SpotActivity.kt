@@ -8,7 +8,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.startup.common.base.BaseActivity
 import com.startup.navigation.LoginModuleNavigator
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint

@@ -49,7 +49,7 @@ import com.startup.home.permission.PermissionUiEvent
 import com.startup.navigation.LoginModuleNavigator
 import com.startup.navigation.SpotModuleNavigator
 import com.startup.stepcounter.broadcastReciver.DailyResetReceiver
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint

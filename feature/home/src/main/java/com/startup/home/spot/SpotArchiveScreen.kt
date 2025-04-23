@@ -53,8 +53,8 @@ import com.startup.home.spot.model.ReviewModel
 import com.startup.home.spot.model.SpotArchiveUiEvent
 import com.startup.home.spot.model.SpotArchiveViewState
 import com.startup.home.spot.model.SpotArchiveViewStateImpl
-import com.startup.ui.WalkieTheme
-import com.startup.ui.noRippleClickable
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 

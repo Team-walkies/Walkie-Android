@@ -1,7 +1,9 @@
 package com.startup.design_system.widget.actionbar
 
+import androidx.annotation.Keep
 import androidx.compose.ui.graphics.Color
 
+@Keep
 sealed class PageActionBarType(open val onBackClicked: () -> Unit) {
     data class JustBackActionBarType(override val onBackClicked: () -> Unit) :
         PageActionBarType(onBackClicked)

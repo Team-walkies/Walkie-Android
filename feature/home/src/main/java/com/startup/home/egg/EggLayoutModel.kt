@@ -5,7 +5,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.startup.home.R
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 import com.startup.home.egg.model.EggKind
 
 

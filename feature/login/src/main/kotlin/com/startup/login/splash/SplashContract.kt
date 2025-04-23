@@ -1,4 +1,4 @@
-package com.startup.walkie.splash
+package com.startup.login.splash
 
 import com.startup.common.base.ScreenNavigationEvent
 import com.startup.common.base.UiEvent

@@ -1,4 +1,4 @@
-package com.startup.ui
+package com.startup.design_system.ui
 
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily

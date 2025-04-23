@@ -37,8 +37,8 @@ import com.startup.design_system.widget.button.PrimaryButton
 import com.startup.home.R
 import com.startup.home.spot.model.MonthType
 import com.startup.home.spot.model.WeekendType
-import com.startup.ui.WalkieTheme
-import com.startup.ui.noRippleClickable
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
 import java.time.LocalDate
 
 /** 바텀 시트, Preview 를 위해 뷰 파일과 분리 */

@@ -22,8 +22,8 @@ import com.startup.domain.model.notice.Notice
 import com.startup.home.R
 import com.startup.home.mypage.model.NoticeScreenNavigationEvent
 import com.startup.home.mypage.model.NoticeViewState
-import com.startup.ui.WalkieTheme
-import com.startup.ui.noRippleClickable
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
 import com.startup.webview.WalkieWebConstants
 import com.startup.webview.WebViewWithBackHandling
 import kotlinx.coroutines.flow.MutableStateFlow

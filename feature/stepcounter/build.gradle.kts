@@ -4,9 +4,6 @@ plugins {
 
 android {
     namespace = "com.startup.stepcounter"
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 dependencies {
