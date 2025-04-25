@@ -1,5 +1,7 @@
 package com.startup.home.spot.model
 
+import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
 import com.startup.common.base.BaseState
 import com.startup.common.base.UiEvent
 import com.startup.common.util.BaseUiState
@@ -21,7 +23,8 @@ class SpotArchiveViewStateImpl : SpotArchiveViewState {
 
 sealed interface SpotArchiveUiEvent : UiEvent {
     data object OnBack : SpotArchiveUiEvent
+    data object RefreshReviewList : SpotArchiveUiEvent
     data class OnDateChanged(val calendarModel: CalendarModel) : SpotArchiveUiEvent
     data class OnDeleteReview(val review: ReviewModel) : SpotArchiveUiEvent
-    data class OnModifyReview(val review: ReviewModel) : SpotArchiveUiEvent
+    data class OnModifyReview(val launcher : ActivityResultLauncher<Intent>, val intent: Intent.() -> Intent) : SpotArchiveUiEvent
 }

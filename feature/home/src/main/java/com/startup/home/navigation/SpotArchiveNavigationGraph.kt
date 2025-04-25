@@ -6,13 +6,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.startup.home.MainScreenNavigationEvent
 import com.startup.home.spot.SpotArchiveScreen
 import com.startup.home.spot.SpotArchiveViewModel
 import com.startup.home.spot.SpotReviewModifyScreen
 import com.startup.home.spot.model.SpotArchiveUiEvent
 
 @Composable
-fun SpotArchiveNavigationGraph(parentNavController: NavHostController, spotArchiveViewModel: SpotArchiveViewModel = hiltViewModel()) {
+fun SpotArchiveNavigationGraph(parentNavController: NavHostController, spotArchiveViewModel: SpotArchiveViewModel = hiltViewModel(), onNavigationEvent: (MainScreenNavigationEvent) -> Unit) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
@@ -31,11 +32,14 @@ fun SpotArchiveNavigationGraph(parentNavController: NavHostController, spotArchi
                     }
 
                     is SpotArchiveUiEvent.OnModifyReview -> {
-                        spotArchiveViewModel.modifyReview(it.review)
+                        onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToSpotModifyActivity(it.launcher, it.intent))
                     }
 
                     is SpotArchiveUiEvent.OnDeleteReview -> {
                         spotArchiveViewModel.deleteReview(it.review)
+                    }
+                    is SpotArchiveUiEvent.RefreshReviewList -> {
+                        spotArchiveViewModel.initializeReviewList()
                     }
                 }
             }

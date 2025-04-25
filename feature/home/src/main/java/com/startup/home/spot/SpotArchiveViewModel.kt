@@ -35,9 +35,16 @@ class SpotArchiveViewModel @Inject constructor(
     override val state: SpotArchiveViewState = _state
 
     init {
+        initializeReviewList()
+    }
+
+    fun initializeReviewList() {
         val currentDate = _state.currentSelectedDate.value.date
         val weeksToFetch = getWeekRangeList(currentDate, WeekFetchDirection.ALL_THREE)
-        fetchWeeklyReviewList(date = _state.currentSelectedDate.value.date, weeksToFetch = weeksToFetch)
+        fetchWeeklyReviewList(
+            date = _state.currentSelectedDate.value.date,
+            weeksToFetch = weeksToFetch
+        )
     }
 
     fun deleteReview(review: ReviewModel) {
@@ -53,11 +60,6 @@ class SpotArchiveViewModel @Inject constructor(
             }
             .catch { }
             .launchIn(viewModelScope)*/
-    }
-
-    fun modifyReview(review: ReviewModel) {
-        Printer.d("LMH", "modifyReview")
-        // TODO 웹뷰로 할 지 네이티브로 할 지
     }
 
     fun changedSelectedDate(date: CalendarModel) {
@@ -126,7 +128,10 @@ class SpotArchiveViewModel @Inject constructor(
                     val grouped = fullEventList.groupBy { event ->
                         getStartOfWeek(event.date).toString()
                     }
-                    Printer.d("LMH", "before filtering event Map ${_state.eventList.value.entries.toList()}")
+                    Printer.d(
+                        tag = "LMH",
+                        message = "before filtering event Map ${_state.eventList.value.entries.toList()}"
+                    )
                     // 새로운 이벤트로 replace 시킴, 다만 이전주, 현재주, 다음주까지만 들고 있게함
                     _state.eventList.value = _state.eventList.value
                         .filterKeys { it in weeksToLoad }
@@ -138,17 +143,25 @@ class SpotArchiveViewModel @Inject constructor(
                                 .map { it.key to BaseUiState(isShowShimmer = false, it.value.data) }
                             )
                         }
-                    Printer.d("LMH", "after filtering event Map ${_state.eventList.value.entries.toList()}")
+                    Printer.d(
+                        "LMH",
+                        "after filtering event Map ${_state.eventList.value.entries.toList()}"
+                    )
                 }
                 .catch { }
                 .launchIn(viewModelScope)
         }
     }
 
-    private fun checkWeekFetchDirection(date: LocalDate, previousDate: LocalDate): WeekFetchDirection {
+    private fun checkWeekFetchDirection(
+        date: LocalDate,
+        previousDate: LocalDate
+    ): WeekFetchDirection {
         val previousWeekStart = getStartOfWeek(previousDate)
         val newWeekStart = getStartOfWeek(date)
-        val weekDiff = kotlin.runCatching { ChronoUnit.WEEKS.between(previousWeekStart, newWeekStart) }.getOrElse { 0L }
+        val weekDiff =
+            kotlin.runCatching { ChronoUnit.WEEKS.between(previousWeekStart, newWeekStart) }
+                .getOrElse { 0L }
 
         return when (weekDiff) {
             -1L -> WeekFetchDirection.PREVIOUS_WEEK

@@ -3,6 +3,7 @@ package com.startup.spot
 import com.startup.common.base.BaseEvent
 import com.startup.common.base.NavigationEvent
 import com.startup.common.base.UiEvent
+import com.startup.domain.model.spot.ModifyReviewWebPostRequest
 import com.startup.domain.model.spot.SpotWebPostRequest
 
 sealed interface SpotEvent : BaseEvent {
@@ -17,6 +18,7 @@ sealed interface SpotNavigationEvent : NavigationEvent {
 }
 
 sealed interface SpotUiEvent : UiEvent {
+    data object LoadWebViewParams : SpotUiEvent
     data object Haptic : SpotUiEvent
     data object StartCountingSteps : SpotUiEvent
     data object PressBackBtn : SpotUiEvent
@@ -24,4 +26,19 @@ sealed interface SpotUiEvent : UiEvent {
     data object Logout : SpotUiEvent
     data object FinishWebView : SpotUiEvent
     data object RequestCurrentSteps : SpotUiEvent
+}
+
+sealed interface ModifyReviewEvent : BaseEvent {
+    data class LoadWebView(val modifyReviewWebPostRequest: ModifyReviewWebPostRequest) : ModifyReviewEvent
+}
+
+sealed interface ModifyReviewUiEvent : UiEvent {
+    data object LoadWebViewParams : ModifyReviewUiEvent
+    data object FinishReviewModify : ModifyReviewUiEvent
+    data object FinishWebView : ModifyReviewUiEvent
+}
+
+sealed interface ModifyReviewNavigationEvent : NavigationEvent {
+    data object FinishWithModifyActivity: ModifyReviewNavigationEvent
+    data object Finish: ModifyReviewNavigationEvent
 }

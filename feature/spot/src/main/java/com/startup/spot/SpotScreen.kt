@@ -44,7 +44,8 @@ internal fun SpotScreen(
     webView.clearHistory()
     webView.clearCache(true)
     LaunchedEffect(Unit) {
-        event.filterIsInstance<SpotEvent>().collect { event ->
+        uiEvent.invoke(SpotUiEvent.LoadWebViewParams)
+        event.collect { event ->
             when (event) {
                 is SpotEvent.LoadWebView -> {
                     val data = event.spotWebPostRequestData

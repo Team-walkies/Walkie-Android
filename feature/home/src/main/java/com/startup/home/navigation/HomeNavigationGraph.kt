@@ -18,13 +18,19 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.startup.common.base.NavigationEvent
+import com.startup.home.MainScreenNavigationEvent
 import com.startup.home.character.HatchingCharacterScreen
 import com.startup.home.character.HatchingCharacterViewModel
 import com.startup.home.notification.NotificationListScreen
 import com.startup.ui.WalkieTheme
 
 @Composable
-fun HomeNavigationGraph(destinationRoute: String, parentNavController: NavHostController, hatchingCharacterViewModel: HatchingCharacterViewModel = hiltViewModel()) {
+fun HomeNavigationGraph(
+    destinationRoute: String,
+    parentNavController: NavHostController,
+    hatchingCharacterViewModel: HatchingCharacterViewModel = hiltViewModel(),
+    onNavigationEvent: (MainScreenNavigationEvent) -> Unit
+) {
     val navController = rememberNavController()
     val snackBarHostState = SnackbarHostState()
     // 홈화면(각각의 NavGraph), 지도화면(각각의 NavGraph), 마이페이지 화면(각각의 NavGraph)
@@ -61,8 +67,16 @@ fun HomeNavigationGraph(destinationRoute: String, parentNavController: NavHostCo
                 startDestination = destinationRoute
             ) {
                 composable(HomeScreenNav.GainEgg.route) { GainEggNavigationGraph(parentNavController = parentNavController) }
-                composable(HomeScreenNav.GainCharacter.route) { HatchingCharacterScreen(hatchingCharacterViewModel.state, hatchingCharacterViewModel::onSelectPartner, ::handleNavigationEvent) }
-                composable(HomeScreenNav.SpotArchive.route) { SpotArchiveNavigationGraph(parentNavController = parentNavController)  }
+                composable(HomeScreenNav.GainCharacter.route) {
+                    HatchingCharacterScreen(
+                        hatchingCharacterViewModel.state,
+                        hatchingCharacterViewModel::onSelectPartner,
+                        ::handleNavigationEvent
+                    )
+                }
+                composable(HomeScreenNav.SpotArchive.route) {
+                    SpotArchiveNavigationGraph(parentNavController = parentNavController, onNavigationEvent = onNavigationEvent)
+                }
                 composable(HomeScreenNav.Notification.route) {
                     NotificationListScreen(onNavigationEvent = ::handleNavigationEvent)
                 }
