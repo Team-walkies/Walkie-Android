@@ -27,6 +27,7 @@ import com.startup.home.mypage.MyPageViewModel
 import com.startup.home.mypage.PersonalInfoPolicyScreen
 import com.startup.home.mypage.PushSettingScreen
 import com.startup.home.mypage.RequestUserOpinionScreen
+import com.startup.home.mypage.ServiceTermScreen
 import com.startup.home.mypage.UnlinkScreen
 import com.startup.home.mypage.model.MyInfoUIEvent
 import com.startup.home.mypage.model.PushSettingUIEvent
@@ -131,6 +132,11 @@ fun MyPageNavigationGraph(
                 }
                 composable(MyPageScreenNav.PersonalInfoPolicy.route) {
                     PersonalInfoPolicyScreen(
+                        onNavigationEvent = ::handleNavigationEvent
+                    )
+                }
+                composable(MyPageScreenNav.ServiceTerm.route) {
+                    ServiceTermScreen(
                         onNavigationEvent = ::handleNavigationEvent
                     )
                 }

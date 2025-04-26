@@ -12,6 +12,7 @@ sealed class MyPageScreenNav(val route: String) {
     data object PushSetting : MyPageScreenNav("pushSetting")
     data object Notice : MyPageScreenNav("notice")
     data object PersonalInfoPolicy : MyPageScreenNav("personalInfoPolicy")
+    data object ServiceTerm : MyPageScreenNav("serviceTerm")
     data object RequestUserOpinion : MyPageScreenNav("requestUserOpinion")
     data object Notification : MyPageScreenNav("notification")
     data object Unlink : MyPageScreenNav("unlink")

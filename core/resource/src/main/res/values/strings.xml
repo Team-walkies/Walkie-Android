@@ -147,6 +147,7 @@
     <string name="setting_push">푸시 알림</string>
     <string name="setting_notice">공지사항</string>
     <string name="setting_policy">개인정보처리방침</string>
+    <string name="setting_service_term">서비스 이용약관</string>
     <string name="setting_app_version">앱 버전</string>
     <string name="setting">설정</string>
     <string name="request_opinion_title">앱에 대한 의견을 남겨주세요!</string>

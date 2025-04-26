@@ -7,7 +7,11 @@ import com.startup.common.base.UiEvent
 
 sealed interface MainScreenNavigationEvent : ScreenNavigationEvent {
     data object MoveToLoginActivity : MainScreenNavigationEvent
-    data class MoveToSpotModifyActivity(val launcher : ActivityResultLauncher<Intent>, val intent: Intent.() -> Intent): MainScreenNavigationEvent
+    data class MoveToSpotModifyActivity(
+        val launcher: ActivityResultLauncher<Intent>,
+        val intent: Intent.() -> Intent
+    ) : MainScreenNavigationEvent
+
     data object MoveToSpotActivity : MainScreenNavigationEvent
 }
 
@@ -23,13 +27,14 @@ sealed interface MyPageScreenNavigationEvent : ScreenNavigationEvent {
     data object MoveToPushSetting : MyPageScreenNavigationEvent
     data object MoveToNotice : MyPageScreenNavigationEvent
     data object MoveToPersonalInfoPolicy : MyPageScreenNavigationEvent
+    data object MoveToServiceTerm : MyPageScreenNavigationEvent
     data object MoveToRequestUserOpinion : MyPageScreenNavigationEvent
-    data class MoveToUnlink(val nickName : String) : MyPageScreenNavigationEvent
+    data class MoveToUnlink(val nickName: String) : MyPageScreenNavigationEvent
     data object MoveToLoginActivityWithLogout : MyPageScreenNavigationEvent
     data object MoveToNotification : MyPageScreenNavigationEvent
 }
 
 
 sealed interface MyPageUiEvent : UiEvent {
-    data object OnClickLogout: MyPageUiEvent
+    data object OnClickLogout : MyPageUiEvent
 }
