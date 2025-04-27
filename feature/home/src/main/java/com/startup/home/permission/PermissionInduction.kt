@@ -354,8 +354,8 @@ fun PermissionBottomSheetAllGrantedPreview() {
                 ),
                 PermissionState(
                     type = UsePermissionHelper.Permission.BATTERY_OPTIMIZATION,
+                    isGranted = false,
                     essential = false,
-                    isGranted = true,
                     title = R.string.permission_battery_optimization,
                     description = R.string.permission_battery_optimization_description,
                     iconRes = R.drawable.ic_battery

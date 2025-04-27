@@ -31,11 +31,13 @@ fun PrimaryTwoButtonModal(
     subTitle: String = "",
     negativeText: String = "",
     positiveText: String = "",
+    onDismiss: () -> Unit = {},
     onClickNegative: () -> Unit,
-    onClickPositive: () -> Unit
+    onClickPositive: () -> Unit,
+    textAlign: TextAlign = TextAlign.Center
 ) {
     Dialog(
-        onDismissRequest = { onClickNegative() },
+        onDismissRequest = { onDismiss() },
         properties = DialogProperties(
             dismissOnBackPress = true,
             dismissOnClickOutside = true,
@@ -59,7 +61,8 @@ fun PrimaryTwoButtonModal(
                     Spacer(Modifier.height(4.dp))
                     Text(
                         subTitle,
-                        style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
+                        style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500),
+                        textAlign = textAlign
                     )
                 }
                 Spacer(Modifier.height(20.dp))
@@ -131,6 +134,7 @@ fun PreviewPrimaryTwoButtonModal() {
             subTitle = "내용입니다",
             negativeText = "취소",
             positiveText = "확인",
+            onDismiss = {},
             onClickNegative = {},
             onClickPositive = {}
         )

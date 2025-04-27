@@ -173,6 +173,7 @@
     <string name="push_setting_today_step_sub_title">하루 걸음 수를 알려드려요</string>
 
     <string name="permission_activity_recognition_alert">신체활동 권한을 허용해 주세요</string>
+    <string name="permission_background_location_alert">위치 접근 권한을 ‘항상 허용’으로 해주세요</string>
     <string name="permission_location_alert">위치 권한을 허용해 주세요</string>
     <string name="permission_bottomsheet_title">워키 이용에 꼭 필요한 권한이에요!</string>
     <string name="permission_bottomsheet_subtitle">원활한 이용을 위해 권한을 허용해주세요</string>
@@ -189,7 +190,12 @@
     <string name="permission_battery_optimization_description">걸음수 정확도 높이기</string>
     <string name="permission_essential">(필수)</string>
     <string name="permission_optional">(선택)</string>
-    <string name="permission_dialog_title">접근권한 허용</string>
+    <string name="permission_essential_dialog_title">접근권한 허용</string>
+    <string name="permission_essential_dialog_message">원활한 서비스 이용을 위해\n‘위치’, ‘신체활동’ 권한을 모두 허용해 주세요</string>
+    <string name="permission_location_dialog_title">위치 권한 허용</string>
+    <string name="permission_location_dialog_message">스팟을 탐색하기 위해 백그라운드 동작 시의 위치 정보 접근을 허가해 주세요.\n\n 1. 설정에서 walkie 선택\n 2. 앱 권한 변경 화면으로 이동\n 3. 위치를 ‘항상 허용’으로 변경</string>
+    <string name="permission_activity_recognition_title">신체활동 권한 허용</string>
+    <string name="permission_activity_recognition_message">걸음 수 측정을 위해 권한이 필요해요</string>
     <string name="permission_dialog_message">원할한 서비스이용을 위해 권한이 필요해요</string>
     <string name="permission_dialog_negative">취소</string>
     <string name="permission_dialog_positive">허용하기</string>

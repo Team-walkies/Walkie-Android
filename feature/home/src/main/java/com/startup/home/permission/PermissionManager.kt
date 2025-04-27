@@ -1,5 +1,6 @@
 package com.startup.home.permission
 
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -10,7 +11,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import com.startup.common.base.UiEvent
-import com.startup.common.extension.moveToAppDetailSetting
 import com.startup.common.util.BatteryOptimizationHelper
 import com.startup.common.util.OsVersions
 import com.startup.common.util.UsePermissionHelper
@@ -27,25 +27,51 @@ class PermissionManager(
     private val activity: HomeActivity,
     private val viewModel: HomeViewModel
 ) {
+
     // 권한 상태 데이터 클래스
     data class PermissionUiState(
         val showEssentialPermissionSheet: Boolean = false,
         val showActivityPermissionAlert: Boolean = false,
+        val showBackgroundPermissionAlert: Boolean = false,
         val showNotificationPermissionSheet: Boolean = false,
         val showPermissionSettingsDialog: Boolean = false
     )
 
     // 현재 권한 상태
     var permissionUiState by mutableStateOf(PermissionUiState())
-
     var permissionStates by mutableStateOf<List<PermissionState>>(emptyList())
 
+    private val settingsLauncher = activity.registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        proceedToBatteryOptimization()
+    }
+
+    private val batteryOptimizationLauncher = activity.registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        proceedToNotification()
+    }
+
     /**
-     * 필수 권한이 모두 허용되었는지 확인
+     * 주요 권한이 모두 허용되었는지 확인
      */
     private fun areAllEssentialPermissionsGranted(): Boolean {
         return permissionStates
             .all { it.isGranted }
+    }
+
+    /**
+     * 배터리 최적화 제외 권한 확인
+     */
+    private fun areSystemPermissionsGranted(): Boolean {
+        return permissionStates
+            .filter { it.type != UsePermissionHelper.Permission.BATTERY_OPTIMIZATION }
+            .all { it.isGranted }
+    }
+    
+    private fun isBatteryOptimizationGranted(): Boolean {
+        return BatteryOptimizationHelper.isBatteryOptimizationIgnored(activity)
     }
 
     /**
@@ -61,13 +87,42 @@ class PermissionManager(
      */
     fun checkPermissions() {
         initPermissionStates()
+        when {
+            areAllEssentialPermissionsGranted() -> {
+                proceedToNotification()
+                activity.startStepCounterService()
+            }
 
-        if (!areAllEssentialPermissionsGranted()) {
-            updateUiState { it.copy(showEssentialPermissionSheet = true) }
+            !areSystemPermissionsGranted() -> {
+                updateUiState { it.copy(showEssentialPermissionSheet = true) }
+            }
+
+            !isBatteryOptimizationGranted() -> {
+                updateUiState { it.copy(showEssentialPermissionSheet = true) }
+            }
+
+            else -> {
+                proceedToNotification()
+            }
+        }
+    }
+
+    private fun proceedToBatteryOptimization() {
+        if (!isBatteryOptimizationGranted()) {
+            val intent = BatteryOptimizationHelper.getBatteryOptimizationSettingsIntent(activity)
+            batteryOptimizationLauncher.launch(intent)
         } else {
-            updateUiState { it.copy(showEssentialPermissionSheet = false) }
+            proceedToNotification()
+        }
+    }
+
+    private fun proceedToNotification() {
+        if (OsVersions.isGreaterThanOrEqualsTIRAMISU() &&
+            !isGranted(UsePermissionHelper.Permission.POST_NOTIFICATIONS)
+        ) {
+            updateUiState { it.copy(showNotificationPermissionSheet = true) }
+        } else {
             activity.startStepCounterService()
-            checkNotificationPermission()
         }
     }
 
@@ -75,59 +130,35 @@ class PermissionManager(
      * 권한 상태 초기화
      */
     private fun initPermissionStates() {
-        val states = mutableListOf<PermissionState>()
-        addLocationPermission(states)
-        addActivityRecognitionPermission(states)
-        addBatteryOptimizationPermission(states)
-        permissionStates = states
-    }
-
-    private fun addActivityRecognitionPermission(states: MutableList<PermissionState>) {
-        states.add(
-            PermissionState(
-                type = UsePermissionHelper.Permission.ACTIVITY_RECOGNITION,
-                isGranted = isGranted(UsePermissionHelper.Permission.ACTIVITY_RECOGNITION),
-                title = R.string.permission_activity_recognition,
-                description = R.string.permission_activity_recognition_description,
-                iconRes = R.drawable.ic_activity
+        permissionStates = buildList {
+            add(
+                PermissionState(
+                    type = UsePermissionHelper.Permission.FOREGROUND_LOCATION,
+                    isGranted = isGranted(UsePermissionHelper.Permission.FOREGROUND_LOCATION),
+                    title = R.string.permission_location,
+                    description = R.string.permission_location_description,
+                    iconRes = R.drawable.ic_loaction_permission
+                )
             )
-        )
-    }
-
-    private fun addLocationPermission(states: MutableList<PermissionState>) {
-        states.add(
-            PermissionState(
-                type = UsePermissionHelper.Permission.FOREGROUND_LOCATION,
-                isGranted = isGranted(UsePermissionHelper.Permission.FOREGROUND_LOCATION),
-                title = R.string.permission_location,
-                description = R.string.permission_location_description,
-                iconRes = R.drawable.ic_loaction_permission
+            add(
+                PermissionState(
+                    type = UsePermissionHelper.Permission.ACTIVITY_RECOGNITION,
+                    isGranted = isGranted(UsePermissionHelper.Permission.ACTIVITY_RECOGNITION),
+                    title = R.string.permission_activity_recognition,
+                    description = R.string.permission_activity_recognition_description,
+                    iconRes = R.drawable.ic_activity
+                )
             )
-        )
-    }
-
-    private fun addBatteryOptimizationPermission(states: MutableList<PermissionState>) {
-        states.add(
-            PermissionState(
-                type = UsePermissionHelper.Permission.BATTERY_OPTIMIZATION,
-                essential = false,
-                isGranted = BatteryOptimizationHelper.isBatteryOptimizationIgnored(activity),
-                title = R.string.permission_battery_optimization,
-                description = R.string.permission_battery_optimization_description,
-                iconRes = R.drawable.ic_battery
+            add(
+                PermissionState(
+                    type = UsePermissionHelper.Permission.BATTERY_OPTIMIZATION,
+                    essential = false,
+                    isGranted = BatteryOptimizationHelper.isBatteryOptimizationIgnored(activity),
+                    title = R.string.permission_battery_optimization,
+                    description = R.string.permission_battery_optimization_description,
+                    iconRes = R.drawable.ic_battery
+                )
             )
-        )
-    }
-
-    /**
-     * 알림 권한 확인
-     * 알림 권한은 별도의 플로우로 이루어져있기에 검사로직을 별도 추가
-     */
-    private fun checkNotificationPermission() {
-        if (OsVersions.isGreaterThanOrEqualsTIRAMISU() &&
-            !isGranted(UsePermissionHelper.Permission.POST_NOTIFICATIONS)
-        ) {
-            updateUiState { it.copy(showNotificationPermissionSheet = true) }
         }
     }
 
@@ -146,20 +177,32 @@ class PermissionManager(
     }
 
     /**
-     * 바텀시트 닫은 후 신체권한 체크용
+     * 바텀시트 닫은 후 권한 체크용
      */
     fun handleEssentialPermissionDismiss() {
-        if (areAllEssentialPermissionsGranted()) {
-            activity.startStepCounterService()
-        } else if (!isGranted(UsePermissionHelper.Permission.ACTIVITY_RECOGNITION)) {
-            emitEvent(PermissionUiEvent.ShowActivityRecognitionAlert(true))
+        updateUiState { it.copy(showEssentialPermissionSheet = false) }
+
+        when {
+            isGranted(UsePermissionHelper.Permission.ACTIVITY_RECOGNITION) -> {
+                activity.startStepCounterService()
+            }
+
+            !isGranted(UsePermissionHelper.Permission.ACTIVITY_RECOGNITION) -> {
+                emitEvent(PermissionUiEvent.ShowActivityRecognitionAlert(true))
+            }
+
+            !isGranted(UsePermissionHelper.Permission.BACKGROUND_LOCATION) -> {
+                emitEvent(PermissionUiEvent.ShowBackgroundLocationAlert(true))
+            }
         }
+
+        proceedToNotification()
     }
 
     fun onEssentialPermissionsGranted() {
         activity.startStepCounterService()
         updateUiState { it.copy(showEssentialPermissionSheet = false) }
-        checkNotificationPermission()
+        proceedToBatteryOptimization()
     }
 
     fun handleNeverAskAgainPermissions() {
@@ -172,29 +215,34 @@ class PermissionManager(
     }
 
     fun handlePermissionRationale() {
-        if (!isGranted(UsePermissionHelper.Permission.ACTIVITY_RECOGNITION)) {
-            emitEvent(PermissionUiEvent.ShowActivityRecognitionAlert(true))
-        }
         updateUiState {
             it.copy(
                 showEssentialPermissionSheet = false,
             )
         }
-        checkNotificationPermission()
+        proceedToBatteryOptimization()
     }
-
 
     /**
      * 신체권한은 중요해서 onResume에서 허용안내 및 만약 허용되면 서비스 재개 로직 추가
      * 서비스가 실행된 상태에서 startStepCounterService 를 호출해도 중복 시작등은 발생하지 않음
      */
     fun checkOnResume() {
-        if (!isGranted(UsePermissionHelper.Permission.ACTIVITY_RECOGNITION)) {
-            emitEvent(PermissionUiEvent.ShowActivityRecognitionAlert(true))
-        } else {
-            emitEvent(PermissionUiEvent.ShowActivityRecognitionAlert(false))
+        updateSystemPermissionAlerts()
+    }
+
+    private fun updateSystemPermissionAlerts() {
+        val isActivityRecognitionGranted =
+            isGranted(UsePermissionHelper.Permission.ACTIVITY_RECOGNITION)
+        emitEvent(PermissionUiEvent.ShowActivityRecognitionAlert(!isActivityRecognitionGranted))
+
+        if (isActivityRecognitionGranted) {
             activity.startStepCounterService()
         }
+
+        val isBackgroundLocationGranted =
+            isGranted(UsePermissionHelper.Permission.BACKGROUND_LOCATION)
+        emitEvent(PermissionUiEvent.ShowBackgroundLocationAlert(!isBackgroundLocationGranted))
     }
 
     /**
@@ -202,14 +250,6 @@ class PermissionManager(
      */
     fun handleNotificationPermissionEvents(action: NotificationAction) {
         updateUiState { it.copy(showNotificationPermissionSheet = false) }
-
-        when (action) {
-            NotificationAction.NEVER_ASK_AGAIN -> {
-                // updateUiState { it.copy(showPermissionSettingsDialog = true) }
-            }
-
-            else -> Unit
-        }
     }
 
     /**
@@ -218,9 +258,10 @@ class PermissionManager(
     fun closePermissionSettingsDialog(goToSettings: Boolean = false) {
         updateUiState { it.copy(showPermissionSettingsDialog = false) }
         if (goToSettings) {
-            activity.moveToAppDetailSetting()
+            settingsLauncher.launch(UsePermissionHelper.getPermissionSettingsIntent(activity))
+        } else {
+            proceedToBatteryOptimization()
         }
-        checkNotificationPermission()
     }
 
     /**

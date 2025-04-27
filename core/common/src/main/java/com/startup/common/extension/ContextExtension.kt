@@ -18,6 +18,21 @@ fun Context.moveToAppDetailSetting() {
     }
 }
 
+fun Context.moveToLocationPermissionSetting() {
+    try {
+        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        startActivity(intent)
+    } catch (e: Exception) {
+        try {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.parse("package:$packageName")
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+        }
+    }
+}
+
 fun Context.openBrowser(url: String) {
     try {
         val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))

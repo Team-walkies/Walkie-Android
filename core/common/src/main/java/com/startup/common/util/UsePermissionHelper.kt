@@ -72,7 +72,7 @@ object UsePermissionHelper {
         Manifest.permission.ACCESS_COARSE_LOCATION
     )
 
-    private val BACKGROUND_LOCATION = if (OsVersions.isGreaterThanOrEqualsQ()) {
+    private val ACCESS_BACKGROUND_LOCATION = if (OsVersions.isGreaterThanOrEqualsQ()) {
         arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
     } else {
         arrayOf()
@@ -88,7 +88,7 @@ object UsePermissionHelper {
             Permission.ACTIVITY_RECOGNITION -> PERMISSION_ACTIVITY_RECOGNITION
             Permission.BATTERY_OPTIMIZATION -> PERMISSION_BATTERY_OPTIMIZATION
             Permission.FOREGROUND_LOCATION -> FOREGROUND_LOCATION
-            Permission.BACKGROUND_LOCATION -> TODO()
+            Permission.BACKGROUND_LOCATION -> ACCESS_BACKGROUND_LOCATION
         }
     }
 
@@ -112,7 +112,6 @@ object UsePermissionHelper {
     fun getPermissionSettingsIntent(context: Context): Intent {
         return Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
             data = Uri.fromParts("package", context.packageName, null)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
     }
 
