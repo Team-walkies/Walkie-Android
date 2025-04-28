@@ -7,7 +7,6 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
 internal fun Project.configureKotlinAndroid() {
-
     with(pluginManager) {
         apply("org.jetbrains.kotlin.android")
     }
@@ -46,5 +45,4 @@ internal fun Project.configureKotlinAndroid() {
         add("implementation", libs.findLibrary("material").get())
         add("testImplementation", libs.findLibrary("junit").get())
     }
-
 }

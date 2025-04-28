@@ -41,8 +41,8 @@ import com.startup.design_system.widget.modal.ErrorTwoButtonModal
 import com.startup.home.MyPageScreenNavigationEvent
 import com.startup.home.R
 import com.startup.home.mypage.model.MyInfoViewState
-import com.startup.ui.WalkieTheme
-import com.startup.ui.noRippleClickable
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
 import withColor
 
 @Composable

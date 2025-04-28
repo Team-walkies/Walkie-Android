@@ -32,8 +32,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.startup.common.extension.springClickable
 import com.startup.design_system.R
-import com.startup.ui.WalkieTheme
-import com.startup.ui.noRippleClickable
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
 
 sealed class BottomNavItem(
     val route: String,

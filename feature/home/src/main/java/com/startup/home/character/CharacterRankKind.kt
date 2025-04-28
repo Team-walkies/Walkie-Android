@@ -12,7 +12,7 @@ import com.startup.home.egg.model.EggKind.Epic
 import com.startup.home.egg.model.EggKind.Legend
 import com.startup.home.egg.model.EggKind.Normal
 import com.startup.home.egg.model.EggKind.Rare
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 
 enum class CharacterRankKind(
     @StringRes val displayStrResId: Int,

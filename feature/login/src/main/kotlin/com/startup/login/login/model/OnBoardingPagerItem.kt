@@ -1,4 +1,4 @@
-package com.startup.walkie.login.model
+package com.startup.login.login.model
 
 import androidx.annotation.DrawableRes
 

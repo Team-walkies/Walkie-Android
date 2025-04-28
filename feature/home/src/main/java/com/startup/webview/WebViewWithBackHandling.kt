@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import com.startup.design_system.widget.actionbar.PageActionBar
 import com.startup.design_system.widget.actionbar.PageActionBarType
 import com.startup.design_system.widget.webview.CommonWebView
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 
 @Composable
 fun <T> WebViewWithBackHandling(

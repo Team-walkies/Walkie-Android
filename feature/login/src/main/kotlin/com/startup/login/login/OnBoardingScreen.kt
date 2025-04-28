@@ -1,8 +1,8 @@
-package com.startup.walkie.login
+package com.startup.login.login
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 
 @Composable
 fun OnBoardingScreen() {

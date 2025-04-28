@@ -30,7 +30,7 @@ import com.startup.design_system.widget.button.DangerButton
 import com.startup.design_system.widget.checkbox.TextCheckBox
 import com.startup.home.R
 import com.startup.home.mypage.model.UnlinkUiEvent
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 
 @Composable
 fun UnlinkScreen(

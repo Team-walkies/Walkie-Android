@@ -18,7 +18,7 @@ import com.startup.common.base.NavigationEvent
 import com.startup.design_system.widget.actionbar.PageActionBar
 import com.startup.design_system.widget.actionbar.PageActionBarType
 import com.startup.domain.model.notice.Notice
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 
 @Composable
 fun NoticeDetailScreen(notice: Notice, onNavigationEvent: (NavigationEvent) -> Unit) {

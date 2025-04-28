@@ -3,8 +3,6 @@ package com.startup.convention.walkie
 import libs
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.getByType
-import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 
 internal fun Project.configureHiltAndroid() {
 

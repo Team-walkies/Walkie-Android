@@ -1,4 +1,4 @@
-package com.startup.walkie.login
+package com.startup.login.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,9 +21,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.startup.login.R
-import com.startup.ui.WalkieTheme
-import com.startup.ui.noRippleClickable
-import com.startup.walkie.login.model.GetCharacterNavigationEvent
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
+import com.startup.login.login.model.GetCharacterNavigationEvent
 
 @Composable
 fun GetCharacterScreen(nickName: String, onNavigationEvent: (GetCharacterNavigationEvent) -> Unit) {

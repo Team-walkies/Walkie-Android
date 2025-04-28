@@ -1,4 +1,4 @@
-package com.startup.walkie.login
+package com.startup.login.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -30,11 +30,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.startup.common.extension.ofMaxLength
 import com.startup.login.R
-import com.startup.ui.WalkieTheme
-import com.startup.ui.noRippleClickable
-import com.startup.walkie.login.model.NickNameSettingEvent
-import com.startup.walkie.login.model.NickNameViewState
-import com.startup.walkie.login.model.NickNameViewStateImpl
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
+import com.startup.login.login.model.NickNameSettingEvent
+import com.startup.login.login.model.NickNameViewState
+import com.startup.login.login.model.NickNameViewStateImpl
 import hasSpecialCharacters
 
 @Composable

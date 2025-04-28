@@ -32,7 +32,7 @@ import com.startup.home.R
 import com.startup.home.character.CharacterRankKind
 import com.startup.home.egg.model.EggKind
 import com.startup.home.egg.model.EggOfCharacterGainProbabilityModel
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 import kotlin.math.roundToInt
 
 @Composable

@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.startup.home.R
 import com.startup.home.egg.model.EggOfCharacterGainProbabilityModel
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 
 enum class EggKind(
     @StringRes val rankStrResId: Int,

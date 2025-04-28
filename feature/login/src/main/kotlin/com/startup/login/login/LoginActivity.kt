@@ -1,4 +1,4 @@
-package com.startup.walkie.login
+package com.startup.login.login
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -26,14 +26,14 @@ import com.startup.common.base.BaseActivity
 import com.startup.common.base.BaseEvent
 import com.startup.common.util.Printer
 import com.startup.navigation.HomeModuleNavigator
-import com.startup.ui.WalkieTheme
-import com.startup.walkie.login.model.GetCharacterNavigationEvent
-import com.startup.walkie.login.model.LoginNavigationEvent
-import com.startup.walkie.login.model.LoginScreenNavigationEvent
-import com.startup.walkie.login.model.LoginUiEvent
-import com.startup.walkie.login.model.NickNameSettingEvent
-import com.startup.walkie.navigation.LoginScreenNav
-import com.startup.walkie.splash.SplashActivity
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.login.login.model.GetCharacterNavigationEvent
+import com.startup.login.login.model.LoginNavigationEvent
+import com.startup.login.login.model.LoginScreenNavigationEvent
+import com.startup.login.login.model.LoginUiEvent
+import com.startup.login.login.model.NickNameSettingEvent
+import com.startup.login.navigation.LoginScreenNav
+import com.startup.login.splash.SplashActivity
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.Flow

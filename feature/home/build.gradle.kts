@@ -4,10 +4,6 @@ plugins {
 
 android {
     namespace = "com.startup.home"
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
 }
 
 dependencies {

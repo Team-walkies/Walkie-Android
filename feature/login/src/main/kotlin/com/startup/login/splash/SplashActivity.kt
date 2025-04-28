@@ -1,4 +1,4 @@
-package com.startup.walkie.splash
+package com.startup.login.splash
 
 import android.content.Intent
 import android.os.Bundle
@@ -22,8 +22,8 @@ import androidx.lifecycle.lifecycleScope
 import com.startup.common.base.BaseActivity
 import com.startup.login.R
 import com.startup.navigation.HomeModuleNavigator
-import com.startup.ui.WalkieTheme
-import com.startup.walkie.login.LoginActivity
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.login.login.LoginActivity
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint

@@ -9,7 +9,6 @@ android {
     buildFeatures.buildConfig = true
 
     defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "BASE_SPOT_URL", getProperty("BASE_SPOT_URL"))
         buildConfigField("String", "BASE_SPOT_MODIFY_URL", getProperty("BASE_SPOT_MODIFY_URL"))
     }

@@ -1,4 +1,4 @@
-package com.startup.walkie.login
+package com.startup.login.login
 
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
@@ -7,10 +7,10 @@ import com.startup.common.util.Printer
 import com.startup.common.util.UserAuthNotFoundException
 import com.startup.domain.usecase.JoinWalkie
 import com.startup.domain.usecase.LoginWalkie
-import com.startup.walkie.login.model.LoginNavigationEvent
-import com.startup.walkie.login.model.LoginScreenNavigationEvent
-import com.startup.walkie.login.model.NickNameViewState
-import com.startup.walkie.login.model.NickNameViewStateImpl
+import com.startup.login.login.model.LoginNavigationEvent
+import com.startup.login.login.model.LoginScreenNavigationEvent
+import com.startup.login.login.model.NickNameViewState
+import com.startup.login.login.model.NickNameViewStateImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn

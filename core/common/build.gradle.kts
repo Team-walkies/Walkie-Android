@@ -6,9 +6,6 @@ plugins {
 android {
     buildFeatures.buildConfig = true
     namespace = "com.startup.common"
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 dependencies {

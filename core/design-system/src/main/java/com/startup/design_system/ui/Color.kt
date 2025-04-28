@@ -1,4 +1,4 @@
-package com.startup.ui
+package com.startup.design_system.ui
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf

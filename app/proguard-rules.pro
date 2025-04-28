@@ -1,27 +1,162 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# 전역적인 처리
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Compose 전반
+-keep class androidx.compose.** { *; }
+# Compose Material3 (optional)
+-keep class androidx.compose.material3.** { *; }
+# Composable 어노테이션을 유지
+-keepclassmembers class * {
+    @androidx.compose.runtime.Composable <methods>;
+}
+# WebView 콜백을 오버라이드한 경우
+-keepclassmembers class * extends android.webkit.WebViewClient {
+    public *;
+}
+-keepclassmembers class * extends android.webkit.WebChromeClient {
+    public *;
+}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepclassmembers class com.startup.spot.SpotBridgeJsInterface {
+    public *;
+}
+-keepclassmembers class com.startup.spot.modify.ModifyReviewBridgeJsInterface {
+    public *;
+}
+-keep class com.startup.spot.modify.ModifyReviewBridgeJsInterface
+-keep class com.startup.spot.SpotBridgeJsInterface
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-keep public class * extends java.lang.Exception
+
+# @Keep 어노테이션
+-keepclassmembers class * {
+    @androidx.annotation.Keep *;
+}
+
+# Kotlin Metadata (리플렉션 대비)
+-keep @kotlin.Metadata class *
+
+# Coroutine
+-keep class kotlinx.coroutines.** { *; }
+
+# KSP + Kotlin Metadata
+-keep @kotlin.Metadata class *
+
+# Data Layer
+-keep class com.startup.data.di.**_Factory { *; }
+-keep class com.startup.data.di.** { *; }
+# Retrofit interface
+-keep interface com.startup.data.remote.service.** { *; }
+# 내부 모델 직렬화용
+-keep class com.startup.data.local.entity.** { *; }
+-keep class com.startup.data.remote.dto.** { *; }
+-keep class com.startup.data.remote.BaseResponse
 
 
-# kakao-sdk
+# R8 full mode strips generic signatures from return types if not kept.
+-if interface * { @retrofit2.http.* public *** *(...); }
+
+-keep,allowoptimization,allowshrinking,allowobfuscation class <3>
+
+# With R8 full mode generic signatures are stripped for classes that are not kept.
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
+
+# Retain service method parameters when optimizing.
+-keepclassmembers,allowshrinking,allowobfuscation interface * {
+    @retrofit2.http.* <methods>;
+}
+
+# Retrofit does reflection on method and parameter annotations.
+-keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
+
+# Gson
+-keep class com.google.gson.** { *; }
+-keepclassmembers class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+
+# Kotlin Metadata for reflection
+-keep @kotlin.Metadata class *
+-dontwarn java.lang.invoke.StringConcatFactory
+
+# DataStore: 프로토나 Preferences는 별도 처리가 필요 없음 (R8에 안전)
+# DataStore (안전하지만 혹시 몰라 기본 keep)
+-keep class androidx.datastore.** { *; }
+
+# Kakao SDK (예: Login)
+-keep class com.kakao.** { *; }
 -keep class com.kakao.sdk.**.model.* { <fields>; }
 -keep class * extends com.google.gson.TypeAdapter
 -keep interface com.kakao.sdk.**.*Api
+
+
+# Home
+-keep class com.startup.home.navigation.** { *; }
+-keep class com.startup.home.di.** { *; }
+
+# Common
+# Lottie Animation
+-keep class com.airbnb.lottie.** { *; }
+-keep class com.startup.common.base.** { *; }
+-keep class com.startup.common.provider.** { *; }
+-keep class com.startup.common.di.** { *; }
+-keep class com.startup.common.util.** { *; }
+
+# Login
+-keep class com.startup.login.navigation.** { *; }
+-keep class com.startup.login.di.** { *; }
+
+# Spot
+-keep class com.startup.spot.navigation.** { *; }
+-keep class com.startup.spot.di.** { *; }
+
+# Step Counter
+-keep class com.startup.stepcounter.di.** { *; }
+-keep class com.startup.stepcounter.navigation.** { *; }
+
+# Design-System
+-keep class com.startup.design_system.ui.** { *; }
+-keep class com.startup.design_system.widget.** { *; }
+
+# ViewModel 키
+-keep class **ViewModel_HiltModules$KeyModule { *; }
+
+# Hilt ViewModel
+-keep class dagger.hilt.android.lifecycle.HiltViewModel
+# Hilt internal 처리용
+
+# EntryPoint로 정의된 클래스
+-keep interface com.startup.**.*EntryPoint
+-keep class com.startup.**.*EntryPoint { *; }
+
+# 🔐 Hilt DI 구성요소
+-keep class dagger.hilt.** { *; }
+-keep class androidx.hilt.** { *; }
+-keep class **_HiltModules* { *; }
+-keep class **_GeneratedInjector { *; }
+-keep class **_Factory { *; }
+-keep class **_HiltComponents* { *; }
+
+-keep class **.HiltWrapper_* { *; }
+-keep @dagger.Module class * { *; }
+-keep @dagger.Provides class * { *; }
+-keep @dagger.hilt.InstallIn class * { *; }
+-keep @dagger.hilt.EntryPoint class * { *; }
+-keep class dagger.hilt.EntryPoints { *; }
+-keep class dagger.hilt.android.EntryPointAccessors { *; }
+
+# 🔐 ViewModel + EntryPoint 포함된 클래스들
+-keep class androidx.lifecycle.ViewModel
+-keep class * extends androidx.lifecycle.ViewModel { *; }
+-keep @dagger.hilt.android.lifecycle.HiltViewModel class * { *; }
+
+# 🔐 DI 대상 생성자
+-keepclassmembers class * {
+    @javax.inject.Inject <init>(...);
+}
+-keepclassmembers class * {
+    @dagger.Provides *;
+}
+# 📌 reflection 대비 필수 메타데이터
+-keep @kotlin.Metadata class *
+-keepattributes *Annotation*
+-keepattributes Signature

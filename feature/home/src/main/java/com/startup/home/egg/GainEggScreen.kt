@@ -56,8 +56,8 @@ import com.startup.home.egg.model.GainEggUiEvent
 import com.startup.home.egg.model.GainEggViewState
 import com.startup.home.egg.model.GainEggViewStateImpl
 import com.startup.home.egg.model.MyEggModel
-import com.startup.ui.WalkieTheme
-import com.startup.ui.noRippleClickable
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.text.NumberFormat
 import java.util.Locale

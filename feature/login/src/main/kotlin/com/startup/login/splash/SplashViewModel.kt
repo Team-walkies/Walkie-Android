@@ -1,4 +1,4 @@
-package com.startup.walkie.splash
+package com.startup.login.splash
 
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel

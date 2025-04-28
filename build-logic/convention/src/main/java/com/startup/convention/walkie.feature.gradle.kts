@@ -5,6 +5,19 @@ plugins {
 }
 configureAndroidCompose()
 
+android {
+    defaultConfig {
+    }
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = true
+        }
+
+        getByName("debug") {
+            isMinifyEnabled = false
+        }
+    }
+}
 dependencies {
     add("androidTestImplementation", libs.findLibrary("androidx.junit").get())
     add("androidTestImplementation", libs.findLibrary("androidx.espresso.core").get())

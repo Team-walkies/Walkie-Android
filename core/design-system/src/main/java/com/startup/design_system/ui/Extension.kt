@@ -1,4 +1,4 @@
-package com.startup.ui
+package com.startup.design_system.ui
 
 import android.graphics.BlurMaskFilter
 import androidx.compose.foundation.clickable

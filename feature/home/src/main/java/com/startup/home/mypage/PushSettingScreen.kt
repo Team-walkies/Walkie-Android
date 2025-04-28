@@ -23,7 +23,7 @@ import com.startup.home.mypage.model.MyInfoUIEvent
 import com.startup.home.mypage.model.MyInfoViewState
 import com.startup.home.mypage.model.MyInfoViewStateImpl
 import com.startup.home.mypage.model.PushSettingUIEvent
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

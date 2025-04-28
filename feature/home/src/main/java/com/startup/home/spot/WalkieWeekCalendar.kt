@@ -30,8 +30,8 @@ import com.startup.common.util.DateUtil.getStartOfWeek
 import com.startup.common.util.DateUtil.matchWeekdayInSameWeekUntilToday
 import com.startup.common.util.Printer
 import com.startup.home.spot.model.CalendarModel
-import com.startup.ui.WalkieTheme
-import com.startup.ui.noRippleClickable
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map

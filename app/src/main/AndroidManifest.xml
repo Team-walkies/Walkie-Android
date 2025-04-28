@@ -61,19 +61,13 @@
             android:foregroundServiceType="health" />
 
         <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Walkie" />
-
-        <activity
             android:name="com.startup.home.HomeActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Walkie" />
 
         <activity
-            android:name=".splash.SplashActivity"
+            android:name="com.startup.login.splash.SplashActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Walkie.Splash">
@@ -96,7 +90,7 @@
         </activity>
 
         <activity
-            android:name=".login.LoginActivity"
+            android:name="com.startup.login.login.LoginActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Walkie" />

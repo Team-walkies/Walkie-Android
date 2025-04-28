@@ -18,7 +18,7 @@ import com.startup.common.util.Printer
 import com.startup.spot.BuildConfig
 import com.startup.spot.ModifyReviewEvent
 import com.startup.spot.ModifyReviewUiEvent
-import com.startup.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme
 import kotlinx.coroutines.flow.Flow
 
 @Composable
