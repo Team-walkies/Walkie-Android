@@ -5,6 +5,12 @@ plugins {
 
 android {
     namespace = "com.startup.navigation"
+
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = false
+        }
+    }
 }
 
 dependencies {

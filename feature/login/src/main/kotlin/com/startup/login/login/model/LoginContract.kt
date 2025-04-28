@@ -42,12 +42,11 @@ interface NickNameViewState : BaseState {
     val providerToken: StateFlow<String?>
 }
 
-class NickNameViewStateImpl : NickNameViewState {
+class NickNameViewStateImpl(override val placeHolder: MutableStateFlow<String>) : NickNameViewState {
     override val nickName: MutableStateFlow<TextFieldValue> = MutableStateFlow(
         TextFieldValue(
             ""
         )
     )
-    override val placeHolder: MutableStateFlow<String> = MutableStateFlow("닉네임")
     override val providerToken: MutableStateFlow<String?> = MutableStateFlow(null)
 }

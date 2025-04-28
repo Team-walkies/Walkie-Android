@@ -1,3 +1,5 @@
+package com.startup.common.util
+
 import android.graphics.Typeface
 import android.text.Html
 import android.text.style.ForegroundColorSpan

@@ -2,6 +2,7 @@ package com.startup.data.remote.datasourceimpl
 
 import androidx.datastore.preferences.core.Preferences
 import com.startup.common.util.KakaoAuthFailException
+import com.startup.common.util.Printer
 import com.startup.common.util.ResponseErrorException
 import com.startup.common.util.UserAuthNotFoundException
 import com.startup.data.datasource.AuthDataSource
@@ -57,6 +58,7 @@ internal class AuthDataSourceImpl @Inject constructor(
             if (item.data != null && item.data.accessToken == null) {
                 throw UserAuthNotFoundException(
                     message = "계정 없음",
+                    nickName = kakaoLoginClient.me().getOrNull()?.kakaoAccount?.profile?.nickname,
                     providerToken = it
                 )
             }

@@ -47,6 +47,7 @@
     <string name="play_this_egg">이 알과 같이 걷기</string>
     <string name="playing_this_egg">같이 걷는 중…</string>
 
+    <string name="onboarding_nick_name_default_placeholder">닉네임</string>
     <string name="onboarding_nick_name_title">워키에서 사용할\n닉네임을 지어주세요</string>
     <string name="onboarding_nick_name_placeholder">워키에서 사용할\n닉네임을 지어주세요</string>
     <string name="onboarding_nick_name_apply">완료</string>

@@ -30,6 +30,7 @@ class ResponseErrorException(
 class UserAuthNotFoundException(
     override val message: String? = null,
     val providerToken: String,
+    val nickName: String?,
     val code: Int? = null
 ) : Exception(message), WalkieException
 

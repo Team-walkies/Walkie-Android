@@ -43,7 +43,7 @@ import com.startup.home.R
 import com.startup.home.mypage.model.MyInfoViewState
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.ui.noRippleClickable
-import withColor
+import com.startup.common.util.withColor
 
 @Composable
 fun MyPageScreen(

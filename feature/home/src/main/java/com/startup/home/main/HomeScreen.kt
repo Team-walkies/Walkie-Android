@@ -69,8 +69,8 @@ import com.startup.home.egg.model.MyEggModel
 import com.startup.home.menu.HistoryItemModel
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.ui.noRippleClickable
-import withBold
-import withUnderline
+import com.startup.common.util.withBold
+import com.startup.common.util.withUnderline
 
 data class HomePermissionState(
     val showActivityRecognitionAlert: Boolean = false,

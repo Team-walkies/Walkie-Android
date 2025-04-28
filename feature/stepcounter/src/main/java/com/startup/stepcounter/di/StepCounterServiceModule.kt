@@ -1,4 +1,4 @@
-package com.startup.stepcounter
+package com.startup.stepcounter.di
 
 import com.startup.stepcounter.service.StepCounterService
 import com.startup.stepcounter.service.StepCounterServiceImpl
