@@ -35,7 +35,8 @@ import com.startup.design_system.ui.noRippleClickable
 import com.startup.login.login.model.NickNameSettingEvent
 import com.startup.login.login.model.NickNameViewState
 import com.startup.login.login.model.NickNameViewStateImpl
-import hasSpecialCharacters
+import com.startup.common.util.hasSpecialCharacters
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun NickNameSettingScreen(
@@ -183,6 +184,6 @@ fun NickNameSettingScreen(
 @Preview(showBackground = true)
 fun PreviewNickNameSettingScreen() {
     WalkieTheme {
-        NickNameSettingScreen(NickNameViewStateImpl(), {})
+        NickNameSettingScreen(NickNameViewStateImpl(placeHolder = MutableStateFlow("")), {})
     }
 }

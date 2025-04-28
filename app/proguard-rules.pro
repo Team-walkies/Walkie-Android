@@ -68,6 +68,17 @@
 # Retrofit does reflection on method and parameter annotations.
 -keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
 
+# 모든 object를 자동 보호
+-keepclassmembers class ** {
+    static ** INSTANCE;
+}
+
+-keepclassmembers class ** {
+    *** get*();
+    *** is*();
+    *** set*(***);
+}
+
 # Gson
 -keep class com.google.gson.** { *; }
 -keepclassmembers class * {
@@ -100,6 +111,9 @@
 -keep class com.startup.common.provider.** { *; }
 -keep class com.startup.common.di.** { *; }
 -keep class com.startup.common.util.** { *; }
+-keep class com.startup.common.event.** { *; }
+-keep class com.startup.common.extension.** { *; }
+
 
 # Login
 -keep class com.startup.login.navigation.** { *; }
@@ -112,6 +126,7 @@
 # Step Counter
 -keep class com.startup.stepcounter.di.** { *; }
 -keep class com.startup.stepcounter.navigation.** { *; }
+-keep class com.startup.stepcounter.service.** { *; }
 
 # Design-System
 -keep class com.startup.design_system.ui.** { *; }
@@ -136,6 +151,11 @@
 -keep class **_Factory { *; }
 -keep class **_HiltComponents* { *; }
 
+# 모든 Hilt EntryPoint 인터페이스 보호 (범용적으로 추가 가능)
+-keep class dagger.hilt.internal.GeneratedComponent { *; }
+-keep class dagger.hilt.android.internal.lifecycle.HiltViewModelFactory { *; }
+-keep class dagger.hilt.android.internal.managers.* { *; }
+-keep class dagger.hilt.android.internal.modules.* { *; }
 -keep class **.HiltWrapper_* { *; }
 -keep @dagger.Module class * { *; }
 -keep @dagger.Provides class * { *; }
