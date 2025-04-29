@@ -111,6 +111,10 @@ fun MainBottomNavigationScreen(
                 navController.navigate(MainScreenNav.MyPageGraph.route + "/${MyPageScreenNav.PersonalInfoPolicy.route}")
             }
 
+            MyPageScreenNavigationEvent.MoveToServiceTerm -> {
+                navController.navigate(MainScreenNav.MyPageGraph.route + "/${MyPageScreenNav.ServiceTerm.route}")
+            }
+
             MyPageScreenNavigationEvent.MoveToRequestUserOpinion -> {
                 navController.navigate(MainScreenNav.MyPageGraph.route + "/${MyPageScreenNav.RequestUserOpinion.route}")
             }

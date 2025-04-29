@@ -35,15 +35,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.startup.common.extension.getAppVersion
+import com.startup.common.extension.noRippleClickable
+import com.startup.common.extension.openBrowser
 import com.startup.common.extension.orZero
+import com.startup.common.util.withColor
+import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.widget.actionbar.MainActionBar
 import com.startup.design_system.widget.modal.ErrorTwoButtonModal
 import com.startup.home.MyPageScreenNavigationEvent
 import com.startup.home.R
 import com.startup.home.mypage.model.MyInfoViewState
-import com.startup.design_system.ui.WalkieTheme
-import com.startup.design_system.ui.noRippleClickable
-import com.startup.common.util.withColor
+import com.startup.webview.WalkieWebConstants
 
 @Composable
 fun MyPageScreen(
@@ -126,6 +128,12 @@ fun MyPageScreen(
                         clickEvent = { onNavigationEvent.invoke(MyPageScreenNavigationEvent.MoveToPersonalInfoPolicy) }
                     ),
                     MenuItem(
+                        type = MenuType.ServiceTerm,
+                        titleStrResId = R.string.setting_service_term,
+                        rightMenuType = RightMenuType.Arrow(),
+                        clickEvent = { onNavigationEvent.invoke(MyPageScreenNavigationEvent.MoveToServiceTerm) }
+                    ),
+                    MenuItem(
                         type = MenuType.Version,
                         titleStrResId = R.string.setting_app_version,
                         rightMenuType = RightMenuType.Text("v${context.getAppVersion()}"),
@@ -140,7 +148,7 @@ fun MyPageScreen(
                     )
                     .padding(16.dp)
                     .noRippleClickable {
-                        onNavigationEvent.invoke(MyPageScreenNavigationEvent.MoveToRequestUserOpinion)
+                        context.openBrowser(WalkieWebConstants.FAQ_URL)
                     }
             ) {
                 Row(
@@ -220,7 +228,8 @@ fun MyPageScreen(
 
 private enum class MenuType(@DrawableRes val drawableResId: Int) {
     MyInfo(R.drawable.ic_setting_my), Push(R.drawable.ic_setting_push),
-    Notice(R.drawable.ic_setting_notice), Policy(R.drawable.ic_setting_policy), Version(R.drawable.ic_setting_version)
+    Notice(R.drawable.ic_setting_notice), Policy(R.drawable.ic_setting_policy),
+    ServiceTerm(R.drawable.ic_setting_service_term), Version(R.drawable.ic_setting_version)
 }
 
 private data class MenuItem(
