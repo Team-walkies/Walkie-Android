@@ -95,7 +95,6 @@ internal fun SpotScreen(
                     }
                     addJavascriptInterface(SpotBridgeJsInterface {
                         uiEvent.invoke(it)
-                        Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show()
                     }, "AndroidBridge")
                     webViewClient = WebViewClient()
                     webChromeClient = object : WebChromeClient() {
