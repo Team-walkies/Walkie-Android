@@ -28,14 +28,10 @@ internal fun Project.configureKotlinAndroid() {
             }
         }
         buildTypes {
-            getByName("debug") {
-            }
             getByName("release") {
-
                 if (this is ApplicationBuildType) {
                     isDebuggable = false
                 }
-                isMinifyEnabled = true
             }
         }
     }
