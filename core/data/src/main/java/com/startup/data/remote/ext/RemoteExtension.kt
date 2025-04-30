@@ -3,6 +3,7 @@ package com.startup.data.remote.ext
 import com.startup.common.util.ResponseErrorException
 import com.startup.data.remote.BaseResponse
 import kotlinx.coroutines.flow.FlowCollector
+import okhttp3.Request
 
 internal suspend fun <T : BaseResponse<R>, R> FlowCollector<R>.emitRemote(
     item: T,
@@ -25,3 +26,8 @@ internal fun <T> T?.requireNotNull(): T {
         else -> this ?: throw NullPointerException("값이 없음")
     }
 }
+
+private const val BEARER = "Bearer "
+internal fun Request.Builder.addAuthorizationHeader(token: String) =
+    this.apply { header("Authorization", BEARER + token) }
+
