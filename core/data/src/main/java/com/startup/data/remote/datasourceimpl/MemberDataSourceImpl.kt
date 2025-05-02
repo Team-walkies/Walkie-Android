@@ -58,4 +58,10 @@ internal class MemberDataSourceImpl @Inject constructor(private val memberServic
             emitRemote(memberService.changeUserProfileVisibility())
         }
     }
+
+    override fun getRecordedSpotCount(): Flow<Int> = flow {
+        handleExceptionIfNeed {
+            emitRemote(memberService.getRecordedSpotCount())
+        }
+    }
 }

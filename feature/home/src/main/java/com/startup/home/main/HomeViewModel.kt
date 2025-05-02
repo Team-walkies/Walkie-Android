@@ -16,7 +16,9 @@ import com.startup.domain.usecase.GetCurrentWalkEgg
 import com.startup.domain.usecase.GetGainEggCount
 import com.startup.domain.usecase.GetHatchedCharacterCount
 import com.startup.domain.usecase.GetMyData
+import com.startup.domain.usecase.GetRecordedSpotCount
 import com.startup.domain.usecase.UpdateEggOfStepCount
+import com.startup.home.HomeScreenViewModelEvent
 import com.startup.home.character.model.WalkieCharacter
 import com.startup.home.character.model.WalkieCharacter.Companion.toUiModel
 import com.startup.home.egg.model.EggKind
@@ -25,6 +27,7 @@ import com.startup.home.egg.model.MyEggModel.Companion.toUiModel
 import com.startup.stepcounter.service.StepCounterService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -32,6 +35,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
@@ -48,38 +52,45 @@ class HomeViewModel @Inject constructor(
     getHatchedCharacterCount: GetHatchedCharacterCount,
     getMyData: GetMyData,
     getCurrentWalkEgg: GetCurrentWalkEgg,
+    getCurrentRecordedSpotCount: GetRecordedSpotCount,
     getCurrentWalkCharacter: GetCurrentWalkCharacter,
 ) : BaseViewModel() {
 
     private val _showActivityPermissionAlert = MutableStateFlow(false)
     private val _showBackgroundLocationPermissionAlert = MutableStateFlow(false)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val _state = HomeViewStateImpl(
         stepsUiState = stepCounter.observeSteps()
             .map { BaseUiState(isShowShimmer = false, data = it) }
             .stateInViewModel(BaseUiState(isShowShimmer = true, data = 0)),
 
-        currentGainEggCountUiState = getGainEggCount.invoke(Unit)
-            .map { BaseUiState(isShowShimmer = false, data = it) }
-            .catch { emit(BaseUiState(isShowShimmer = false, data = 0)) }
-            .stateInViewModel(BaseUiState(isShowShimmer = true, data = 0)),
+        currentGainEggCountUiState = viewModelEvent.filter { it == HomeScreenViewModelEvent.RefreshReviewList }.flatMapLatest {
+            getGainEggCount.invoke(Unit)
+                .map { BaseUiState(isShowShimmer = false, data = it) }
+                .catch { emit(BaseUiState(isShowShimmer = false, data = 0)) }
+        }.stateInViewModel(BaseUiState(isShowShimmer = true, data = 0)),
 
-        currentHatchedCharacterCountUiState = getHatchedCharacterCount.invoke(Unit)
-            .map { BaseUiState(isShowShimmer = false, data = it) }
-            .catch { emit(BaseUiState(isShowShimmer = false, data = 0)) }
-            .stateInViewModel(BaseUiState(isShowShimmer = true, data = 0)),
+        currentHatchedCharacterCountUiState = viewModelEvent.filter { it == HomeScreenViewModelEvent.RefreshReviewList }.flatMapLatest {
+            getHatchedCharacterCount.invoke(Unit)
+                .map { BaseUiState(isShowShimmer = false, data = it) }
+                .catch { emit(BaseUiState(isShowShimmer = false, data = 0)) }
+        }.stateInViewModel(BaseUiState(isShowShimmer = true, data = 0)),
 
-        userInfoUiState = getMyData.invoke(Unit)
-            .map { BaseUiState(isShowShimmer = false, data = it as UserInfo?) }
-            .catch { emit(BaseUiState(isShowShimmer = false, data = null)) }
-            .stateInViewModel(BaseUiState(isShowShimmer = true, data = null)),
+        // 탐험한 리뷰 수 조회 용
+        currentRecordedSpotCountUiState = viewModelEvent.filter { it == HomeScreenViewModelEvent.RefreshReviewList }.flatMapLatest {
+            getCurrentRecordedSpotCount.invoke(Unit)
+                .map { BaseUiState(isShowShimmer = false, data = it) }
+                .catch { emit(BaseUiState(isShowShimmer = false, data = 0)) }
+        }.stateInViewModel(BaseUiState(isShowShimmer = true, data = 0)),
 
         currentWalkEggUiState = getCurrentWalkEgg.invoke(Unit)
             .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
             .catch {
                 emit(
                     BaseUiState(
-                        isShowShimmer = false, data = MyEggModel(
+                        isShowShimmer = false,
+                        data = MyEggModel(
                             characterId = 0,
                             eggKind = EggKind.Empty,
                             obtainedDate = "",
@@ -94,7 +105,8 @@ class HomeViewModel @Inject constructor(
             }
             .stateInViewModel(
                 BaseUiState(
-                    isShowShimmer = true, data = MyEggModel(
+                    isShowShimmer = true,
+                    data = MyEggModel(
                         characterId = 0,
                         eggKind = EggKind.Empty,
                         obtainedDate = "",
@@ -112,7 +124,9 @@ class HomeViewModel @Inject constructor(
             .catch { emit(BaseUiState(isShowShimmer = false, data = WalkieCharacter.ofEmpty())) }
             .stateInViewModel(BaseUiState(isShowShimmer = true, data = WalkieCharacter.ofEmpty())),
         showActivityPermissionAlert = _showActivityPermissionAlert.stateInViewModel(false),
-        showBackgroundPermissionAlert = _showBackgroundLocationPermissionAlert.stateInViewModel(false)
+        showBackgroundPermissionAlert = _showBackgroundLocationPermissionAlert.stateInViewModel(false),
+        userInfo = getMyData.invoke(Unit).catch {  }.stateInViewModel(null)
+
     )
 
     override val state: HomeViewState
@@ -177,10 +191,9 @@ class HomeViewModel @Inject constructor(
 
     private fun processUserInfo() {
         viewModelScope.launch {
-            _state.userInfoUiState
-                .collect { uiState ->
-                    val userInfo = uiState.data
-                    if (!uiState.isShowShimmer && userInfo != null) {
+            _state.userInfo
+                .collect { userInfo ->
+                    if(userInfo != null) {
                         Printer.e("JUNWOO", "eggId : ${userInfo.eggId}")
                         updateStepProgress(userInfo)
                     }
@@ -264,7 +277,7 @@ class HomeViewModel @Inject constructor(
         _showActivityPermissionAlert.value = show
     }
 
-    fun setBackgroundLocationPermssionAlertState(show: Boolean){
+    fun setBackgroundLocationPermssionAlertState(show: Boolean) {
         _showBackgroundLocationPermissionAlert.value = show
     }
 }
@@ -273,22 +286,24 @@ interface HomeViewState : BaseState {
     val stepsUiState: StateFlow<BaseUiState<Int>>
     val currentHatchedCharacterCountUiState: StateFlow<BaseUiState<Int>>
     val currentGainEggCountUiState: StateFlow<BaseUiState<Int>>
-    val userInfoUiState: StateFlow<BaseUiState<UserInfo?>>
+    val currentRecordedSpotCountUiState: StateFlow<BaseUiState<Int>>
     val currentWalkEggUiState: StateFlow<BaseUiState<MyEggModel>>
     val currentWalkCharacterUiState: StateFlow<BaseUiState<WalkieCharacter>>
     val showActivityPermissionAlert: StateFlow<Boolean>
     val showBackgroundPermissionAlert: StateFlow<Boolean>
+    val userInfo: StateFlow<UserInfo?>
 }
 
 class HomeViewStateImpl(
     override val stepsUiState: StateFlow<BaseUiState<Int>>,
     override val currentHatchedCharacterCountUiState: StateFlow<BaseUiState<Int>>,
     override val currentGainEggCountUiState: StateFlow<BaseUiState<Int>>,
-    override val userInfoUiState: StateFlow<BaseUiState<UserInfo?>>,
+    override val currentRecordedSpotCountUiState: StateFlow<BaseUiState<Int>>,
     override val currentWalkEggUiState: StateFlow<BaseUiState<MyEggModel>>,
     override val currentWalkCharacterUiState: StateFlow<BaseUiState<WalkieCharacter>>,
     override val showActivityPermissionAlert: StateFlow<Boolean>,
-    override val showBackgroundPermissionAlert: StateFlow<Boolean>
+    override val showBackgroundPermissionAlert: StateFlow<Boolean>,
+    override val userInfo: StateFlow<UserInfo?>
 ) : HomeViewState
 
 data class HatchingAnimationCharacterData(

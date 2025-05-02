@@ -285,8 +285,8 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
                                         finish()
                                     }
 
-                                    MainScreenNavigationEvent.MoveToSpotActivity -> {
-                                        spotModuleNavigator.navigateSpotView(context = this@HomeActivity)
+                                    is MainScreenNavigationEvent.MoveToSpotActivity -> {
+                                        spotModuleNavigator.navigateSpotView(activity = this@HomeActivity, launcher = it.launcher)
                                     }
 
                                     else -> {}

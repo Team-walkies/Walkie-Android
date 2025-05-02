@@ -55,6 +55,10 @@ import com.startup.common.extension.shimmerEffect
 import com.startup.common.extension.shimmerEffectGray200
 import com.startup.common.util.BaseUiState
 import com.startup.common.util.formatWithLocale
+import com.startup.common.util.withBold
+import com.startup.common.util.withUnderline
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
 import com.startup.design_system.widget.actionbar.MainLogoActionBar
 import com.startup.design_system.widget.modal.PrimaryTwoButtonModal
 import com.startup.design_system.widget.permission.PermissionInduction
@@ -67,10 +71,6 @@ import com.startup.home.egg.getEggLayoutModel
 import com.startup.home.egg.model.EggKind
 import com.startup.home.egg.model.MyEggModel
 import com.startup.home.menu.HistoryItemModel
-import com.startup.design_system.ui.WalkieTheme
-import com.startup.design_system.ui.noRippleClickable
-import com.startup.common.util.withBold
-import com.startup.common.util.withUnderline
 
 data class HomePermissionState(
     val showActivityRecognitionAlert: Boolean = false,
@@ -81,7 +81,6 @@ val LocalHomePermissionState = compositionLocalOf { HomePermissionState() }
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel(),
     state: HomeViewState,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit
 ) {
@@ -106,7 +105,7 @@ fun HomeScreen(
             HomeContent(
                 paddingValues = paddingValues,
                 scrollState = scrollState,
-                viewState = viewModel.state,
+                viewState = state,
                 onNavigationEvent = onNavigationEvent
             )
         }
@@ -354,7 +353,7 @@ private fun MyHistorySection(
 ) {
     val eggCountState by viewState.currentGainEggCountUiState.collectAsStateWithLifecycle()
     val characterCountState by viewState.currentHatchedCharacterCountUiState.collectAsStateWithLifecycle()
-    val userInfoState by viewState.userInfoUiState.collectAsStateWithLifecycle()
+    val currentRecordedSpotCountUiState by viewState.currentRecordedSpotCountUiState.collectAsStateWithLifecycle()
 
     if (eggCountState.isShowShimmer) {
         SkeletonHistoryTitleText()
@@ -368,20 +367,13 @@ private fun MyHistorySection(
 
     Spacer(modifier = Modifier.height(8.dp))
 
-    val userData = userInfoState.data
-    val spotCount = if (!userInfoState.isShowShimmer && userData != null) {
-        userData.recordedSpot
-    } else {
-        0
-    }
-
     HistoryItems(
         eggCountState = eggCountState,
         characterCountState = characterCountState,
-        spotCountState = if (userInfoState.isShowShimmer) {
+        spotCountState = if (currentRecordedSpotCountUiState.isShowShimmer) {
             BaseUiState(true, 0)
         } else {
-            BaseUiState(false, spotCount)
+            BaseUiState(false, currentRecordedSpotCountUiState.data)
         },
         onNavigationEvent = onNavigationEvent
     )

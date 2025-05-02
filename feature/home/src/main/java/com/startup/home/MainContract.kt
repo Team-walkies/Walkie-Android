@@ -2,6 +2,7 @@ package com.startup.home
 
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
+import com.startup.common.base.BaseEvent
 import com.startup.common.base.ScreenNavigationEvent
 import com.startup.common.base.UiEvent
 
@@ -12,7 +13,11 @@ sealed interface MainScreenNavigationEvent : ScreenNavigationEvent {
         val intent: Intent.() -> Intent
     ) : MainScreenNavigationEvent
 
-    data object MoveToSpotActivity : MainScreenNavigationEvent
+    data class MoveToSpotActivity(val launcher : ActivityResultLauncher<Intent>) : MainScreenNavigationEvent
+}
+
+sealed interface HomeScreenViewModelEvent : BaseEvent {
+    data object RefreshReviewList: HomeScreenViewModelEvent
 }
 
 sealed interface HomeScreenNavigationEvent : ScreenNavigationEvent {

@@ -13,4 +13,5 @@ interface MemberRepository {
     fun modifyWalkingCharacter(characterId: Long): Flow<Unit>
     fun getWalkingCharacter(): Flow<MyCharacterWithWalk>
     fun changeUserProfileVisibility(): Flow<Boolean>
+    fun getRecordedSpotCount(): Flow<Int>
 }
