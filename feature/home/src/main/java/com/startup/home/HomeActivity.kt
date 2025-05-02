@@ -1,7 +1,5 @@
 package com.startup.home
 
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -35,6 +33,7 @@ import com.startup.common.base.NavigationEvent
 import com.startup.common.base.UiEvent
 import com.startup.common.util.OsVersions
 import com.startup.common.util.UsePermissionHelper
+import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.widget.modal.PrimaryTwoButtonModal
 import com.startup.home.character.model.CharacterFactory
 import com.startup.home.main.HomeViewModel
@@ -48,8 +47,6 @@ import com.startup.home.permission.PermissionManager
 import com.startup.home.permission.PermissionUiEvent
 import com.startup.navigation.LoginModuleNavigator
 import com.startup.navigation.SpotModuleNavigator
-import com.startup.stepcounter.broadcastReciver.DailyResetReceiver
-import com.startup.design_system.ui.WalkieTheme
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,14 +55,10 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 
 @AndroidEntryPoint
-class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
-    DailyResetReceiver.OnDateChangedListener {
+class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
     override val viewModel: HomeViewModel by viewModels<HomeViewModel>()
 
     private lateinit var permissionManager: PermissionManager
-
-    // 날짜 변경 수신기
-    private val dailyResetReceiver = DailyResetReceiver()
 
     // KSP는 필드 주입이 안 됨
     private val loginModuleNavigator: LoginModuleNavigator by lazy {
@@ -104,26 +97,11 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
             viewModel = viewModel
         )
         permissionManager.checkPermissions()
-
-        dailyResetReceiver.setOnDateChangedListener(this)
-        registerDailyResetReceiver()
-
         setContent {
             WalkieTheme {
                 MainScreenWithPermissionBottomSheet()
             }
         }
-    }
-
-    private fun registerDailyResetReceiver() {
-        val filter = IntentFilter().apply {
-            addAction(Intent.ACTION_DATE_CHANGED)
-        }
-        registerReceiver(dailyResetReceiver, filter)
-    }
-
-    override fun onDateChanged() {
-        viewModel.resetStepCount()
     }
 
     fun startStepCounterService() {
@@ -424,11 +402,5 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
     @InstallIn(SingletonComponent::class)
     interface LoginNavigatorEntryPoint {
         fun loginNavigatorNavigator(): LoginModuleNavigator
-    }
-
-    override fun onDestroy() {
-        unregisterReceiver(dailyResetReceiver)
-        dailyResetReceiver.removeOnDateChangedListener()
-        super.onDestroy()
     }
 }
