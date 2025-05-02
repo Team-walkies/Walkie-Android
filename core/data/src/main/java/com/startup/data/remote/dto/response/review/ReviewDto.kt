@@ -24,7 +24,15 @@ data class ReviewDto(
     @SerializedName("endTime")
     val endTime: String?,
     @SerializedName("characterId")
-    val characterId: Int?,
+    val characterId: Long?,
+    @SerializedName("type")
+    val characterType: Int?,
+    @SerializedName("characterClass")
+    val characterClass: Int?,
+    @SerializedName("rank")
+    val rank: Int?,
+    @SerializedName("keyword")
+    val spotType: String?,
     @SerializedName("pic")
     val pic: String?,
     @SerializedName("reviewCd")
@@ -33,7 +41,8 @@ data class ReviewDto(
     val review: String?,
     @SerializedName("rating")
     val rating: Int?,
-) {
+
+    ) {
     fun toDomain(): Review = Review(
         reviewId = reviewId.orZero(),
         spotId = spotId.orZero(),
@@ -43,6 +52,10 @@ data class ReviewDto(
         startTime = startTime.orEmpty(),
         endTime = endTime.orEmpty(),
         characterId = characterId.orZero(),
+        characterClass = characterClass.orZero(),
+        characterType = characterType.orZero(),
+        spotType = spotType.orEmpty(),
+        rank = rank.orZero(),
         pic = pic.orEmpty(),
         reviewCd = reviewCd.orFalse(),
         review = review.orEmpty(),

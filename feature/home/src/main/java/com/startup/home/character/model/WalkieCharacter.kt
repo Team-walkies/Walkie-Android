@@ -44,7 +44,7 @@ data class WalkieCharacter(
             count = 0
         )
 
-        private fun getTypeAndClassOfWalkieCharacter(
+        fun getTypeAndClassOfWalkieCharacter(
             characterId: Long,
             type: Int,
             clazz: Int,

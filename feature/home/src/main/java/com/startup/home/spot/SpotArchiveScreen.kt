@@ -55,6 +55,8 @@ import com.startup.home.spot.model.SpotArchiveViewState
 import com.startup.home.spot.model.SpotArchiveViewStateImpl
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.ui.noRippleClickable
+import com.startup.home.character.model.WalkieCharacter
+import com.startup.home.spot.model.SpotKeyword
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
@@ -274,13 +276,13 @@ private fun ReviewItem(reviewModel: ReviewModel, onClickOption: (ReviewModel) ->
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
                 modifier = Modifier.size(38.dp),
-                painter = painterResource(R.drawable.jelly_1),
+                painter = painterResource(reviewModel.walkieCharacter.characterImageResId),
                 contentDescription = stringResource(R.string.desc_character)
             )
             Column(modifier = Modifier.weight(1F)) {
                 Row {
                     Text(
-                        text = "해파리",
+                        text = stringResource(reviewModel.walkieCharacter.characterNameResId),
                         style = WalkieTheme.typography.head6.copy(color = WalkieTheme.colors.gray700)
                     )
                     Text(
@@ -324,7 +326,7 @@ private fun ReviewItem(reviewModel: ReviewModel, onClickOption: (ReviewModel) ->
             ) {
                 Image(
                     modifier = Modifier.size(16.dp),
-                    painter = painterResource(R.drawable.ic_map_park),
+                    painter = painterResource(reviewModel.spotType.drawableResId),
                     contentDescription = stringResource(R.string.desc_calendar_review_map_kind)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -537,9 +539,10 @@ private fun PreviewReviewItem() {
                 timeRange = "오후 01:45 ~ 04:10",
                 rating = 2,
                 moveDuration = "10h 20m",
-                characterId = 1,
+                walkieCharacter = WalkieCharacter.ofEmpty(),
                 step = "2,000",
                 spotId = 1,
+                spotType = SpotKeyword.FOOD,
                 distance = 23.toDouble()
             ),
             {}
