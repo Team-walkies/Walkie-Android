@@ -48,12 +48,16 @@ class SpotActivity : BaseActivity<SpotUiEvent, SpotNavigationEvent>() {
         navigationEventFlow.onEach {
             when (it) {
                 SpotNavigationEvent.FinishSpotActivity -> {
-                    setResult(RESULT_OK) // -1
+                    setResult(RESULT_CANCELED)
                     finish()
                 }
 
                 SpotNavigationEvent.Logout -> {
                     loginModuleNavigator.navigateLoginView(context = this)
+                    finish()
+                }
+                SpotNavigationEvent.FinishAndRefreshSpotActivity -> {
+                    setResult(RESULT_OK)
                     finish()
                 }
             }

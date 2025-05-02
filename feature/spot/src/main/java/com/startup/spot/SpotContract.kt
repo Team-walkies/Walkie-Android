@@ -14,6 +14,7 @@ sealed interface SpotEvent : BaseEvent {
 
 sealed interface SpotNavigationEvent : NavigationEvent {
     data object FinishSpotActivity: SpotNavigationEvent
+    data object FinishAndRefreshSpotActivity: SpotNavigationEvent
     data object Logout: SpotNavigationEvent
 }
 

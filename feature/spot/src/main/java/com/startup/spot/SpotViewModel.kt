@@ -43,7 +43,7 @@ class SpotViewModel @Inject constructor(
                 }
 
                 SpotUiEvent.FinishReview -> {
-                    notifyEvent(SpotNavigationEvent.FinishSpotActivity)
+                    notifyEvent(SpotNavigationEvent.FinishAndRefreshSpotActivity)
                 }
 
                 SpotUiEvent.FinishWebView -> {

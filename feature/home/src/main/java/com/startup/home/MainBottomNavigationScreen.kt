@@ -1,7 +1,10 @@
 package com.startup.home
 
 import android.app.Activity
+import android.app.Activity.RESULT_OK
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,10 +20,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.startup.common.util.Printer
 import com.startup.design_system.widget.toast.ShowToast
 import com.startup.home.main.HomeScreen
 import com.startup.home.main.HomeViewModel
@@ -32,6 +37,7 @@ import com.startup.home.navigation.MainScreenNav
 import com.startup.home.navigation.MyPageScreenNav
 import com.startup.home.navigation.WalkieBottomNavigation
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun MainBottomNavigationScreen(
@@ -46,6 +52,15 @@ fun MainBottomNavigationScreen(
     var backPressedOnce by remember { mutableStateOf(false) }
     val canNavigateBack = navHostController.previousBackStackEntry != null
 
+    val spotMoveActivityLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                homeViewModel.notifyViewModelEvent(HomeScreenViewModelEvent.RefreshReviewList)
+            }
+        }
+    val isHomeRefresh by navController.currentBackStackEntryFlow.map { !canNavigateBack && it.destination.route == MainScreenNav.BottomNavigation.route }
+        .collectAsStateWithLifecycle(false)
+
     BackHandler(enabled = !canNavigateBack) {
         if (backPressedOnce) {
             (context as? Activity)?.finish()
@@ -53,7 +68,11 @@ fun MainBottomNavigationScreen(
             backPressedOnce = true
         }
     }
-
+    LaunchedEffect(isHomeRefresh) {
+        if (isHomeRefresh) {
+            homeViewModel.notifyViewModelEvent(HomeScreenViewModelEvent.RefreshReviewList)
+        }
+    }
     // 2초 후 플래그 리셋
     LaunchedEffect(backPressedOnce) {
         if (backPressedOnce) {
@@ -73,6 +92,7 @@ fun MainBottomNavigationScreen(
             }
         }
     }
+
     fun handleHomeScreenNavigationEvent(navigationEvent: HomeScreenNavigationEvent) {
         when (navigationEvent) {
             HomeScreenNavigationEvent.MoveToGainEgg -> {
@@ -162,7 +182,7 @@ fun MainBottomNavigationScreen(
             modifier = Modifier.align(Alignment.BottomCenter),
             navController = navHostController,
             onCenterItemClick = {
-                onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToSpotActivity)
+                onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToSpotActivity(spotMoveActivityLauncher))
             }
         )
     }

@@ -49,4 +49,9 @@ internal interface MemberService {
     /** 내 프로필 공개/비공개 토글 API, 요청하면 값이 반전 됨 */
     @PATCH("api/v1/members/profile/visibility")
     suspend fun changeUserProfileVisibility(): BaseResponse<IsPublicDto>
+
+    /* 사용자가 기록한 스팟의 갯수 조회 */
+    @GET("api/v1/members/recorded-spot")
+    suspend fun getRecordedSpotCount(): BaseResponse<Int>
+
 }

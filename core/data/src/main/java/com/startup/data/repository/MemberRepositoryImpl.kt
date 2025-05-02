@@ -33,4 +33,5 @@ internal class MemberRepositoryImpl @Inject constructor(private val memberDataSo
     override fun getWalkingCharacter(): Flow<MyCharacterWithWalk> = memberDataSource.getWalkingCharacter().map { it.toDomain() }
 
     override fun changeUserProfileVisibility(): Flow<Boolean> = memberDataSource.changeUserProfileVisibility().map { it.isPublic.orFalse() }
+    override fun getRecordedSpotCount(): Flow<Int> = memberDataSource.getRecordedSpotCount()
 }

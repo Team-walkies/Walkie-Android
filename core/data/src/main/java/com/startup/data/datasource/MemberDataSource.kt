@@ -17,4 +17,5 @@ interface MemberDataSource {
     fun modifyWalkingCharacter(request: CharacterIdRequest): Flow<Unit>
     fun getWalkingCharacter(): Flow<CharacterDto>
     fun changeUserProfileVisibility(): Flow<IsPublicDto>
+    fun getRecordedSpotCount(): Flow<Int>
 }
