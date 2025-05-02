@@ -9,14 +9,6 @@ plugins {
 }
 
 android {
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = true
-        }
-        getByName("debug") {
-            isMinifyEnabled = false
-        }
-    }
     defaultConfig {
         consumerProguardFiles("$rootDir/app/proguard-rules.pro")
     }

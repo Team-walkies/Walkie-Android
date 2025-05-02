@@ -126,7 +126,9 @@
 # Step Counter
 -keep class com.startup.stepcounter.di.** { *; }
 -keep class com.startup.stepcounter.navigation.** { *; }
+-keep class com.startup.stepcounter.notification.** { *; }
 -keep class com.startup.stepcounter.service.** { *; }
+-keep class com.startup.stepcounter.broadcastReciver.** { *; }
 
 # Design-System
 -keep class com.startup.design_system.ui.** { *; }
