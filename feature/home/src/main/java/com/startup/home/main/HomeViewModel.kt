@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -179,6 +180,7 @@ class HomeViewModel @Inject constructor(
                             eggKind = _state.currentWalkEggUiState.value.data.eggKind
                         )
                     )
+                    processUserInfo()
                 } else {
                     _hatchingInfo.value = BaseUiState(
                         isShowShimmer = false,
@@ -232,7 +234,6 @@ class HomeViewModel @Inject constructor(
                     "JUNWOO",
                     "latitude : ${locationData.latitude} , longitude : ${locationData.longitude}"
                 )
-
                 updateEggOfStepCount.invoke(
                     UpdateStepData(
                         eggId = eggId,
@@ -240,7 +241,12 @@ class HomeViewModel @Inject constructor(
                         latitude = locationData.latitude,
                         longitude = locationData.longitude
                     )
-                ).catch {}.launchIn(viewModelScope)
+                ).onEach {
+                    // 알 부화 처리 이후 홈 리프레시
+                    viewModelScope.launch {
+                        notifyViewModelEvent(HomeScreenViewModelEvent.RefreshReviewList)
+                    }
+                }.catch {}.launchIn(viewModelScope)
 
                 resetStepCount()
             }
