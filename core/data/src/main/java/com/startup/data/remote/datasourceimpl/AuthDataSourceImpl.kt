@@ -2,7 +2,6 @@ package com.startup.data.remote.datasourceimpl
 
 import androidx.datastore.preferences.core.Preferences
 import com.startup.common.util.KakaoAuthFailException
-import com.startup.common.util.Printer
 import com.startup.common.util.ResponseErrorException
 import com.startup.common.util.UserAuthNotFoundException
 import com.startup.data.datasource.AuthDataSource
@@ -88,8 +87,8 @@ internal class AuthDataSourceImpl @Inject constructor(
     override fun logOut(): Flow<Unit> = flow {
         handleExceptionIfNeed {
             kakaoLoginClient.logout()
-            emitRemote(memberService.logout())
             logoutManager.logout()
+            emitRemote(memberService.logoutService())
         }
     }
 
@@ -114,5 +113,6 @@ internal class AuthDataSourceImpl @Inject constructor(
         Unit
     }
 
-    override fun getAccessToken(): Flow<String> = tokenDataStoreProvider.getFlowValue(accessTokenKey)
+    override fun getAccessToken(): Flow<String> =
+        tokenDataStoreProvider.getFlowValue(accessTokenKey)
 }

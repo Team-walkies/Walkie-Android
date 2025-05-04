@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import com.startup.common.base.BaseEvent
 import com.startup.common.base.ScreenNavigationEvent
-import com.startup.common.base.UiEvent
 
 sealed interface MainScreenNavigationEvent : ScreenNavigationEvent {
     data object MoveToLoginActivity : MainScreenNavigationEvent
@@ -13,11 +12,12 @@ sealed interface MainScreenNavigationEvent : ScreenNavigationEvent {
         val intent: Intent.() -> Intent
     ) : MainScreenNavigationEvent
 
-    data class MoveToSpotActivity(val launcher : ActivityResultLauncher<Intent>) : MainScreenNavigationEvent
+    data class MoveToSpotActivity(val launcher: ActivityResultLauncher<Intent>) :
+        MainScreenNavigationEvent
 }
 
 sealed interface HomeScreenViewModelEvent : BaseEvent {
-    data object RefreshReviewList: HomeScreenViewModelEvent
+    data object RefreshReviewList : HomeScreenViewModelEvent
 }
 
 sealed interface HomeScreenNavigationEvent : ScreenNavigationEvent {
@@ -39,7 +39,6 @@ sealed interface MyPageScreenNavigationEvent : ScreenNavigationEvent {
     data object MoveToNotification : MyPageScreenNavigationEvent
 }
 
-
-sealed interface MyPageUiEvent : UiEvent {
-    data object OnClickLogout : MyPageUiEvent
+sealed interface ErrorToastEvent : BaseEvent {
+    data class ShowToast(val messageResId: Int = R.string.toast_common_error) : ErrorToastEvent
 }

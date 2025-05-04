@@ -12,7 +12,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -21,7 +27,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.startup.common.base.NavigationEvent
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.widget.toast.ShowToast
+import com.startup.home.ErrorToastEvent
 import com.startup.home.MainScreenNavigationEvent
+import com.startup.home.R
 import com.startup.home.mypage.MyInfoScreen
 import com.startup.home.mypage.MyPageViewModel
 import com.startup.home.mypage.PersonalInfoPolicyScreen
@@ -33,7 +43,6 @@ import com.startup.home.mypage.model.MyInfoUIEvent
 import com.startup.home.mypage.model.PushSettingUIEvent
 import com.startup.home.mypage.model.UnlinkUiEvent
 import com.startup.home.notification.NotificationListScreen
-import com.startup.design_system.ui.WalkieTheme
 
 @Composable
 fun MyPageNavigationGraph(
@@ -45,12 +54,19 @@ fun MyPageNavigationGraph(
     val navController = rememberNavController()
     val snackBarHostState = SnackbarHostState()
     // 홈화면(각각의 NavGraph), 지도화면(각각의 NavGraph), 마이페이지 화면(각각의 NavGraph)
+    var showErrorToast by remember { mutableStateOf(false) }
+    var errorMessageResId by remember { mutableIntStateOf(R.string.toast_common_error) }
 
     LaunchedEffect(Unit) {
         myPageViewModel.event.collect {
             when (it) {
                 MainScreenNavigationEvent.MoveToLoginActivity -> {
                     onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToLoginActivity)
+                }
+
+                is ErrorToastEvent.ShowToast -> {
+                    errorMessageResId = it.messageResId
+                    showErrorToast = true
                 }
 
                 else -> {}
@@ -157,7 +173,6 @@ fun MyPageNavigationGraph(
                         uiEventSender = {
                             when (it) {
                                 UnlinkUiEvent.UnlinkWalkie -> {
-                                    // TODO
                                     myPageViewModel.unLink()
                                 }
                             }
@@ -173,6 +188,12 @@ fun MyPageNavigationGraph(
                     })
                 }
             }
+        }
+    }
+
+    if (showErrorToast) {
+        ShowToast(stringResource(errorMessageResId), 2_000) {
+            showErrorToast = false
         }
     }
 }
