@@ -48,18 +48,14 @@ class SpotArchiveViewModel @Inject constructor(
     }
 
     fun deleteReview(review: ReviewModel) {
-        Printer.d("LMH", "deleteReview")
-        // TODO 실제로 지워지면 ,, 테스트가 너무 귀찮아져서 (리뷰를 다시 써야함) 일단 block
-        /*deleteReview
+        Printer.d("LMH", "deleteReview $review")
+        deleteReview
             .invoke(review.reviewId)
             .onEach {
-                _state.clearEventList()
-                val currentDate = _state.currentSelectedDate.value.date
-                val weeksToFetch = getWeekRangeList(currentDate, WeekFetchDirection.ALL_THREE)
-                fetchWeeklyReviewList(date = _state.currentSelectedDate.value.date, weeksToFetch = weeksToFetch)
+                initializeReviewList()
             }
             .catch { }
-            .launchIn(viewModelScope)*/
+            .launchIn(viewModelScope)
     }
 
     fun changedSelectedDate(date: CalendarModel) {
