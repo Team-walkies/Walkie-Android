@@ -11,7 +11,12 @@ data class Review(
     /** hh:mm:ss */
     val endTime: String,
     /** 같이 걸은 캐릭터 Id */
-    val characterId: Int,
+    val characterId: Long,
+    val characterType : Int,
+    val characterClass : Int,
+    /** 스팟 타입 아이콘 **/
+    val spotType:String,
+    val rank : Int,
     /** 리뷰 사진 url */
     val pic: String,
     /** 리뷰 작성 여부 */
