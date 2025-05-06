@@ -36,10 +36,12 @@ sealed interface ModifyReviewEvent : BaseEvent {
 sealed interface ModifyReviewUiEvent : UiEvent {
     data object LoadWebViewParams : ModifyReviewUiEvent
     data object FinishReviewModify : ModifyReviewUiEvent
+    data object Logout : ModifyReviewUiEvent
     data object FinishWebView : ModifyReviewUiEvent
 }
 
 sealed interface ModifyReviewNavigationEvent : NavigationEvent {
     data object FinishWithModifyActivity: ModifyReviewNavigationEvent
     data object Finish: ModifyReviewNavigationEvent
+    data object Logout: ModifyReviewNavigationEvent
 }

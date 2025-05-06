@@ -9,6 +9,7 @@ import com.startup.common.util.ExtraConst
 import com.startup.common.util.Printer
 import com.startup.domain.model.spot.ModifyReviewWebPostRequest
 import com.startup.domain.usecase.GetToken
+import com.startup.domain.usecase.LocalLogout
 import com.startup.spot.ModifyReviewEvent
 import com.startup.spot.ModifyReviewNavigationEvent
 import com.startup.spot.ModifyReviewUiEvent
@@ -21,7 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ModifyReviewViewModel @Inject constructor(
     private val getToken: GetToken,
-    private val stateHandle: SavedStateHandle
+    private val stateHandle: SavedStateHandle,
+    private val logout: LocalLogout,
 ) : BaseViewModel() {
     override val state: BaseState = object : BaseState {}
 
@@ -60,6 +62,13 @@ class ModifyReviewViewModel @Inject constructor(
 
                 ModifyReviewUiEvent.LoadWebViewParams -> {
                     fetchLoadUrlParams()
+                }
+                ModifyReviewUiEvent.Logout -> {
+                    logout
+                        .invoke(Unit)
+                        .onEach { notifyEvent(ModifyReviewNavigationEvent.Logout) }
+                        .catch { }
+                        .launchIn(viewModelScope)
                 }
             }
         }

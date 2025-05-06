@@ -59,6 +59,10 @@ class ModifyReviewActivity : BaseActivity<ModifyReviewUiEvent, ModifyReviewNavig
                     setResult(RESULT_CANCELED)
                     finish()
                 }
+
+                ModifyReviewNavigationEvent.Logout -> {
+                    navigateToLogin()
+                }
             }
         }.launchIn(lifecycleScope)
     }

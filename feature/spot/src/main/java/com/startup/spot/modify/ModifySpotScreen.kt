@@ -15,10 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.startup.common.util.Printer
+import com.startup.design_system.ui.WalkieTheme
 import com.startup.spot.BuildConfig
 import com.startup.spot.ModifyReviewEvent
 import com.startup.spot.ModifyReviewUiEvent
-import com.startup.design_system.ui.WalkieTheme
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -93,7 +93,10 @@ internal class ModifyReviewBridgeJsInterface(
         bridgeCallBack.invoke(ModifyReviewUiEvent.FinishReviewModify)
 
     }
-
+    @JavascriptInterface
+    fun unauthorizedFromWeb() {
+        bridgeCallBack.invoke(ModifyReviewUiEvent.Logout)
+    }
     @JavascriptInterface
     fun finishWebView() {
         bridgeCallBack.invoke(ModifyReviewUiEvent.FinishWebView)

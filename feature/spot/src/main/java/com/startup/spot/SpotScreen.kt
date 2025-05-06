@@ -7,7 +7,6 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +23,6 @@ import com.startup.common.util.UsePermissionHelper
 import com.startup.common.util.rememberPermissionRequestDelegator
 import com.startup.design_system.ui.WalkieTheme
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterIsInstance
 
 @Composable
 internal fun SpotScreen(
@@ -156,6 +154,11 @@ internal class SpotBridgeJsInterface(
 
     @JavascriptInterface
     fun logout() {
+        bridgeCallBack.invoke(SpotUiEvent.Logout)
+    }
+
+    @JavascriptInterface
+    fun unauthorizedFromWeb() {
         bridgeCallBack.invoke(SpotUiEvent.Logout)
     }
 
