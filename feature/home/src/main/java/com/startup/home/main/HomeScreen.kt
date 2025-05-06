@@ -47,10 +47,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.startup.common.extension.moveToAppDetailSetting
-import com.startup.common.extension.moveToLocationPermissionSetting
 import com.startup.common.extension.shimmerEffect
 import com.startup.common.extension.shimmerEffectGray200
 import com.startup.common.util.BaseUiState
@@ -258,7 +256,7 @@ private fun EggAndPartnerSection(
                     dialogTitleResId = R.string.permission_location_dialog_title,
                     dialogMessageResId = R.string.permission_location_dialog_message,
                     textAlign = TextAlign.Start,
-                    onPositiveClick = { context.moveToLocationPermissionSetting() },
+                    onPositiveClick = { context.moveToAppDetailSetting() },
                     modifier = Modifier.padding(top = 4.dp, start = 16.dp, end = 8.dp)
                 )
 
