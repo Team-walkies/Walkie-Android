@@ -14,6 +14,7 @@ import com.startup.data.remote.service.NoticeService
 import com.startup.data.remote.service.ReviewService
 import com.startup.data.remote.service.SpotService
 import com.startup.data.util.AuthInterceptor
+import com.startup.data.util.TokenAuthenticator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -76,10 +77,12 @@ internal object NetworkModule {
     @Singleton
     @AuthHttpClient
     fun providesAuthHttpClient(
+        tokenAuthenticator: TokenAuthenticator,
         headerInterceptor: AuthInterceptor,
         loggerInterceptor: HttpLoggingInterceptor,
     ) =
         OkHttpClient.Builder()
+            .authenticator(tokenAuthenticator)
             .addInterceptor(headerInterceptor)
             .addInterceptor(loggerInterceptor)
             .build()
