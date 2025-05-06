@@ -40,7 +40,7 @@ class GainEggViewModel @Inject constructor(
             getGainEggList
                 .invoke(Unit)
                 .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
-                .catch {}
+                .catch { emit(BaseUiState(isShowShimmer = false, data = emptyList())) }
         }.stateInViewModel(BaseUiState(isShowShimmer = true, data = emptyList()))
     )
     override val state: GainEggViewState get() = _state
