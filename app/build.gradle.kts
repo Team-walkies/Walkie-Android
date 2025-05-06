@@ -14,7 +14,7 @@ android {
     defaultConfig {
         applicationId = "com.startup.walkie"
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
         targetSdk = Const.TARGET_SDK
         val nativeAppKey = properties.getProperty("NATIVE_APP_KEY")
         buildConfigField("String", "NATIVE_APP_KEY", nativeAppKey)
