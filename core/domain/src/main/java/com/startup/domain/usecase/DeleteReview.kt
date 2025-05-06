@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class DeleteReview @Inject constructor(private val reviewRepository: ReviewRepository) :
-    BaseUseCase<Unit, Int>() {
-    override fun invoke(params: Int): Flow<Unit> =
+    BaseUseCase<Int, Int>() {
+    override fun invoke(params: Int): Flow<Int> =
         reviewRepository.deleteReview(params)
 }

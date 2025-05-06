@@ -14,7 +14,7 @@ class ReviewRepositoryImpl @Inject constructor(private val reviewDataSource: Rev
     override fun modifyReview(reviewId: Int, request: ModifyReview): Flow<Unit> =
         reviewDataSource.modifyReview(reviewId, ModifyReviewRequest(review = request.review, rating = request.rating))
 
-    override fun deleteReview(reviewId: Int): Flow<Unit> = reviewDataSource.deleteReview(reviewId)
+    override fun deleteReview(reviewId: Int): Flow<Int> = reviewDataSource.deleteReview(reviewId)
 
     override fun getSpotOfReviews(spotId: Long): Flow<Int> =
         reviewDataSource.getSpotOfReviews(spotId).map { it.count.orZero() }

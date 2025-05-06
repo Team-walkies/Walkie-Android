@@ -20,7 +20,7 @@ internal class ReviewDataSourceImpl @Inject constructor(private val reviewServic
         }
     }
 
-    override fun deleteReview(reviewId: Int): Flow<Unit> = flow {
+    override fun deleteReview(reviewId: Int): Flow<Int> = flow {
         handleExceptionIfNeed {
             emitRemote(reviewService.deleteReview(reviewId))
         }

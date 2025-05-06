@@ -5,6 +5,7 @@ import com.startup.data.remote.dto.request.review.ModifyReviewRequest
 import com.startup.data.remote.dto.response.review.ReviewResponse
 import com.startup.data.remote.dto.response.review.SpotCountResponse
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -20,8 +21,8 @@ internal interface ReviewService {
     ): BaseResponse<Unit>
 
     /** 리뷰 삭제 API */
-    @POST("api/v1/reviews/{reviewId}")
-    suspend fun deleteReview(@Path("reviewId") reviewId: Int): BaseResponse<Unit>
+    @DELETE("api/v1/reviews/{reviewId}")
+    suspend fun deleteReview(@Path("reviewId") reviewId: Int): BaseResponse<Int>
 
     /** 스팟 별 리뷰수 조회 API */
     @GET("api/v1/reviews/count/{spotId}")
