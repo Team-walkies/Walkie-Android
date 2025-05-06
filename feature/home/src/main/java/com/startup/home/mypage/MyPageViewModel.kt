@@ -8,12 +8,14 @@ import com.startup.domain.usecase.GetArriveSpotNotiEnabled
 import com.startup.domain.usecase.GetEggHatchedNotiEnabled
 import com.startup.domain.usecase.GetMyData
 import com.startup.domain.usecase.GetTodayStepNotiEnabled
-import com.startup.domain.usecase.LocalLogout
+import com.startup.domain.usecase.Logout
 import com.startup.domain.usecase.Unlink
 import com.startup.domain.usecase.UpdateArriveSpotNotiEnabled
 import com.startup.domain.usecase.UpdateEggHatchedNotiEnabled
 import com.startup.domain.usecase.UpdateTodayStepNotiEnabled
+import com.startup.home.ErrorToastEvent
 import com.startup.home.MainScreenNavigationEvent
+import com.startup.home.R
 import com.startup.home.mypage.model.MyInfoViewModelEvent
 import com.startup.home.mypage.model.MyInfoViewState
 import com.startup.home.mypage.model.MyInfoViewStateImpl
@@ -40,7 +42,7 @@ class MyPageViewModel @Inject constructor(
     private val updateEggHatchedNotiEnabled: UpdateEggHatchedNotiEnabled,
     private val updateTodayStepNotiEnabled: UpdateTodayStepNotiEnabled,
     private val unlink: Unlink,
-    private val localLogout: LocalLogout
+    private val logout: Logout
 ) : BaseViewModel() {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _state: MyInfoViewStateImpl = MyInfoViewStateImpl(
@@ -97,18 +99,24 @@ class MyPageViewModel @Inject constructor(
     fun unLink() {
         unlink
             .invoke(Unit)
-            .onEach { notifyEvent(MainScreenNavigationEvent.MoveToLoginActivity) }
-            .catch { }
+            .onEach {
+                notifyEvent(MainScreenNavigationEvent.MoveToLoginActivity)
+            }
+            .catch {
+                notifyEvent(ErrorToastEvent.ShowToast(R.string.toast_common_error))
+            }
             .launchIn(viewModelScope)
     }
 
     fun logout() {
-        localLogout
+        logout
             .invoke(Unit)
             .onEach {
                 notifyEvent(MainScreenNavigationEvent.MoveToLoginActivity)
             }
-            .catch { }
+            .catch {
+                notifyEvent(MainScreenNavigationEvent.MoveToLoginActivity)
+            }
             .launchIn(viewModelScope)
     }
 }

@@ -1,17 +1,18 @@
 package com.startup.data.remote.service
 
 import com.startup.data.remote.BaseResponse
-import com.startup.data.remote.dto.response.character.CharacterDto
 import com.startup.data.remote.dto.request.character.CharacterIdRequest
-import com.startup.data.remote.dto.response.egg.EggDto
 import com.startup.data.remote.dto.request.egg.WalkingEggRequest
 import com.startup.data.remote.dto.request.member.MemberNickNameRequest
+import com.startup.data.remote.dto.response.character.CharacterDto
+import com.startup.data.remote.dto.response.egg.EggDto
 import com.startup.data.remote.dto.response.member.GetUserInfoResponse
 import com.startup.data.remote.dto.response.member.IsPublicDto
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
+import retrofit2.http.POST
 
 internal interface MemberService {
     /** 내 정보 조회하기 */
@@ -27,8 +28,8 @@ internal interface MemberService {
     suspend fun withdrawalService(): BaseResponse<Unit>
 
     /** 로그 아웃 하기 */
-    @DELETE("api/v1/members/logout")
-    suspend fun logout(): BaseResponse<Unit>
+    @POST("api/v1/auth/logout")
+    suspend fun logoutService(): BaseResponse<Unit>
 
     /** 같이 걷는 알 변경 API */
     @PATCH("api/v1/members/eggs/play")
@@ -50,7 +51,7 @@ internal interface MemberService {
     @PATCH("api/v1/members/profile/visibility")
     suspend fun changeUserProfileVisibility(): BaseResponse<IsPublicDto>
 
-    /* 사용자가 기록한 스팟의 갯수 조회 */
+    /** 사용자가 기록한 스팟의 갯수 조회 **/
     @GET("api/v1/members/recorded-spot")
     suspend fun getRecordedSpotCount(): BaseResponse<Int>
 

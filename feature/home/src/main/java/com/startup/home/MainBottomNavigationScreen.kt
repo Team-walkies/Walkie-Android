@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,7 +26,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.startup.common.util.Printer
 import com.startup.design_system.widget.toast.ShowToast
 import com.startup.home.main.HomeScreen
 import com.startup.home.main.HomeViewModel
@@ -50,6 +50,8 @@ fun MainBottomNavigationScreen(
 
     val context = LocalContext.current
     var backPressedOnce by remember { mutableStateOf(false) }
+    var showErrorToast by remember { mutableStateOf(false) }
+    var errorMessageResId by remember { mutableIntStateOf(R.string.toast_common_error) }
     val canNavigateBack = navHostController.previousBackStackEntry != null
 
     val spotMoveActivityLauncher =
@@ -82,10 +84,15 @@ fun MainBottomNavigationScreen(
     }
 
     LaunchedEffect(Unit) {
-        myPageViewModel.event.collect {
-            when (it) {
+        myPageViewModel.event.collect { event ->
+            when (event) {
                 MainScreenNavigationEvent.MoveToLoginActivity -> {
                     onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToLoginActivity)
+                }
+
+                is ErrorToastEvent.ShowToast -> {
+                    errorMessageResId = event.messageResId
+                    showErrorToast = true
                 }
 
                 else -> {}
@@ -182,12 +189,22 @@ fun MainBottomNavigationScreen(
             modifier = Modifier.align(Alignment.BottomCenter),
             navController = navHostController,
             onCenterItemClick = {
-                onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToSpotActivity(spotMoveActivityLauncher))
+                onNavigationEvent.invoke(
+                    MainScreenNavigationEvent.MoveToSpotActivity(
+                        spotMoveActivityLauncher
+                    )
+                )
             }
         )
     }
 
     if (backPressedOnce) {
         ShowToast(stringResource(R.string.toast_home_back_press), 2_000) {}
+    }
+
+    if (showErrorToast) {
+        ShowToast(stringResource(errorMessageResId), 2_000) {
+            showErrorToast = false
+        }
     }
 }
