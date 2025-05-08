@@ -25,7 +25,6 @@ import androidx.navigation.navArgument
 import com.startup.common.base.BaseActivity
 import com.startup.common.base.BaseEvent
 import com.startup.common.util.Printer
-import com.startup.navigation.HomeModuleNavigator
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.login.login.model.GetCharacterNavigationEvent
 import com.startup.login.login.model.LoginNavigationEvent
@@ -34,12 +33,14 @@ import com.startup.login.login.model.LoginUiEvent
 import com.startup.login.login.model.NickNameSettingEvent
 import com.startup.login.navigation.LoginScreenNav
 import com.startup.login.splash.SplashActivity
+import com.startup.navigation.HomeModuleNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
@@ -52,6 +53,7 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
             SplashActivity.HomeModuleNavigatorEntryPoint::class.java
         ).homeModuleNavigator()
     }
+    private val kaKaoLoginClient by lazy { KaKaoLoginClient() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +82,17 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
     override fun handleUiEvent(uiEvent: LoginUiEvent) {
         when (uiEvent) {
             LoginUiEvent.OnClickLoginButton -> {
-                viewModel.onLogin()
+
+                lifecycleScope.launch {
+                    kaKaoLoginClient.login(this@LoginActivity).fold(
+                        onSuccess = { token ->
+                            viewModel.onLogin(token.accessToken)
+                        },
+                        onFailure = { error ->
+                            Printer.e("LMH", "로그인 오류 : $error")
+                        }
+                    )
+                }
             }
 
             else -> {}
@@ -105,7 +117,6 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
     @Composable
     fun MainContent(eventFlow: Flow<BaseEvent>) {
         val navController = rememberNavController()
-        val snackBarHostState = SnackbarHostState()
 
         // 이벤트 수집
         LaunchedEffect(Unit) {

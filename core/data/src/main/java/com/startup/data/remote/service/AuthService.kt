@@ -10,7 +10,7 @@ import retrofit2.http.POST
 
 internal interface AuthService {
     @POST("api/v1/auth/login")
-    suspend fun login(@Body request: LoginRequest): BaseResponse<TokenDto>
+    suspend fun login(@Body request: LoginRequest): BaseResponse<TokenDto?>
 
     @POST("api/v1/auth/signup")
     suspend fun join(@Body request: JoinRequest): BaseResponse<TokenDto>

@@ -3,13 +3,12 @@ package com.startup.data.repository
 import com.startup.data.datasource.AuthDataSource
 import com.startup.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 internal class AuthRepositoryImpl @Inject constructor(private val authDataSource: AuthDataSource) :
     AuthRepository {
-    override fun login(): Flow<Unit> =
-        authDataSource.login()
+    override fun login(kakaoToken: String): Flow<Unit> =
+        authDataSource.login(kakaoToken)
 
     override fun unLink(): Flow<Unit> = authDataSource.unLink()
 

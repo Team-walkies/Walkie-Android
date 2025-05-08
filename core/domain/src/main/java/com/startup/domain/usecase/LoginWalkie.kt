@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class LoginWalkie @Inject constructor(private val authRepository: AuthRepository) :
-    BaseUseCase<Unit, Unit>() {
-    override fun invoke(params: Unit): Flow<Unit> =
-        authRepository.login()
+    BaseUseCase<Unit, String>() {
+    override fun invoke(params: String): Flow<Unit> =
+        authRepository.login(params)
 }

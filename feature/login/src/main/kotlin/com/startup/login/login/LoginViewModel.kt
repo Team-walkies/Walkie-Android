@@ -35,19 +35,20 @@ class LoginViewModel @Inject constructor(
         _state.nickName.update { textFieldValue }
     }
 
-    fun onLogin() {
-        loginWalkie.invoke(Unit).catch { exception ->
-            if (exception is UserAuthNotFoundException) {
-                _state.providerToken.update { exception.providerToken }
-                exception.nickName?.let {
-                    _state.placeHolder.update { it }
+    fun onLogin(kakaoToken: String) {
+        loginWalkie.invoke(kakaoToken)
+            .catch { exception ->
+                if (exception is UserAuthNotFoundException) {
+                    _state.providerToken.update { exception.providerToken }
+                    exception.nickName?.let {
+                        _state.placeHolder.update { it }
+                    }
+                    notifyEvent(LoginScreenNavigationEvent.MoveToNickNameSettingScreen)
+                    Printer.e("LMH", "EXCEPTION $exception")
                 }
-                notifyEvent(LoginScreenNavigationEvent.MoveToNickNameSettingScreen)
-                Printer.e("LMH", "EXCEPTION $exception")
-            }
-        }.onEach {
-            notifyEvent(LoginNavigationEvent.MoveToMainActivity)
-        }.launchIn(viewModelScope)
+            }.onEach {
+                notifyEvent(LoginNavigationEvent.MoveToMainActivity)
+            }.launchIn(viewModelScope)
     }
 
     fun onJoinWalkie(nickName: String) {
