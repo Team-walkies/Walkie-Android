@@ -1,6 +1,7 @@
 package com.startup.data.remote.dto.response.character
 
 import com.google.gson.annotations.SerializedName
+import com.startup.common.util.DateUtil
 import com.startup.domain.model.character.CharacterObtainInfo
 
 data class AcquisitionInfo(
@@ -12,6 +13,6 @@ data class AcquisitionInfo(
 ) {
     fun toDomain() = CharacterObtainInfo(
         obtainedPosition = obtainedPosition.orEmpty(),
-        obtainedDate = obtainedDate.orEmpty()
+        obtainedDate = DateUtil.convertLocalDate(obtainedDate.orEmpty())
     )
 }

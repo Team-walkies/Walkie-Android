@@ -10,11 +10,17 @@ data class AcquisitionCharacterInfoResponse(
     val characterCount: Int?,
     @SerializedName("rank")
     val rank: Int?,
+    @SerializedName("type")
+    val type: Int?,
+    @SerializedName("characterClass")
+    val characterClass: Int?,
     @SerializedName("obtainedDetails")
     val obtainedDetails: List<AcquisitionInfo>?,
 ) {
     fun toDomain(characterId: Long) = CharacterDetail(
         characterId = characterId,
+        type = type.orZero(),
+        characterClass = characterClass.orZero(),
         characterCount = characterCount.orZero(),
         rank = rank.orZero(),
         obtainInfo = obtainedDetails?.toDomain().orEmpty()

@@ -48,20 +48,24 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.startup.common.base.NavigationEvent
+import com.startup.common.extension.orFalse
 import com.startup.common.util.BaseUiState
+import com.startup.common.util.DateUtil
+import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.WalkieTheme.colors
+import com.startup.design_system.ui.noRippleClickable
 import com.startup.design_system.widget.actionbar.PageActionBar
 import com.startup.design_system.widget.actionbar.PageActionBarType
 import com.startup.design_system.widget.bottom_sheet.WalkieDragHandle
 import com.startup.design_system.widget.button.PrimaryButton
 import com.startup.design_system.widget.tag.TagMedium
+import com.startup.domain.model.character.CharacterObtainInfo
 import com.startup.home.R
 import com.startup.home.character.model.CharacterKind
 import com.startup.home.character.model.HatchingCharacterViewState
 import com.startup.home.character.model.HatchingCharacterViewStateImpl
 import com.startup.home.character.model.WalkieCharacter
-import com.startup.design_system.ui.WalkieTheme
-import com.startup.design_system.ui.WalkieTheme.colors
-import com.startup.design_system.ui.noRippleClickable
+import com.startup.home.character.model.WalkieCharacterDetail
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -74,7 +78,9 @@ object CharacterTabType {
 @Composable
 fun HatchingCharacterScreen(
     viewState: HatchingCharacterViewState,
-    onSelectPartner: (WalkieCharacter) -> Unit,
+    onClickPartner: (WalkieCharacter) -> Unit,
+    onSelectPartner: (WalkieCharacterDetail) -> Unit,
+    onDismissBottomSheet: () -> Unit,
     onNavigationEvent: (NavigationEvent) -> Unit
 ) {
     Column(
@@ -88,6 +94,7 @@ fun HatchingCharacterScreen(
 
         val scrollState = rememberScrollState()
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        val characterDetail by viewState.characterDetail.collectAsStateWithLifecycle()
         var viewingCharacter: WalkieCharacter? by remember { mutableStateOf(null) }
         Column(
             modifier = Modifier
@@ -101,16 +108,21 @@ fun HatchingCharacterScreen(
                 style = WalkieTheme.typography.head2
             )
             Spacer(modifier = Modifier.height(22.dp))
-            CharacterTabsContent(viewState) { viewingCharacter = it }
+            CharacterTabsContent(viewState) {
+                onClickPartner(it)
+                viewingCharacter = it
+            }
         }
 
-        if (viewingCharacter != null) {
-            viewingCharacter?.let {
+        if (characterDetail != null) {
+            characterDetail?.let {
                 CharacterDetailBottomSheet(
                     sheetState = sheetState,
                     character = it,
+                    picked = viewingCharacter?.picked.orFalse(),
                     onDismiss = {
                         viewingCharacter = null
+                        onDismissBottomSheet.invoke()
                     },
                     onSelectPartner = { character ->
                         viewingCharacter = null
@@ -445,9 +457,10 @@ private fun CharacterItemContent(
 @Composable
 fun CharacterDetailBottomSheet(
     sheetState: SheetState,
-    character: WalkieCharacter,
+    character: WalkieCharacterDetail,
+    picked: Boolean,
     onDismiss: () -> Unit,
-    onSelectPartner: (WalkieCharacter) -> Unit
+    onSelectPartner: (WalkieCharacterDetail) -> Unit
 ) {
     val density = LocalDensity.current
     val screenHeight = with(density) {
@@ -474,7 +487,8 @@ fun CharacterDetailBottomSheet(
         ) {
             CharacterDetailContent(
                 character = character,
-                onSelectPartner = onSelectPartner
+                onSelectPartner = onSelectPartner,
+                picked = picked
             )
         }
     }
@@ -482,8 +496,9 @@ fun CharacterDetailBottomSheet(
 
 @Composable
 fun CharacterDetailContent(
-    character: WalkieCharacter,
-    onSelectPartner: (WalkieCharacter) -> Unit
+    picked: Boolean,
+    character: WalkieCharacterDetail,
+    onSelectPartner: (WalkieCharacterDetail) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -491,17 +506,17 @@ fun CharacterDetailContent(
             .padding(bottom = 30.dp, start = 16.dp, end = 16.dp)
     ) {
         CharacterDetailScrollableContent(
-            character = character,
+            characterDetail = character,
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
         )
 
-        Spacer(modifier = Modifier.height(34.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         CharacterSelectButton(
             character = character,
-            isAlreadySelected = character.picked,
+            isAlreadySelected = picked,
             onSelectPartner = onSelectPartner
         )
     }
@@ -509,7 +524,7 @@ fun CharacterDetailContent(
 
 @Composable
 private fun CharacterDetailScrollableContent(
-    character: WalkieCharacter,
+    characterDetail: WalkieCharacterDetail,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -517,15 +532,15 @@ private fun CharacterDetailScrollableContent(
         modifier = modifier
     ) {
         Image(
-            painter = painterResource(id = character.characterImageResId),
-            contentDescription = stringResource(id = character.characterNameResId),
+            painter = painterResource(id = characterDetail.character.characterImageResId),
+            contentDescription = stringResource(id = characterDetail.character.characterNameResId),
             modifier = Modifier.size(180.dp)
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = stringResource(id = character.characterNameResId),
+            text = stringResource(id = characterDetail.character.characterNameResId),
             style = WalkieTheme.typography.head3.copy(color = colors.gray700)
         )
 
@@ -539,22 +554,22 @@ private fun CharacterDetailScrollableContent(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        CharacterInfoTags(character)
+        CharacterInfoTags(characterDetail)
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        CharacterHistoryList()
+        CharacterHistoryList(characterDetail.obtainInfoList)
     }
 }
 
 @Composable
-private fun CharacterInfoTags(character: WalkieCharacter) {
+private fun CharacterInfoTags(characterDetail: WalkieCharacterDetail) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         TagMedium(
-            text = stringResource(character.rank.displayStrResId),
-            textColor = character.rank.getTextColor()
+            text = stringResource(characterDetail.character.rank.displayStrResId),
+            textColor = characterDetail.character.rank.getTextColor()
         )
         Row(
             modifier = Modifier
@@ -574,19 +589,19 @@ private fun CharacterInfoTags(character: WalkieCharacter) {
 }
 
 @Composable
-private fun CharacterHistoryList() {
+private fun CharacterHistoryList(list: List<CharacterObtainInfo>) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        repeat(10) {
-            CharacterHistoryItem()
+        list.forEach {
+            CharacterHistoryItem(it)
         }
     }
 }
 
 @Composable
-private fun CharacterHistoryItem() {
+private fun CharacterHistoryItem(info: CharacterObtainInfo) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
@@ -606,7 +621,7 @@ private fun CharacterHistoryItem() {
             )
 
             Text(
-                text = "서울시 서초구",
+                text = info.obtainedPosition,
                 modifier = Modifier
                     .padding(start = 4.dp)
                     .weight(1f),
@@ -614,7 +629,7 @@ private fun CharacterHistoryItem() {
             )
 
             Text(
-                text = "2025.01.13  부화",
+                text = stringResource(R.string.character_hatched_date_description, DateUtil.convertDateFormat(info.obtainedDate)),
                 style = WalkieTheme.typography.body2.copy(color = colors.gray500)
             )
         }
@@ -623,9 +638,9 @@ private fun CharacterHistoryItem() {
 
 @Composable
 private fun CharacterSelectButton(
-    character: WalkieCharacter,
+    character: WalkieCharacterDetail,
     isAlreadySelected: Boolean,
-    onSelectPartner: (WalkieCharacter) -> Unit
+    onSelectPartner: (WalkieCharacterDetail) -> Unit
 ) {
     val buttonText = if (isAlreadySelected) {
         stringResource(R.string.character_already_selected)
@@ -662,27 +677,13 @@ private fun PreviewHatchingCharacterScreen() {
                         emptyList()
                     )
                 ),
+                characterDetail = MutableStateFlow(null),
             ),
             onSelectPartner = {},
-            onNavigationEvent = {}
+            onClickPartner = {},
+            onDismissBottomSheet = {},
+            onNavigationEvent = {},
         )
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@PreviewScreenSizes
-@Composable
-@Preview(showBackground = true)
-fun PreviewCharacterDetailBottomSheet() {
-    WalkieTheme {
-        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-        CharacterDetailBottomSheet(
-            sheetState = sheetState,
-            onDismiss = {},
-            character = WalkieCharacter.ofEmpty(),
-            onSelectPartner = {}
-        )
-    }
-}
