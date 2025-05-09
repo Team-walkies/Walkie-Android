@@ -18,11 +18,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.startup.common.base.NavigationEvent
+import com.startup.design_system.ui.WalkieTheme
 import com.startup.home.MainScreenNavigationEvent
 import com.startup.home.character.HatchingCharacterScreen
 import com.startup.home.character.HatchingCharacterViewModel
 import com.startup.home.notification.NotificationListScreen
-import com.startup.design_system.ui.WalkieTheme
 
 @Composable
 fun HomeNavigationGraph(
@@ -70,12 +70,17 @@ fun HomeNavigationGraph(
                 composable(HomeScreenNav.GainCharacter.route) {
                     HatchingCharacterScreen(
                         hatchingCharacterViewModel.state,
-                        hatchingCharacterViewModel::onSelectPartner,
-                        ::handleNavigationEvent
+                        onClickPartner = hatchingCharacterViewModel::onClickPartner,
+                        onSelectPartner = hatchingCharacterViewModel::onSelectPartner,
+                        onDismissBottomSheet = hatchingCharacterViewModel::clearViewingPartner,
+                        onNavigationEvent = ::handleNavigationEvent
                     )
                 }
                 composable(HomeScreenNav.SpotArchive.route) {
-                    SpotArchiveNavigationGraph(parentNavController = parentNavController, onNavigationEvent = onNavigationEvent)
+                    SpotArchiveNavigationGraph(
+                        parentNavController = parentNavController,
+                        onNavigationEvent = onNavigationEvent
+                    )
                 }
                 composable(HomeScreenNav.Notification.route) {
                     NotificationListScreen(onNavigationEvent = ::handleNavigationEvent)

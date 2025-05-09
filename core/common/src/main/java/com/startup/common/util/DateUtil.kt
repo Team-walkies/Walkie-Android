@@ -38,6 +38,12 @@ object DateUtil {
         date.format(formatter)
     }.getOrNull().orEmpty()
 
+    /** yyyy.MM.dd */
+    fun convertDateFormat(date: LocalDate): String = kotlin.runCatching {
+        val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
+        date.format(formatter)
+    }.getOrNull().orEmpty()
+
     fun convertTranslatorDateFormat(date: LocalDate): String = runCatching {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         formatter.format(date)

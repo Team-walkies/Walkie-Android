@@ -95,6 +95,7 @@
     <string name="character_gain_induction">알을 부화시켜 얻어요</string>
     <string name="character_partner_select">이 캐릭터와 같이 걷기</string>
     <string name="character_already_selected">같이 걷는 중…</string>
+    <string name="character_hatched_date_description">%s. 부화</string>
 
 
     <string name="jellyfish_basic">해파리</string>
