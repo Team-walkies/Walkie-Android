@@ -20,6 +20,7 @@ import com.startup.domain.usecase.GetRecordedSpotCount
 import com.startup.domain.usecase.UpdateEggOfStepCount
 import com.startup.home.HomeScreenViewModelEvent
 import com.startup.home.character.model.WalkieCharacter
+import com.startup.home.character.model.WalkieCharacter.Companion.ofEmpty
 import com.startup.home.character.model.WalkieCharacter.Companion.toUiModel
 import com.startup.home.egg.model.EggKind
 import com.startup.home.egg.model.MyEggModel
@@ -98,14 +99,14 @@ class HomeViewModel @Inject constructor(
                             BaseUiState(
                                 isShowShimmer = false,
                                 data = MyEggModel(
-                                    characterId = 0,
                                     eggKind = EggKind.Empty,
                                     obtainedDate = "",
                                     obtainedPosition = "",
                                     eggId = 0,
                                     play = false,
                                     nowStep = 0,
-                                    needStep = 0
+                                    needStep = 0,
+                                    walkieCharacter = ofEmpty()
                                 )
                             )
                         )
@@ -114,7 +115,7 @@ class HomeViewModel @Inject constructor(
                 BaseUiState(
                     isShowShimmer = true,
                     data = MyEggModel(
-                        characterId = 0,
+                        walkieCharacter = ofEmpty(),
                         eggKind = EggKind.Empty,
                         obtainedDate = "",
                         obtainedPosition = "",
@@ -195,7 +196,7 @@ class HomeViewModel @Inject constructor(
                         isShowShimmer = false,
                         data = HatchingAnimationCharacterData(
                             isHatching = true,
-                            character = _state.currentWalkCharacterUiState.value.data,
+                            character = _state.currentWalkEggUiState.value.data.walkieCharacter,
                             eggKind = _state.currentWalkEggUiState.value.data.eggKind
                         )
                     )

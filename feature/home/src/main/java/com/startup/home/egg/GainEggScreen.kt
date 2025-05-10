@@ -58,6 +58,7 @@ import com.startup.home.egg.model.GainEggViewStateImpl
 import com.startup.home.egg.model.MyEggModel
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.ui.noRippleClickable
+import com.startup.home.character.model.WalkieCharacter
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.text.NumberFormat
 import java.util.Locale
@@ -368,10 +369,10 @@ private fun PreviewBottomModal() {
                 nowStep = 8334,
                 needStep = 10000,
                 play = true,
-                characterId = -1,
                 eggKind = EggKind.Epic,
                 obtainedPosition = "대전시 유성구",
                 obtainedDate = DateUtil.convertDateTimeFormat("2024-01-12 12:20:10"),
+                walkieCharacter = WalkieCharacter.ofEmpty()
             ), {}, {}
         )
     }

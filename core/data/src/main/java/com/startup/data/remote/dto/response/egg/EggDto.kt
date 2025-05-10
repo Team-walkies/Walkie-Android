@@ -16,8 +16,12 @@ data class EggDto(
     val nowStep: Int?,
     @SerializedName("play")
     val play: Boolean?,
-    @SerializedName("rank")
+    @SerializedName("characterRank")
     val rank: Int?,
+    @SerializedName("characterType")
+    val type: Int?,
+    @SerializedName("characterClass")
+    val clazz: Int?,
     @SerializedName("obtainedDate")
     val obtainedDate: String?,
     @SerializedName("obtainedPosition")
@@ -31,6 +35,8 @@ data class EggDto(
         nowStep = nowStep.orZero(),
         play = play.orFalse(),
         obtainedDate = obtainedDate.orEmpty(),
-        obtainedPosition = obtainedPosition.orEmpty()
+        obtainedPosition = obtainedPosition.orEmpty(),
+        characterClass = clazz.orZero(),
+        type = type.orZero(),
     )
 }

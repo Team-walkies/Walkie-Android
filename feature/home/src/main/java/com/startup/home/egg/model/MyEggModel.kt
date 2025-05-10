@@ -2,9 +2,9 @@ package com.startup.home.egg.model
 
 import com.startup.common.util.DateUtil
 import com.startup.domain.model.egg.MyEgg
+import com.startup.home.character.model.WalkieCharacter
 
 data class MyEggModel(
-    val characterId: Long,
     val eggId: Long,
     val needStep: Int,
     val nowStep: Int,
@@ -12,18 +12,26 @@ data class MyEggModel(
     val eggKind: EggKind,
     val obtainedDate: String,
     val obtainedPosition: String,
+    val walkieCharacter: WalkieCharacter
 ) {
     companion object {
         fun List<MyEgg>.toUiModel(): List<MyEggModel> = map { it.toUiModel() }
         fun MyEgg.toUiModel(): MyEggModel = MyEggModel(
-            characterId = characterId,
             eggId = eggId,
             needStep = needStep,
             nowStep = nowStep,
             play = play,
             eggKind = EggKind.rankOfEggKind(rank),
             obtainedDate = DateUtil.convertDateFormat(obtainedDate),
-            obtainedPosition = obtainedPosition
+            obtainedPosition = obtainedPosition,
+            walkieCharacter = WalkieCharacter.getTypeAndClassOfWalkieCharacter(
+                characterId = characterId,
+                rank = rank,
+                clazz = characterClass,
+                type = type,
+                picked = false,
+                count = 0
+            )
         )
 
         fun List<MyEggModel>.currentPlayEgg(): MyEggModel? = find { it.play }

@@ -9,4 +9,6 @@ data class MyEgg(
     val rank: Int,
     val obtainedDate: String,
     val obtainedPosition: String,
+    val type: Int,
+    val characterClass: Int,
 )
