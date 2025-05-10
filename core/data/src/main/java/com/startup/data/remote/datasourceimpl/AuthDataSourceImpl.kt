@@ -59,7 +59,7 @@ internal class AuthDataSourceImpl @Inject constructor(
         }
     }
 
-    override fun unLink(): Flow<Unit> = flow {
+    override fun unLink(): Flow<Int> = flow {
         handleExceptionIfNeed {
             emitRemote(memberService.withdrawalService())
             kakaoLogoutHelper.unLink()

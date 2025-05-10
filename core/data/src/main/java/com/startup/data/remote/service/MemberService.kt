@@ -25,7 +25,7 @@ internal interface MemberService {
 
     /** 회원탈퇴 하기 */
     @DELETE("api/v1/members")
-    suspend fun withdrawalService(): BaseResponse<Unit>
+    suspend fun withdrawalService(): BaseResponse<Int>
 
     /** 로그 아웃 하기 */
     @POST("api/v1/auth/logout")

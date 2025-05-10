@@ -10,7 +10,7 @@ internal class AuthRepositoryImpl @Inject constructor(private val authDataSource
     override fun login(kakaoToken: String): Flow<Unit> =
         authDataSource.login(kakaoToken)
 
-    override fun unLink(): Flow<Unit> = authDataSource.unLink()
+    override fun unLink(): Flow<Int> = authDataSource.unLink()
 
     override fun logOut(): Flow<Unit> = authDataSource.logOut()
     override fun localLogout(): Flow<Unit> = authDataSource.localLogout()
