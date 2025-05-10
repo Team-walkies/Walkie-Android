@@ -47,8 +47,7 @@ class HatchingCharacterViewModel @Inject constructor(
                 .invoke(0)
                 .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
                 .onEach { Printer.d("LMH", "Jelly $it") }
-                .catch { }
-
+                .catch { emit(BaseUiState(isShowShimmer = false, data = emptyList())) }
         }.stateInViewModel(BaseUiState(isShowShimmer = true, data = emptyList())),
         dinoCharacterState = merge(
             flow<Unit> { emit(Unit) },
@@ -58,7 +57,7 @@ class HatchingCharacterViewModel @Inject constructor(
                 .invoke(1)
                 .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
                 .onEach { Printer.d("LMH", "Dino $it") }
-                .catch { }
+                .catch { emit(BaseUiState(isShowShimmer = false, data = emptyList())) }
         }.stateInViewModel(BaseUiState(isShowShimmer = true, data = emptyList())),
         characterDetail = MutableStateFlow(null),
     )
