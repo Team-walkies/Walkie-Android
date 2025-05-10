@@ -1,6 +1,7 @@
 package com.startup.data.remote.datasourceimpl
 
 import androidx.datastore.preferences.core.Preferences
+import com.startup.common.util.Printer
 import com.startup.common.util.ResponseErrorException
 import com.startup.common.util.UserAuthNotFoundException
 import com.startup.data.datasource.AuthDataSource
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -52,7 +54,8 @@ internal class AuthDataSourceImpl @Inject constructor(
         tokenDataStoreProvider.putValue(accessTokenKey, it.accessToken)
         tokenDataStoreProvider.putValue(refreshTokenKey, it.refreshToken!!)
     }.catch {
-        if (it is UserAuthNotFoundException) {
+        Printer.e("LMH", " EXCEPTION $it")
+        if (it is UserAuthNotFoundException || it is ResponseErrorException || it is HttpException) {
             throw it
         } else {
             throw ResponseErrorException("로그인 오류")

@@ -71,16 +71,16 @@ fun ErrorModal(
                             WalkieTheme.colors.red100,
                             RoundedCornerShape(12.dp)
                         )
+                        .noRippleClickable {
+                            onClickPositive.invoke()
+                        }
                         .fillMaxWidth()
                         .padding(vertical = 13.dp)
                 ) {
                     Text(
                         modifier = Modifier
                             .wrapContentSize()
-                            .align(Alignment.Center)
-                            .noRippleClickable {
-                                onClickPositive.invoke()
-                            },
+                            .align(Alignment.Center),
                         text = positiveText,
                         style = WalkieTheme.typography.body1,
                         textAlign = TextAlign.Center,

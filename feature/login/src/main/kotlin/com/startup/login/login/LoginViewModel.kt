@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,14 +56,11 @@ class LoginViewModel @Inject constructor(
                         _state.placeHolder.update { nickName }
                     }
                     notifyEvent(LoginScreenNavigationEvent.MoveToNickNameSettingScreen)
-                    Printer.e("LMH", "EXCEPTION $exception")
+                } else if ((exception is ResponseErrorException && exception.code == 401) || (exception is HttpException && exception.code() == 401)) {
+                    _errorDialog.update { UserAccountWithdrawnException() }
                 }
             }.onEach {
                 notifyEvent(LoginNavigationEvent.MoveToMainActivity)
-            }.catch {
-                if (it is ResponseErrorException && it.code == 401) {
-                    _errorDialog.update { UserAccountWithdrawnException() }
-                }
             }
             .launchIn(viewModelScope)
     }
