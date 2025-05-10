@@ -48,7 +48,7 @@ class SpotActivity : BaseActivity<SpotUiEvent, SpotNavigationEvent>() {
         navigationEventFlow.onEach {
             when (it) {
                 SpotNavigationEvent.FinishSpotActivity -> {
-                    setResult(RESULT_CANCELED)
+                    setResult(RESULT_OK)
                     finish()
                 }
 
