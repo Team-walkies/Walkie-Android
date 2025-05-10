@@ -26,34 +26,34 @@ class StepDataStoreImpl @Inject constructor(
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "walkie_settings")
 
     private companion object {
+        private val TODAY_STEPS = intPreferencesKey("today_steps")
         private val CURRENT_STEPS = intPreferencesKey("current_steps")
         private val TARGET_STEP = intPreferencesKey("target_step")
         private val TARGET_REACHED = booleanPreferencesKey("target_reached")
         private val LAST_RESET_DATE = stringPreferencesKey("last_reset_date")
-        private val YESTERDAY_STEPS = intPreferencesKey("yesterday_steps")
     }
 
-    override suspend fun getCurrentSteps(): Int {
+    override suspend fun getEggCurrentSteps(): Int {
         return context.dataStore.data.first()[CURRENT_STEPS] ?: 0
     }
 
-    override suspend fun saveCurrentSteps(steps: Int) {
+    override suspend fun saveEggCurrentSteps(steps: Int) {
         context.dataStore.edit { preferences ->
             preferences[CURRENT_STEPS] = steps
         }
     }
 
-    override suspend fun getTargetStep(): Int {
-        return context.dataStore.data.first()[TARGET_STEP] ?: 10000
+    override suspend fun getHatchingTargetStep(): Int {
+        return context.dataStore.data.first()[TARGET_STEP] ?: 0
     }
 
-    override suspend fun setTargetStep(target: Int) {
+    override suspend fun setHatchingTargetStep(target: Int) {
         context.dataStore.edit { preferences ->
             preferences[TARGET_STEP] = target
         }
     }
 
-    override suspend fun resetSteps() {
+    override suspend fun resetHatchingSteps() {
         context.dataStore.edit { preferences ->
             preferences[CURRENT_STEPS] = 0
         }
@@ -69,10 +69,6 @@ class StepDataStoreImpl @Inject constructor(
         }
     }
 
-    override fun observeSteps(): Flow<Int> = context.dataStore.data
-        .map { preferences ->
-            preferences[CURRENT_STEPS] ?: 0
-        }
 
     override suspend fun isLastResetToday(): Boolean {
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
@@ -87,13 +83,27 @@ class StepDataStoreImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveYesterdaySteps(steps: Int) {
+    override suspend fun saveTodaySteps(steps: Int) {
         context.dataStore.edit { preferences ->
-            preferences[YESTERDAY_STEPS] = steps
+            preferences[TODAY_STEPS] = steps
         }
     }
 
-    override suspend fun getYesterdaySteps(): Int {
-        return context.dataStore.data.first()[YESTERDAY_STEPS] ?: 0
+    override suspend fun getTodaySteps(): Int {
+        return context.dataStore.data.first()[TODAY_STEPS] ?: 0
     }
+
+    override suspend fun resetTodaySteps() {
+        context.dataStore.edit { preferences ->
+            preferences[TODAY_STEPS] = 0
+        }
+    }
+
+    /**
+     * first : 알 걸음수 , second : 오늘의 걸음수
+     */
+    override fun observeSteps(): Flow<Pair<Int, Int>> = context.dataStore.data
+        .map { preferences ->
+            Pair(preferences[CURRENT_STEPS] ?: 0, preferences[TODAY_STEPS] ?: 0)
+        }
 }

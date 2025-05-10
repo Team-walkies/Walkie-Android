@@ -1,5 +1,7 @@
 package com.startup.home
 
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -50,6 +52,7 @@ import com.startup.home.permission.PermissionManager
 import com.startup.home.permission.PermissionUiEvent
 import com.startup.navigation.LoginModuleNavigator
 import com.startup.navigation.SpotModuleNavigator
+import com.startup.stepcounter.broadcastReciver.DailyResetReceiver
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,10 +61,14 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 
 @AndroidEntryPoint
-class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
+class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
+    DailyResetReceiver.OnDateChangedListener {
     override val viewModel: HomeViewModel by viewModels<HomeViewModel>()
 
     private lateinit var permissionManager: PermissionManager
+
+    // 날짜 변경 수신기
+    private val dailyResetReceiver = DailyResetReceiver()
 
     // KSP는 필드 주입이 안 됨
     private val loginModuleNavigator: LoginModuleNavigator by lazy {
@@ -100,11 +107,26 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
             viewModel = viewModel
         )
         permissionManager.checkPermissions()
+        dailyResetReceiver.setOnDateChangedListener(this)
+        registerDailyResetReceiver()
+
         setContent {
             WalkieTheme {
                 MainScreenWithPermissionBottomSheet()
             }
         }
+    }
+
+
+    private fun registerDailyResetReceiver() {
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_DATE_CHANGED)
+        }
+        registerReceiver(dailyResetReceiver, filter)
+    }
+
+    override fun onDateChanged() {
+        viewModel.resetTodayStepCount()
     }
 
     fun startStepCounterService() {
@@ -292,7 +314,10 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
                                     }
 
                                     is MainScreenNavigationEvent.MoveToSpotActivity -> {
-                                        spotModuleNavigator.navigateSpotView(activity = this@HomeActivity, launcher = it.launcher)
+                                        spotModuleNavigator.navigateSpotView(
+                                            activity = this@HomeActivity,
+                                            launcher = it.launcher
+                                        )
                                     }
 
                                     else -> {}
@@ -391,6 +416,12 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
     override fun onResume() {
         super.onResume()
         permissionManager.checkOnResume()
+    }
+
+    override fun onDestroy() {
+        unregisterReceiver(dailyResetReceiver)
+        dailyResetReceiver.removeOnDateChangedListener()
+        super.onDestroy()
     }
 
     override fun navigateToLogin() {
