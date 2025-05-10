@@ -6,7 +6,7 @@
 
     </style>
 
-    <style name="Theme.Walkie.Splash" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.Walkie.Splash" parent="android:Theme.Material.Light.NoActionBar">
         <item name="postSplashScreenTheme">@style/Theme.Walkie</item>
         <item name="windowSplashScreenBackground">@color/white</item>
     </style>
