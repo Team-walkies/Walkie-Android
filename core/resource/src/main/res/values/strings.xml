@@ -49,7 +49,7 @@
 
     <string name="onboarding_nick_name_default_placeholder">닉네임</string>
     <string name="onboarding_nick_name_title">워키에서 사용할\n닉네임을 지어주세요</string>
-    <string name="onboarding_nick_name_placeholder">워키에서 사용할\n닉네임을 지어주세요</string>
+    <string name="onboarding_nick_name_placeholder">닉네임</string>
     <string name="onboarding_nick_name_apply">완료</string>
 
     <string name="warning_nick_name_has_special_character">특수문자 및 기호는 사용할 수 없습니다</string>

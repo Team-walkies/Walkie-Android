@@ -40,8 +40,8 @@ class LoginViewModel @Inject constructor(
             .catch { exception ->
                 if (exception is UserAuthNotFoundException) {
                     _state.providerToken.update { exception.providerToken }
-                    exception.nickName?.let {
-                        _state.placeHolder.update { it }
+                    exception.nickName?.let { nickName ->
+                        _state.placeHolder.update { nickName }
                     }
                     notifyEvent(LoginScreenNavigationEvent.MoveToNickNameSettingScreen)
                     Printer.e("LMH", "EXCEPTION $exception")
