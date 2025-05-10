@@ -72,20 +72,20 @@ enum class EggKind(
             Rare -> {
                 EggOfCharacterGainProbabilityModel(
                     eggKind = this,
-                    normalProbability = 0.50F,
-                    rareProbability = 0.35F,
-                    epicProbability = 0.10F,
-                    legendProbability = 0.05F
+                    normalProbability = 0.60F,
+                    rareProbability = 0.25F,
+                    epicProbability = 0.12F,
+                    legendProbability = 0.03F
                 )
             }
 
             Epic -> {
                 EggOfCharacterGainProbabilityModel(
                     eggKind = this,
-                    normalProbability = 0.20F,
+                    normalProbability = 0.35F,
                     rareProbability = 0.40F,
-                    epicProbability = 0.30F,
-                    legendProbability = 0.10F
+                    epicProbability = 0.20F,
+                    legendProbability = 0.05F
                 )
             }
 
@@ -93,9 +93,9 @@ enum class EggKind(
                 EggOfCharacterGainProbabilityModel(
                     eggKind = this,
                     normalProbability = 0.05F,
-                    rareProbability = 0.25F,
-                    epicProbability = 0.40F,
-                    legendProbability = 0.30F
+                    rareProbability = 0.50F,
+                    epicProbability = 0.30F,
+                    legendProbability = 0.15F
                 )
             }
         }
