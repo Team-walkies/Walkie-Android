@@ -5,7 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel
 import com.startup.common.util.Printer
 import com.startup.common.util.ResourceProvider
+import com.startup.common.util.ResponseErrorException
+import com.startup.common.util.UserAccountWithdrawnException
 import com.startup.common.util.UserAuthNotFoundException
+import com.startup.common.util.WalkieException
 import com.startup.domain.usecase.JoinWalkie
 import com.startup.domain.usecase.LoginWalkie
 import com.startup.login.R
@@ -15,6 +18,7 @@ import com.startup.login.login.model.NickNameViewState
 import com.startup.login.login.model.NickNameViewStateImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -30,6 +34,13 @@ class LoginViewModel @Inject constructor(
     private val _state =
         NickNameViewStateImpl(placeHolder = MutableStateFlow(resourceProvider.getString(R.string.onboarding_nick_name_placeholder)))
     override val state: NickNameViewState = _state
+
+    private val _errorDialog: MutableStateFlow<WalkieException?> = MutableStateFlow(null)
+    val errorDialog: StateFlow<WalkieException?> = _errorDialog
+
+    fun onClearErrorDialog() {
+        _errorDialog.update { null }
+    }
 
     fun onNickNameChanged(textFieldValue: TextFieldValue) {
         _state.nickName.update { textFieldValue }
@@ -48,7 +59,12 @@ class LoginViewModel @Inject constructor(
                 }
             }.onEach {
                 notifyEvent(LoginNavigationEvent.MoveToMainActivity)
-            }.launchIn(viewModelScope)
+            }.catch {
+                if (it is ResponseErrorException && it.code == 401) {
+                    _errorDialog.update { UserAccountWithdrawnException() }
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     fun onJoinWalkie(nickName: String) {
