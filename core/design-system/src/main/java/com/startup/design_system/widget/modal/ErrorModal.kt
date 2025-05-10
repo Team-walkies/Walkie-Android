@@ -15,11 +15,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.startup.design_system.R
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.ui.noRippleClickable
 
@@ -46,17 +48,20 @@ fun ErrorModal(
                 modifier = Modifier
                     .padding(top = 24.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
                     .background(WalkieTheme.colors.white),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(
-                    title,
-                    style = WalkieTheme.typography.head4.copy(color = WalkieTheme.colors.gray700)
-                )
+                if (title.isNotEmpty()) {
+                    Text(
+                        title,
+                        style = WalkieTheme.typography.head4.copy(color = WalkieTheme.colors.gray700)
+                    )
+                }
                 if (subTitle.isNotEmpty()) {
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        subTitle,
-                        style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
+                        text = subTitle,
+                        style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500),
+                        textAlign = TextAlign.Center
                     )
                 }
                 Spacer(Modifier.height(20.dp))
@@ -92,8 +97,8 @@ fun ErrorModal(
 fun PreviewErrorModal() {
     WalkieTheme {
         ErrorModal(
-            title = "제목",
-            subTitle = "내용입니다",
+            title = "",
+            subTitle = stringResource(R.string.dialog_user_account_withdrawn_exception),
             positiveText = "확인",
             onDismiss = {},
             onClickPositive = {}

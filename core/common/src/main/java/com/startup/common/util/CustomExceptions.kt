@@ -39,6 +39,11 @@ class KakaoAuthFailException(
     val code: Int? = null
 ) : Exception(message), WalkieException
 
+class UserAccountWithdrawnException(
+    override val message: String? = null,
+    val code: Int? = null
+) : Exception(message), WalkieException
+
 class SessionExpireException(
     override val message: String? = null,
     val code: Int? = null

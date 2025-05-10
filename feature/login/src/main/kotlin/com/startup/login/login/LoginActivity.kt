@@ -14,9 +14,12 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavType
@@ -28,6 +31,8 @@ import com.startup.common.base.BaseActivity
 import com.startup.common.base.BaseEvent
 import com.startup.common.util.Printer
 import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.widget.modal.ErrorModal
+import com.startup.login.R
 import com.startup.login.login.model.GetCharacterNavigationEvent
 import com.startup.login.login.model.LoginNavigationEvent
 import com.startup.login.login.model.LoginScreenNavigationEvent
@@ -62,6 +67,19 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
         setContent {
             WalkieTheme {
                 MainContent(viewModel.event)
+                val errorDialog by viewModel.errorDialog.collectAsStateWithLifecycle()
+                if (errorDialog != null) {
+                    ErrorModal(
+                        subTitle = stringResource(R.string.dialog_user_account_withdrawn_exception),
+                        positiveText = stringResource(R.string.dialog_positive),
+                        onDismiss = {
+                            viewModel.onClearErrorDialog()
+                        },
+                        onClickPositive = {
+                            viewModel.onClearErrorDialog()
+                        }
+                    )
+                }
             }
         }
         handleNavigationEvent(viewModel.event.filterIsInstance())
