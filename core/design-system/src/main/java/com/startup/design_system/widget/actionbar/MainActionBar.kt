@@ -22,7 +22,7 @@ import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.ui.noRippleClickable
 
 @Composable
-fun MainActionBar(isExistAlarm: Boolean, onClickAlarm: () -> Unit) {
+fun MainActionBar(isExistAlarm: Boolean, isAlarmEnabled: Boolean = false, onClickAlarm: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -34,14 +34,16 @@ fun MainActionBar(isExistAlarm: Boolean, onClickAlarm: () -> Unit) {
             modifier = Modifier
                 .size(24.dp)
         ) {
-            Icon(
-                modifier = Modifier
-                    .size(24.dp)
-                    .noRippleClickable { onClickAlarm.invoke() },
-                painter = painterResource(R.drawable.ic_alert),
-                tint = WalkieTheme.colors.gray400,
-                contentDescription = null
-            )
+            if (isAlarmEnabled) {
+                Icon(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .noRippleClickable { onClickAlarm.invoke() },
+                    painter = painterResource(R.drawable.ic_alert),
+                    tint = WalkieTheme.colors.gray400,
+                    contentDescription = null
+                )
+            }
             if (isExistAlarm) {
                 Box(
                     Modifier
@@ -67,8 +69,8 @@ fun MainActionBar(isExistAlarm: Boolean, onClickAlarm: () -> Unit) {
 fun PreviewMainActionBar() {
     WalkieTheme {
         Column(verticalArrangement = Arrangement.spacedBy(30.dp)) {
-            MainActionBar(isExistAlarm = true) {}
-            MainActionBar(isExistAlarm = false) {}
+            MainActionBar(isExistAlarm = true, isAlarmEnabled = true) {}
+            MainActionBar(isExistAlarm = false, isAlarmEnabled = true) {}
         }
     }
 }
