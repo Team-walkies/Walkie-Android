@@ -709,7 +709,9 @@ private fun StepInformation(step: Int) {
                 .padding(start = 20.dp)
         ) {
             Text(
-                text = stringResource(R.string.home_kilometer, step * 0.02),
+                text = stringResource(
+                    R.string.home_kilometer, kotlin.math.round((0.0006 * step) * 100) / 100.0
+                ),
                 style = WalkieTheme.typography.head2,
                 color = Color.White
             )
