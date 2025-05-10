@@ -64,7 +64,7 @@ internal fun SpotScreen(
 
                     is SpotEvent.RequestCurrentSteps -> {
                         val steps = event.steps.toString()
-                        sendToWebView(webView, method = "getStepsFromMobile", message = steps)
+                        sendToWebView(webView, method = "onReceiveStepsFromMobile", message = steps)
                     }
                 }
             }
@@ -131,7 +131,7 @@ internal fun SpotScreen(
 }
 
 internal fun sendToWebView(webView: WebView, method: String, message: String) {
-    webView.evaluateJavascript("javascript:$method('$message')", null)
+    webView.evaluateJavascript("javascript:$method($message)", null)
 }
 
 internal class SpotBridgeJsInterface(
@@ -174,7 +174,7 @@ internal class SpotBridgeJsInterface(
     }
 
     @JavascriptInterface
-    fun requestCurrentSteps() {
+    fun getStepsFromMobile() {
         bridgeCallBack.invoke(SpotUiEvent.RequestCurrentSteps)
     }
 }

@@ -13,7 +13,7 @@ class SpotModuleNavigatorImpl @Inject constructor() : SpotModuleNavigator {
         launcher: ActivityResultLauncher<Intent>,
         activity: Activity
     ) {
-        activity.startActivity(Intent(activity, SpotActivity::class.java))
+        launcher.launch(Intent(activity, SpotActivity::class.java))
     }
 
     override fun navigateSpotModifyView(
