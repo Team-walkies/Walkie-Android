@@ -331,7 +331,7 @@ private fun ReviewItem(reviewModel: ReviewModel, onClickOption: (ReviewModel) ->
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = reviewModel.spotId.toString(),
+                    text = reviewModel.spotName,
                     style = WalkieTheme.typography.head6.copy(color = WalkieTheme.colors.blue400)
                 )
             }
@@ -543,6 +543,7 @@ private fun PreviewReviewItem() {
                 step = "2,000",
                 spotId = 1,
                 spotType = SpotKeyword.FOOD,
+                spotName = "",
                 distance = 23.toDouble()
             ),
             {}

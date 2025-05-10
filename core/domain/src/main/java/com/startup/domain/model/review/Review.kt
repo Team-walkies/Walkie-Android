@@ -1,4 +1,5 @@
 package com.startup.domain.model.review
+
 data class Review(
     val reviewId: Int,
     val spotId: Int,
@@ -12,11 +13,12 @@ data class Review(
     val endTime: String,
     /** 같이 걸은 캐릭터 Id */
     val characterId: Long,
-    val characterType : Int,
-    val characterClass : Int,
+    val characterType: Int,
+    val characterClass: Int,
     /** 스팟 타입 아이콘 **/
-    val spotType:String,
-    val rank : Int,
+    val spotType: String,
+    val spotName: String,
+    val rank: Int,
     /** 리뷰 사진 url */
     val pic: String,
     /** 리뷰 작성 여부 */

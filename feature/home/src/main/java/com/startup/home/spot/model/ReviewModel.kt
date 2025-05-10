@@ -23,6 +23,7 @@ data class ReviewModel(
     val review: String,
     val walkieCharacter: WalkieCharacter,
     val spotType: SpotKeyword,
+    val spotName: String,
     /** 평점 */
     val rating: Int,
 ) {
@@ -51,6 +52,7 @@ data class ReviewModel(
             } catch (e: IllegalArgumentException) {
                 SpotKeyword.NATURE
             },
+            spotName = spotName,
             rating = rating
         )
     }

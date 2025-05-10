@@ -33,6 +33,8 @@ data class ReviewDto(
     val rank: Int?,
     @SerializedName("keyword")
     val spotType: String?,
+    @SerializedName("spotName")
+    val spotName: String?,
     @SerializedName("pic")
     val pic: String?,
     @SerializedName("reviewCd")
@@ -55,6 +57,7 @@ data class ReviewDto(
         characterClass = characterClass.orZero(),
         characterType = characterType.orZero(),
         spotType = spotType.orEmpty(),
+        spotName = spotName.orEmpty(),
         rank = rank.orZero(),
         pic = pic.orEmpty(),
         reviewCd = reviewCd.orFalse(),
