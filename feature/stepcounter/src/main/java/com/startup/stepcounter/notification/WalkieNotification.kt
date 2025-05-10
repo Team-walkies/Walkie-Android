@@ -62,7 +62,7 @@ fun buildWalkieNotification(context: Context, step: Int, target: Int = 10000): N
 
 
     return NotificationCompat.Builder(context, WALKIE_STEP_NOTIFICATION_CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_walkie_artwork)
+        .setSmallIcon(R.drawable.ic_walkie_notification)
         .setCustomContentView(customLayout)
         .setContentIntent(pendingIntent)
         .setOngoing(true)
@@ -122,7 +122,7 @@ fun updateStepNotification(context: Context, steps: Int, target: Int) {
  */
 fun buildArriveNotification(context: Context): Notification {
     return NotificationCompat.Builder(context, NotificationCode.ARRIVE_NOTIFICATION_CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_walkie_artwork)
+        .setSmallIcon(R.drawable.ic_walkie_notification)
         .setContentTitle(context.getString(R.string.notification_arrive_title))
         .setContentText(context.getString(R.string.notification_arrive_message))
         .setAutoCancel(true)
@@ -170,7 +170,7 @@ fun sendArriveNotification(context: Context) {
 fun buildHatchingNotification(context: Context): Notification {
 
     return NotificationCompat.Builder(context, NotificationCode.HATCHING_NOTIFICATION_CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_walkie_artwork)
+        .setSmallIcon(R.drawable.ic_walkie_notification)
         .setContentTitle(context.getString(R.string.notification_hatching_title))
         .setContentText(context.getString(R.string.notification_hatching_message))
         .setAutoCancel(true)
@@ -233,7 +233,7 @@ private fun createPermissionNotificationChannel(context: Context) {
 private fun buildPermissionInductionNotification(context: Context): Notification {
     createPermissionNotificationChannel(context)
     return NotificationCompat.Builder(context, ACTIVITY_PERMISSION_NOTIFICATION_CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_walkie_artwork)
+        .setSmallIcon(R.drawable.ic_walkie_notification)
         .setContentTitle(context.getString(R.string.notification_permission_title))
         .setContentText(context.getString(R.string.notification_permission_message))
         .setContentIntent(createPendingIntent(context))
