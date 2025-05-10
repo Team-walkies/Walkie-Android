@@ -13,7 +13,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.IBinder
 import androidx.core.app.ServiceCompat
-import com.startup.common.event.EggHatchingEvent
+import com.startup.common.event.EventContainer
 import com.startup.common.util.OsVersions
 import com.startup.common.util.Printer
 import com.startup.common.util.UsePermissionHelper.isGrantedPermissions
@@ -165,7 +165,7 @@ internal class WalkieStepForegroundService @Inject constructor() : Service(), Se
 
             if (targetSteps in 1..totalSteps && !isAlreadyReached) {
                 stepDataStore.setTargetReached(true)
-                EggHatchingEvent.triggerHatchingAnimation()
+                EventContainer.triggerHatchingAnimation()
                 sendHatchingNotification(context)
             }
 

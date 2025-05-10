@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -117,18 +119,20 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
     @Composable
     fun MainContent(eventFlow: Flow<BaseEvent>) {
         val navController = rememberNavController()
-
         // 이벤트 수집
+        val lifecycleOwner = LocalLifecycleOwner.current
         LaunchedEffect(Unit) {
-            eventFlow.collect { event ->
-                Printer.e("LMH", "GET NAVIGATION EVENT $event")
-                when (event) {
-                    is LoginScreenNavigationEvent.MoveToNickNameSettingScreen -> {
-                        navController.navigate(LoginScreenNav.NickNameSetting.route)
-                    }
+            lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                eventFlow.collect { event ->
+                    Printer.e("LMH", "GET NAVIGATION EVENT $event")
+                    when (event) {
+                        is LoginScreenNavigationEvent.MoveToNickNameSettingScreen -> {
+                            navController.navigate(LoginScreenNav.NickNameSetting.route)
+                        }
 
-                    is LoginScreenNavigationEvent.MoveToGetCharacterScreen -> {
-                        navController.navigate(LoginScreenNav.GetCharacter.route + "/${event.nickName}")
+                        is LoginScreenNavigationEvent.MoveToGetCharacterScreen -> {
+                            navController.navigate(LoginScreenNav.GetCharacter.route + "/${event.nickName}")
+                        }
                     }
                 }
             }

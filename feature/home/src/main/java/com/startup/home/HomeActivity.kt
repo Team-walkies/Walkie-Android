@@ -21,7 +21,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -115,9 +118,12 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>() {
     @Composable
     fun MainScreenWithPermissionBottomSheet() {
 
+        val lifecycleOwner = LocalLifecycleOwner.current
         LaunchedEffect(Unit) {
-            viewModel.uiEventFlow.collect { event ->
-                handleUiEvent(event)
+            lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEventFlow.collect { event ->
+                    handleUiEvent(event)
+                }
             }
         }
 

@@ -2,6 +2,7 @@ package com.startup.home.character
 
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel
+import com.startup.common.event.EventContainer
 import com.startup.common.util.BaseUiState
 import com.startup.common.util.Printer
 import com.startup.domain.usecase.GetCurrentHatchedCharacter
@@ -71,7 +72,8 @@ class HatchingCharacterViewModel @Inject constructor(
             .invoke(character.characterId)
             .map { it.toUiModel() }
             .onEach { item ->
-                _state.characterDetail.update { item } }
+                _state.characterDetail.update { item }
+            }
             .catch { }
             .launchIn(viewModelScope)
     }
@@ -80,7 +82,10 @@ class HatchingCharacterViewModel @Inject constructor(
         clearViewingPartner()
         updateWalkingCharacter
             .invoke(characterDetail.character.characterId)
-            .onEach { notifyViewModelEvent(HatchingCharacterViewModelEvent.FetchCharacterList) }
+            .onEach {
+                EventContainer.onRefreshEvent()
+                notifyViewModelEvent(HatchingCharacterViewModelEvent.FetchCharacterList)
+            }
             .catch { }
             .launchIn(viewModelScope)
     }

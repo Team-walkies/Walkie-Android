@@ -20,6 +20,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -57,19 +60,22 @@ fun MyPageNavigationGraph(
     var showErrorToast by remember { mutableStateOf(false) }
     var errorMessageResId by remember { mutableIntStateOf(R.string.toast_common_error) }
 
+    val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(Unit) {
-        myPageViewModel.event.collect {
-            when (it) {
-                MainScreenNavigationEvent.MoveToLoginActivity -> {
-                    onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToLoginActivity)
-                }
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            myPageViewModel.event.collect {
+                when (it) {
+                    MainScreenNavigationEvent.MoveToLoginActivity -> {
+                        onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToLoginActivity)
+                    }
 
-                is ErrorToastEvent.ShowToast -> {
-                    errorMessageResId = it.messageResId
-                    showErrorToast = true
-                }
+                    is ErrorToastEvent.ShowToast -> {
+                        errorMessageResId = it.messageResId
+                        showErrorToast = true
+                    }
 
-                else -> {}
+                    else -> {}
+                }
             }
         }
     }
