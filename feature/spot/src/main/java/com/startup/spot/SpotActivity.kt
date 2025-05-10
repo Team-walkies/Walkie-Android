@@ -3,6 +3,7 @@ package com.startup.spot
 import android.os.Bundle
 import android.webkit.CookieManager
 import android.webkit.WebView
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -34,6 +35,7 @@ class SpotActivity : BaseActivity<SpotUiEvent, SpotNavigationEvent>() {
         setContent {
             WebView.setWebContentsDebuggingEnabled(true)
             WalkieTheme {
+                BackHandler {}
                 CookieManager.getInstance().removeAllCookies(null)
                 SpotScreen(
                     event = viewModel.event.filterIsInstance<SpotEvent>(),

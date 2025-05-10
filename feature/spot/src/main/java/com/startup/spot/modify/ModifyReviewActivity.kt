@@ -3,6 +3,7 @@ package com.startup.spot.modify
 import android.os.Bundle
 import android.webkit.CookieManager
 import android.webkit.WebView
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -37,6 +38,7 @@ class ModifyReviewActivity : BaseActivity<ModifyReviewUiEvent, ModifyReviewNavig
         setContent {
             WebView.setWebContentsDebuggingEnabled(true)
             WalkieTheme {
+                BackHandler {}
                 CookieManager.getInstance().removeAllCookies(null)
                 ModifySpotScreen(
                     event = viewModel.event.filterIsInstance<ModifyReviewEvent>(),
