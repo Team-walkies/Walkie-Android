@@ -21,11 +21,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.startup.common.event.EventContainer
 import com.startup.design_system.widget.toast.ShowToast
 import com.startup.home.main.HomeScreen
 import com.startup.home.main.HomeViewModel
@@ -53,11 +57,11 @@ fun MainBottomNavigationScreen(
     var showErrorToast by remember { mutableStateOf(false) }
     var errorMessageResId by remember { mutableIntStateOf(R.string.toast_common_error) }
     val canNavigateBack = navHostController.previousBackStackEntry != null
-
+    val lifecycleOwner = LocalLifecycleOwner.current
     val spotMoveActivityLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
-                homeViewModel.notifyViewModelEvent(HomeScreenViewModelEvent.RefreshReviewList)
+                homeViewModel.notifyViewModelEvent(HomeScreenViewModelEvent.RefreshHome)
             }
         }
     val isHomeRefresh by navController.currentBackStackEntryFlow.map { !canNavigateBack && it.destination.route == MainScreenNav.BottomNavigation.route }
@@ -72,7 +76,7 @@ fun MainBottomNavigationScreen(
     }
     LaunchedEffect(isHomeRefresh) {
         if (isHomeRefresh) {
-            homeViewModel.notifyViewModelEvent(HomeScreenViewModelEvent.RefreshReviewList)
+            homeViewModel.notifyViewModelEvent(HomeScreenViewModelEvent.RefreshHome)
         }
     }
     // 2초 후 플래그 리셋
@@ -84,18 +88,28 @@ fun MainBottomNavigationScreen(
     }
 
     LaunchedEffect(Unit) {
-        myPageViewModel.event.collect { event ->
-            when (event) {
-                MainScreenNavigationEvent.MoveToLoginActivity -> {
-                    onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToLoginActivity)
-                }
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            EventContainer.homeRefreshEventFlow.collect {
+                homeViewModel.notifyViewModelEvent(HomeScreenViewModelEvent.RefreshHome)
+            }
+        }
+    }
 
-                is ErrorToastEvent.ShowToast -> {
-                    errorMessageResId = event.messageResId
-                    showErrorToast = true
-                }
+    LaunchedEffect(Unit) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            myPageViewModel.event.collect { event ->
+                when (event) {
+                    MainScreenNavigationEvent.MoveToLoginActivity -> {
+                        onNavigationEvent.invoke(MainScreenNavigationEvent.MoveToLoginActivity)
+                    }
 
-                else -> {}
+                    is ErrorToastEvent.ShowToast -> {
+                        errorMessageResId = event.messageResId
+                        showErrorToast = true
+                    }
+
+                    else -> {}
+                }
             }
         }
     }

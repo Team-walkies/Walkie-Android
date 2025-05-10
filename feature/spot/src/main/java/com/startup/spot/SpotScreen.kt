@@ -18,6 +18,9 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import com.startup.common.util.Printer
 import com.startup.common.util.UsePermissionHelper
 import com.startup.common.util.rememberPermissionRequestDelegator
@@ -39,27 +42,30 @@ internal fun SpotScreen(
         }
     }
     val haptic = LocalHapticFeedback.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     webView.clearHistory()
     webView.clearCache(true)
     LaunchedEffect(Unit) {
         uiEvent.invoke(SpotUiEvent.LoadWebViewParams)
-        event.collect { event ->
-            when (event) {
-                is SpotEvent.LoadWebView -> {
-                    val data = event.spotWebPostRequestData
-                    val url =
-                        BuildConfig.BASE_SPOT_URL + "/?accessToken=${data.accessToken}&memberId=${data.userId}&characterRank=${data.characterRank}&characterType=${data.characterType}&characterClass=${data.characterClass}"
-                    Printer.e("LMH", "URL $url")
-                    webView.loadUrl(url)
-                }
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            event.collect { event ->
+                when (event) {
+                    is SpotEvent.LoadWebView -> {
+                        val data = event.spotWebPostRequestData
+                        val url =
+                            BuildConfig.BASE_SPOT_URL + "/?accessToken=${data.accessToken}&memberId=${data.userId}&characterRank=${data.characterRank}&characterType=${data.characterType}&characterClass=${data.characterClass}"
+                        Printer.e("LMH", "URL $url")
+                        webView.loadUrl(url)
+                    }
 
-                SpotEvent.Haptic -> {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                }
+                    SpotEvent.Haptic -> {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
 
-                is SpotEvent.RequestCurrentSteps -> {
-                    val steps = event.steps.toString()
-                    sendToWebView(webView, method = "getStepsFromMobile", message = steps)
+                    is SpotEvent.RequestCurrentSteps -> {
+                        val steps = event.steps.toString()
+                        sendToWebView(webView, method = "getStepsFromMobile", message = steps)
+                    }
                 }
             }
         }

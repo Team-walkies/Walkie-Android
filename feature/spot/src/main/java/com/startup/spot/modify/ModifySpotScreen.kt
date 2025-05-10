@@ -14,6 +14,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import com.startup.common.util.Printer
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.spot.BuildConfig
@@ -37,16 +40,20 @@ internal fun ModifySpotScreen(
     }
     webView.clearHistory()
     webView.clearCache(true)
+
+    val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(Unit) {
         uiEvent.invoke(ModifyReviewUiEvent.LoadWebViewParams)
-        event.collect { event ->
-            when (event) {
-                is ModifyReviewEvent.LoadWebView -> {
-                    val data = event.modifyReviewWebPostRequest
-                    val url =
-                        BuildConfig.BASE_SPOT_MODIFY_URL + "?reviewId=${data.reviewId}&spotId=${data.spotId}&token=${data.accessToken}"
-                    Printer.e("LMH", "URL $url")
-                    webView.loadUrl(url)
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            event.collect { event ->
+                when (event) {
+                    is ModifyReviewEvent.LoadWebView -> {
+                        val data = event.modifyReviewWebPostRequest
+                        val url =
+                            BuildConfig.BASE_SPOT_MODIFY_URL + "?reviewId=${data.reviewId}&spotId=${data.spotId}&token=${data.accessToken}"
+                        Printer.e("LMH", "URL $url")
+                        webView.loadUrl(url)
+                    }
                 }
             }
         }

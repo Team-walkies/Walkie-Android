@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseState
 import com.startup.common.base.BaseViewModel
 import com.startup.common.base.UiEvent
-import com.startup.common.event.EggHatchingEvent
+import com.startup.common.event.EventContainer
 import com.startup.common.util.BaseUiState
 import com.startup.common.util.Printer
 import com.startup.domain.model.egg.UpdateStepData
@@ -66,67 +66,70 @@ class HomeViewModel @Inject constructor(
             .map { BaseUiState(isShowShimmer = false, data = it) }
             .stateInViewModel(BaseUiState(isShowShimmer = true, data = 0)),
 
-        currentGainEggCountUiState = viewModelEvent.filter { it == HomeScreenViewModelEvent.RefreshReviewList }.flatMapLatest {
+        currentGainEggCountUiState = viewModelEvent.filter { it == HomeScreenViewModelEvent.RefreshHome }.flatMapLatest {
             getGainEggCount.invoke(Unit)
                 .map { BaseUiState(isShowShimmer = false, data = it) }
                 .catch { emit(BaseUiState(isShowShimmer = false, data = 0)) }
         }.stateInViewModel(BaseUiState(isShowShimmer = true, data = 0)),
 
-        currentHatchedCharacterCountUiState = viewModelEvent.filter { it == HomeScreenViewModelEvent.RefreshReviewList }.flatMapLatest {
+        currentHatchedCharacterCountUiState = viewModelEvent.filter { it == HomeScreenViewModelEvent.RefreshHome }.flatMapLatest {
             getHatchedCharacterCount.invoke(Unit)
                 .map { BaseUiState(isShowShimmer = false, data = it) }
                 .catch { emit(BaseUiState(isShowShimmer = false, data = 0)) }
         }.stateInViewModel(BaseUiState(isShowShimmer = true, data = 0)),
 
         // 탐험한 리뷰 수 조회 용
-        currentRecordedSpotCountUiState = viewModelEvent.filter { it == HomeScreenViewModelEvent.RefreshReviewList }.flatMapLatest {
+        currentRecordedSpotCountUiState = viewModelEvent.filter { it == HomeScreenViewModelEvent.RefreshHome }.flatMapLatest {
             getCurrentRecordedSpotCount.invoke(Unit)
                 .map { BaseUiState(isShowShimmer = false, data = it) }
                 .catch { emit(BaseUiState(isShowShimmer = false, data = 0)) }
         }.stateInViewModel(BaseUiState(isShowShimmer = true, data = 0)),
 
-        currentWalkEggUiState = getCurrentWalkEgg.invoke(Unit)
-            .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
-            .catch {
-                emit(
-                    BaseUiState(
-                        isShowShimmer = false,
-                        data = MyEggModel(
-                            characterId = 0,
-                            eggKind = EggKind.Empty,
-                            obtainedDate = "",
-                            obtainedPosition = "",
-                            eggId = 0,
-                            play = false,
-                            nowStep = 0,
-                            needStep = 0
+        currentWalkEggUiState = viewModelEvent.filter { it == HomeScreenViewModelEvent.RefreshHome }.flatMapLatest {
+            getCurrentWalkEgg
+                .invoke(Unit)
+                .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
+                .catch {
+                    emit(
+                        BaseUiState(
+                            isShowShimmer = false,
+                            data = MyEggModel(
+                                characterId = 0,
+                                eggKind = EggKind.Empty,
+                                obtainedDate = "",
+                                obtainedPosition = "",
+                                eggId = 0,
+                                play = false,
+                                nowStep = 0,
+                                needStep = 0
+                            )
                         )
                     )
+                }
+        }.stateInViewModel(
+            BaseUiState(
+                isShowShimmer = true,
+                data = MyEggModel(
+                    characterId = 0,
+                    eggKind = EggKind.Empty,
+                    obtainedDate = "",
+                    obtainedPosition = "",
+                    eggId = 0,
+                    play = false,
+                    nowStep = 0,
+                    needStep = 0
                 )
-            }
-            .stateInViewModel(
-                BaseUiState(
-                    isShowShimmer = true,
-                    data = MyEggModel(
-                        characterId = 0,
-                        eggKind = EggKind.Empty,
-                        obtainedDate = "",
-                        obtainedPosition = "",
-                        eggId = 0,
-                        play = false,
-                        nowStep = 0,
-                        needStep = 0
-                    )
-                )
-            ),
-
-        currentWalkCharacterUiState = getCurrentWalkCharacter.invoke(Unit)
-            .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
-            .catch { emit(BaseUiState(isShowShimmer = false, data = WalkieCharacter.ofEmpty())) }
-            .stateInViewModel(BaseUiState(isShowShimmer = true, data = WalkieCharacter.ofEmpty())),
+            )
+        ),
+        currentWalkCharacterUiState = viewModelEvent.filter { it == HomeScreenViewModelEvent.RefreshHome }
+            .flatMapLatest {
+                getCurrentWalkCharacter.invoke(Unit)
+                    .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
+                    .catch { emit(BaseUiState(isShowShimmer = false, data = WalkieCharacter.ofEmpty())) }
+            }.stateInViewModel(BaseUiState(isShowShimmer = true, data = WalkieCharacter.ofEmpty())),
         showActivityPermissionAlert = _showActivityPermissionAlert.stateInViewModel(false),
         showBackgroundPermissionAlert = _showBackgroundLocationPermissionAlert.stateInViewModel(false),
-        userInfo = getMyData.invoke(Unit).catch {  }.stateInViewModel(null)
+        userInfo = getMyData.invoke(Unit).catch { }.stateInViewModel(null)
 
     )
 
@@ -170,7 +173,7 @@ class HomeViewModel @Inject constructor(
 
     private fun observeEggHatchingEvents() {
         viewModelScope.launch {
-            EggHatchingEvent.hatchingAnimationFlow.collect { isHatching ->
+            EventContainer.hatchingAnimationFlow.collect { isHatching ->
                 if (isHatching) {
                     _hatchingInfo.value = BaseUiState(
                         isShowShimmer = false,
@@ -244,7 +247,7 @@ class HomeViewModel @Inject constructor(
                 ).onEach {
                     // 알 부화 처리 이후 홈 리프레시
                     viewModelScope.launch {
-                        notifyViewModelEvent(HomeScreenViewModelEvent.RefreshReviewList)
+                        notifyViewModelEvent(HomeScreenViewModelEvent.RefreshHome)
                     }
                 }.catch {}.launchIn(viewModelScope)
 

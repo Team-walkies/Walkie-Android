@@ -17,7 +17,7 @@ sealed interface MainScreenNavigationEvent : ScreenNavigationEvent {
 }
 
 sealed interface HomeScreenViewModelEvent : BaseEvent {
-    data object RefreshReviewList : HomeScreenViewModelEvent
+    data object RefreshHome : HomeScreenViewModelEvent
 }
 
 sealed interface HomeScreenNavigationEvent : ScreenNavigationEvent {
