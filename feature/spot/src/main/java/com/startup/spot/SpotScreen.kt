@@ -53,7 +53,7 @@ internal fun SpotScreen(
                     is SpotEvent.LoadWebView -> {
                         val data = event.spotWebPostRequestData
                         val url =
-                            BuildConfig.BASE_SPOT_URL + "/?accessToken=${data.accessToken}&memberId=${data.userId}&characterRank=${data.characterRank}&characterType=${data.characterType}&characterClass=${data.characterClass}"
+                            BuildConfig.BASE_SPOT_URL + "/?accessToken=${data.accessToken}&characterId=${data.userId}&characterRank=${data.characterRank}&characterType=${data.characterType}&characterClass=${data.characterClass}"
                         Printer.e("LMH", "URL $url")
                         webView.loadUrl(url)
                     }
