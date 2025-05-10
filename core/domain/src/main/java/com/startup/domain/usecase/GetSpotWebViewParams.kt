@@ -14,15 +14,14 @@ class GetSpotWebViewParams @Inject constructor(
 ) : BaseUseCase<SpotWebPostRequest, Unit>() {
     override fun invoke(params: Unit): Flow<SpotWebPostRequest> = combine(
         authRepository.getAccessToken(),
-        memberRepository.getUserInfo(),
         memberRepository.getWalkingCharacter()
-    ) { token, userInfo, character ->
+    ) { token, character ->
         SpotWebPostRequest(
             accessToken = token,
             characterType = character.type,
             characterClass = character.clazz,
             characterRank = character.rank,
-            userId = userInfo.memberId
+            characterId = character.characterId
         )
     }
 }

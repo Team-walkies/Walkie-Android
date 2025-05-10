@@ -5,5 +5,5 @@ data class SpotWebPostRequest(
     val characterRank: Int,
     val characterType: Int,
     val characterClass: Int,
-    val userId: Long,
+    val characterId: Long,
 )
