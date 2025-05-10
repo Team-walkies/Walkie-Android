@@ -634,7 +634,10 @@ private fun EggContent(
         ) {
             if (eggModel.eggKind != EggKind.Empty) {
                 SpeechBubble(
-                    steps = (eggModel.needStep - eggModel.nowStep).formatWithLocale(),
+                    steps = ((eggModel.needStep - eggModel.nowStep).coerceIn(
+                        0,
+                        eggModel.needStep
+                    )).formatWithLocale(),
                     modifier = Modifier
                         .offset(y = 30.dp)
                         .zIndex(5f),

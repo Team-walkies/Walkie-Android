@@ -198,7 +198,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _state.userInfo
                 .collect { userInfo ->
-                    if(userInfo != null) {
+                    if (userInfo != null) {
                         Printer.e("JUNWOO", "eggId : ${userInfo.eggId}")
                         updateStepProgress(userInfo)
                     }
@@ -213,10 +213,10 @@ class HomeViewModel @Inject constructor(
             if (remainingStep > 0) {
                 // 남은 걸음수가 있는 경우
                 Printer.e("JUNWOO", "remainingStep : $remainingStep")
-                updateStepWithStepCount(userInfo.eggId, remainingStep)
+                updateStepWithStepCount(userInfo.eggId, dataStore.getCurrentSteps())
             } else {
                 // 목표 달성한 경우 - 위치 정보 포함하여 업데이트
-                updateEggWithLocationData(userInfo.eggId, remainingStep)
+                updateEggWithLocationData(userInfo.eggId, dataStore.getCurrentSteps())
             }
         }
     }
