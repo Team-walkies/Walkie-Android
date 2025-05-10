@@ -178,7 +178,7 @@ private fun HomeContent(
 
 @Composable
 private fun EggAndPartnerSection(
-    stepCountState: BaseUiState<Int>,
+    stepCountState: BaseUiState<Pair<Int, Int>>,
     eggModelState: BaseUiState<MyEggModel>,
     walkieCharacterState: BaseUiState<WalkieCharacter>,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
@@ -552,7 +552,7 @@ private fun HistoryItem(
 @Composable
 fun EggLayout(
     modifier: Modifier = Modifier,
-    stepCountState: BaseUiState<Int>,
+    stepCountState: BaseUiState<Pair<Int, Int>>,
     eggModelState: BaseUiState<MyEggModel>,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
 ) {
@@ -582,7 +582,8 @@ fun EggLayout(
             )
         } else {
             EggContent(
-                step = stepCountState.data,
+                eggStep = stepCountState.data.first,
+                todayStep = stepCountState.data.second,
                 eggModel = eggModelState.data,
                 eggAttribute = eggAttribute,
                 onNavigationEvent = onNavigationEvent
@@ -594,7 +595,8 @@ fun EggLayout(
 
 @Composable
 private fun EggContent(
-    step: Int,
+    todayStep: Int,
+    eggStep: Int,
     eggModel: MyEggModel,
     eggAttribute: EggLayoutModel,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
@@ -602,7 +604,7 @@ private fun EggContent(
     val permissionState = LocalHomePermissionState.current
 
     Box(modifier = Modifier.fillMaxSize()) {
-        StepInformation(step = step)
+        StepInformation(step = todayStep)
 
         // 화면 너비에 맞게 크기 조정
         val maxEggSize = 360.dp
@@ -634,7 +636,7 @@ private fun EggContent(
         ) {
             if (eggModel.eggKind != EggKind.Empty) {
                 SpeechBubble(
-                    steps = ((eggModel.needStep - eggModel.nowStep).coerceIn(
+                    steps = ((eggModel.needStep - eggStep).coerceIn(
                         0,
                         eggModel.needStep
                     )).formatWithLocale(),

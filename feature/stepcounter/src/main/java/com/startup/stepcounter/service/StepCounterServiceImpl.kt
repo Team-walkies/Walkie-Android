@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 interface StepCounterService {
-    fun observeSteps(): Flow<Int>
-    suspend fun resetSteps()
+    fun observeSteps(): Flow<Pair<Int, Int>>
+    suspend fun resetEggStep()
     fun startCounting()
     fun stopCounting()
     suspend fun checkAndResetForNewDay(): Int?  // null이면 오늘 이미 초기화됨, 아니면 이전 걸음 수 반환
@@ -21,7 +21,7 @@ class StepCounterServiceImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val stepDataStore: StepDataStore
 ) : StepCounterService {
-    override fun observeSteps(): Flow<Int> = stepDataStore.observeSteps()
+    override fun observeSteps(): Flow<Pair<Int, Int>> = stepDataStore.observeSteps()
 
     override fun startCounting() {
         if (OsVersions.isGreaterThanOrEqualsO()) {
@@ -31,8 +31,10 @@ class StepCounterServiceImpl @Inject constructor(
         }
     }
 
-    override suspend fun resetSteps() {
-        stepDataStore.resetSteps()
+    override suspend fun resetEggStep() {
+        stepDataStore.resetHatchingSteps()
+        stepDataStore.setHatchingTargetStep(0)
+        stepDataStore.setTargetReached(false)
     }
 
     override fun stopCounting() {
@@ -45,11 +47,9 @@ class StepCounterServiceImpl @Inject constructor(
             return null  // 이미 초기화됨
         }
         // 현재 걸음 수 가져오기
-        val currentSteps = stepDataStore.getCurrentSteps()
-        // 이전 걸음 수 저장
-        stepDataStore.saveYesterdaySteps(currentSteps)
+        val currentSteps = stepDataStore.getTodaySteps()
         // 걸음 수 초기화
-        stepDataStore.resetSteps()
+        stepDataStore.resetTodaySteps()
         // 마지막 초기화 날짜 업데이트
         stepDataStore.saveLastResetDate()
         // 이전 걸음 수 반환

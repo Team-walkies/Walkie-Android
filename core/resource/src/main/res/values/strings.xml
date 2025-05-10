@@ -12,6 +12,8 @@
     <string name="notification_arrive_message">지금 바로 접속해 알을 확인해보세요</string>
     <string name="notification_permission_title">걸음수 측정이 중지 되었어요.</string>
     <string name="notification_permission_message">걸음수 측정을 위해 신체권한 활동 권한을 허용해주세요</string>
+    <string name="notification_default_title">알과 함께 걸어보세요!</string>
+    <string name="notification_default_message">알을 선택해 캐릭터를 부화시켜보세요.</string>
 
     <string name="home_step">걸음</string>
     <string name="home_kilometer">%.2fkm</string>

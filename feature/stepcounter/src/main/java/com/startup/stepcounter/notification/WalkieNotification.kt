@@ -19,13 +19,27 @@ import com.startup.stepcounter.notification.NotificationCode.ACTIVITY_PERMISSION
 import com.startup.stepcounter.notification.NotificationCode.ACTIVITY_PERMISSION_NOTIFICATION_CHANNEL_NAME
 import com.startup.stepcounter.notification.NotificationCode.ACTIVITY_PERMISSION_NOTIFICATION_DESCRIPTION
 import com.startup.stepcounter.notification.NotificationCode.ACTIVITY_PERMISSION_NOTIFICATION_ID
+import com.startup.stepcounter.notification.NotificationCode.WALKIE_EGG_INDUCTION_NOTIFICATION_CHANNEL_ID
 import com.startup.stepcounter.notification.NotificationCode.WALKIE_STEP_NOTIFICATION_CHANNEL_ID
 import com.startup.stepcounter.notification.NotificationCode.WALKIE_STEP_NOTIFICATION_ID
 
 
 @SuppressLint("RemoteViewLayout")
-fun buildWalkieNotification(context: Context, step: Int, target: Int = 10000): Notification {
+fun buildWalkieNotification(context: Context, step: Int, target: Int = 0): Notification {
     createNotificationChannel(context)
+
+    if (target == 0) {
+        return NotificationCompat.Builder(context, WALKIE_EGG_INDUCTION_NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_walkie_notification)
+            .setContentTitle(context.getString(R.string.notification_default_title))
+            .setContentText(context.getString(R.string.notification_default_message))
+            .setContentIntent(createPendingIntent(context))
+            .setOngoing(true)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .build()
+    }
 
     val pendingIntent = createPendingIntent(context)
 

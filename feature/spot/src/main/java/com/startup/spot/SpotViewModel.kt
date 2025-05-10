@@ -65,7 +65,7 @@ class SpotViewModel @Inject constructor(
                 SpotUiEvent.RequestCurrentSteps -> {
                     // 스팟 탐험 완료 후 현재까지 증가한 걸음수를 계산하여 전달
                     viewModelScope.launch {
-                        val currentSteps = stepDataStore.getCurrentSteps()
+                        val currentSteps = stepDataStore.getEggCurrentSteps()
                         val spotStepsDifference = currentSteps - spotStepStartValue
                         notifyEvent(SpotEvent.RequestCurrentSteps(spotStepsDifference))
                     }
@@ -74,7 +74,7 @@ class SpotViewModel @Inject constructor(
                 SpotUiEvent.StartCountingSteps -> {
                     // 스팟 탐험 걸음수 측정 시작 - 현재 걸음수를 기준점으로 저장
                     viewModelScope.launch {
-                        spotStepStartValue = stepDataStore.getCurrentSteps()
+                        spotStepStartValue = stepDataStore.getEggCurrentSteps()
                     }
                 }
                 SpotUiEvent.LoadWebViewParams -> {
