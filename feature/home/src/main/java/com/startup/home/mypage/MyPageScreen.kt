@@ -38,7 +38,7 @@ import com.startup.common.extension.getAppVersion
 import com.startup.common.extension.noRippleClickable
 import com.startup.common.extension.openBrowser
 import com.startup.common.extension.orZero
-import com.startup.common.util.withColor
+import com.startup.common.extension.withColor
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.widget.actionbar.MainActionBar
 import com.startup.design_system.widget.modal.ErrorTwoButtonModal

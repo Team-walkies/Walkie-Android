@@ -3,7 +3,7 @@ package com.startup.common.base
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.startup.domain.util.BaseUseCase
+import com.startup.domain.usecase.base.BaseUseCase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

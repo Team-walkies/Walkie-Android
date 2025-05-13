@@ -3,11 +3,11 @@ package com.startup.home.character
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel
 import com.startup.common.event.EventContainer
-import com.startup.common.util.BaseUiState
+import com.startup.common.base.BaseUiState
 import com.startup.common.util.Printer
-import com.startup.domain.usecase.GetCurrentHatchedCharacter
-import com.startup.domain.usecase.GetHatchedCharacterDetail
-import com.startup.domain.usecase.UpdateWalkingCharacter
+import com.startup.domain.usecase.character.GetCurrentHatchedCharacter
+import com.startup.domain.usecase.character.GetHatchedCharacterDetail
+import com.startup.domain.usecase.walk.UpdateWalkingCharacter
 import com.startup.home.character.model.HatchingCharacterViewModelEvent
 import com.startup.home.character.model.HatchingCharacterViewState
 import com.startup.home.character.model.HatchingCharacterViewStateImpl

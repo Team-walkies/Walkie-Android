@@ -5,7 +5,7 @@ import com.startup.common.base.BaseViewModel
 import com.startup.common.util.ResponseErrorException
 import com.startup.common.util.SessionExpireException
 import com.startup.domain.model.notice.Notice
-import com.startup.domain.usecase.GetNoticeList
+import com.startup.domain.usecase.notice.GetNoticeList
 import com.startup.home.mypage.model.NoticeViewState
 import com.startup.home.mypage.model.NoticeViewStateImpl
 import dagger.hilt.android.lifecycle.HiltViewModel

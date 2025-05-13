@@ -8,8 +8,8 @@ import com.startup.common.base.BaseViewModel
 import com.startup.common.util.ExtraConst
 import com.startup.common.util.Printer
 import com.startup.domain.model.spot.ModifyReviewWebPostRequest
-import com.startup.domain.usecase.GetToken
-import com.startup.domain.usecase.LocalLogout
+import com.startup.domain.usecase.auth.GetToken
+import com.startup.domain.usecase.auth.LocalLogout
 import com.startup.spot.ModifyReviewEvent
 import com.startup.spot.ModifyReviewNavigationEvent
 import com.startup.spot.ModifyReviewUiEvent

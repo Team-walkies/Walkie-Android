@@ -3,7 +3,7 @@ package com.startup.login.splash
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel
 import com.startup.common.base.BaseState
-import com.startup.domain.usecase.GetMyData
+import com.startup.domain.usecase.profile.GetMyData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch

@@ -4,7 +4,7 @@ import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import com.startup.common.base.BaseState
 import com.startup.common.base.UiEvent
-import com.startup.common.util.BaseUiState
+import com.startup.common.base.BaseUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate

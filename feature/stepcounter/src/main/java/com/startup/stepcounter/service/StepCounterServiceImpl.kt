@@ -9,13 +9,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-interface StepCounterService {
-    fun observeSteps(): Flow<Pair<Int, Int>>
-    suspend fun resetEggStep()
-    fun startCounting()
-    fun stopCounting()
-    suspend fun checkAndResetForNewDay(): Int?  // null이면 오늘 이미 초기화됨, 아니면 이전 걸음 수 반환
-}
 
 class StepCounterServiceImpl @Inject constructor(
     @ApplicationContext private val context: Context,

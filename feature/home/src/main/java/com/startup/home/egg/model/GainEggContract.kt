@@ -3,7 +3,7 @@ package com.startup.home.egg.model
 import com.startup.common.base.BaseEvent
 import com.startup.common.base.BaseState
 import com.startup.common.base.UiEvent
-import com.startup.common.util.BaseUiState
+import com.startup.common.base.BaseUiState
 import kotlinx.coroutines.flow.StateFlow
 
 class GainEggViewStateImpl(

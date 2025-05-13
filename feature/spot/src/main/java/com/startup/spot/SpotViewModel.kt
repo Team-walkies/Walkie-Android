@@ -6,8 +6,8 @@ import com.startup.common.base.BaseState
 import com.startup.common.base.BaseViewModel
 import com.startup.common.util.Printer
 import com.startup.domain.provider.StepDataStore
-import com.startup.domain.usecase.GetSpotWebViewParams
-import com.startup.domain.usecase.LocalLogout
+import com.startup.domain.usecase.spot.GetSpotWebViewParams
+import com.startup.domain.usecase.auth.LocalLogout
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn

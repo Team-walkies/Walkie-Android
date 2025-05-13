@@ -3,14 +3,13 @@ package com.startup.login.login
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel
-import com.startup.common.util.Printer
-import com.startup.common.util.ResourceProvider
+import com.startup.common.provider.ResourceProvider
 import com.startup.common.util.ResponseErrorException
 import com.startup.common.util.UserAccountWithdrawnException
 import com.startup.common.util.UserAuthNotFoundException
 import com.startup.common.util.WalkieException
-import com.startup.domain.usecase.JoinWalkie
-import com.startup.domain.usecase.LoginWalkie
+import com.startup.domain.usecase.auth.JoinWalkie
+import com.startup.domain.usecase.auth.LoginWalkie
 import com.startup.login.R
 import com.startup.login.login.model.LoginNavigationEvent
 import com.startup.login.login.model.LoginScreenNavigationEvent

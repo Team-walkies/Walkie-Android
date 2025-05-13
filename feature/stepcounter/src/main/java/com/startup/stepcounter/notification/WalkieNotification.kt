@@ -13,7 +13,7 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.startup.common.util.OsVersions
 import com.startup.common.util.Printer
-import com.startup.common.util.formatWithLocale
+import com.startup.common.extension.formatWithLocale
 import com.startup.stepcounter.R
 import com.startup.stepcounter.notification.NotificationCode.ACTIVITY_PERMISSION_NOTIFICATION_CHANNEL_ID
 import com.startup.stepcounter.notification.NotificationCode.ACTIVITY_PERMISSION_NOTIFICATION_CHANNEL_NAME
