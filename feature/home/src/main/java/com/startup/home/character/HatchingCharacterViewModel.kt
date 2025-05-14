@@ -59,11 +59,11 @@ class HatchingCharacterViewModel @Inject constructor(
                 .onEach { Printer.d("LMH", "Dino $it") }
                 .catch { emit(BaseUiState(isShowShimmer = false, data = emptyList())) }
         }.stateInViewModel(BaseUiState(isShowShimmer = true, data = emptyList())),
-        characterDetail = MutableStateFlow(null),
+        characterDetail = MutableStateFlow(BaseUiState(isShowShimmer = true, data = null)),
     )
 
     fun clearViewingPartner() {
-        _state.characterDetail.update { null }
+        _state.characterDetail.update { it.copy(isShowShimmer = true, data = null) }
     }
 
     fun onClickPartner(character: WalkieCharacter) {
@@ -71,7 +71,12 @@ class HatchingCharacterViewModel @Inject constructor(
             .invoke(character.characterId)
             .map { it.toUiModel() }
             .onEach { item ->
-                _state.characterDetail.update { item }
+                _state.characterDetail.update {
+                    it.copy(
+                        isShowShimmer = false,
+                        data = item
+                    )
+                }
             }
             .catch { }
             .launchIn(viewModelScope)

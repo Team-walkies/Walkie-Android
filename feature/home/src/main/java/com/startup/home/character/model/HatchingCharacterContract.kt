@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.StateFlow
 interface HatchingCharacterViewState : BaseState {
     val jellyfishCharacterState: StateFlow<BaseUiState<List<WalkieCharacter>>>
     val dinoCharacterState: StateFlow<BaseUiState<List<WalkieCharacter>>>
-    val characterDetail : StateFlow<WalkieCharacterDetail?>
+    val characterDetail : StateFlow<BaseUiState<WalkieCharacterDetail?>>
 }
 
 class HatchingCharacterViewStateImpl(
     override val jellyfishCharacterState: StateFlow<BaseUiState<List<WalkieCharacter>>>,
     override val dinoCharacterState: StateFlow<BaseUiState<List<WalkieCharacter>>>,
-    override val characterDetail: MutableStateFlow<WalkieCharacterDetail?>,
+    override val characterDetail: MutableStateFlow<BaseUiState<WalkieCharacterDetail?>>,
 ) : HatchingCharacterViewState
 
 

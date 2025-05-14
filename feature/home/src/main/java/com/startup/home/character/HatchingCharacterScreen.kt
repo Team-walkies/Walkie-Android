@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -43,12 +44,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.startup.common.base.NavigationEvent
 import com.startup.common.extension.orFalse
+import com.startup.common.extension.shimmerEffect
 import com.startup.common.util.BaseUiState
 import com.startup.common.util.DateUtil
 import com.startup.design_system.ui.WalkieTheme
@@ -94,7 +94,7 @@ fun HatchingCharacterScreen(
 
         val scrollState = rememberScrollState()
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        val characterDetail by viewState.characterDetail.collectAsStateWithLifecycle()
+        val characterDetailUiState by viewState.characterDetail.collectAsStateWithLifecycle()
         var viewingCharacter: WalkieCharacter? by remember { mutableStateOf(null) }
         Column(
             modifier = Modifier
@@ -114,22 +114,21 @@ fun HatchingCharacterScreen(
             }
         }
 
-        if (characterDetail != null) {
-            characterDetail?.let {
-                CharacterDetailBottomSheet(
-                    sheetState = sheetState,
-                    character = it,
-                    picked = viewingCharacter?.picked.orFalse(),
-                    onDismiss = {
-                        viewingCharacter = null
-                        onDismissBottomSheet.invoke()
-                    },
-                    onSelectPartner = { character ->
-                        viewingCharacter = null
-                        onSelectPartner(character)
-                    }
-                )
-            }
+        viewingCharacter?.let { preloadCharacter ->
+            CharacterDetailBottomSheet(
+                sheetState = sheetState,
+                characterUiState = characterDetailUiState,
+                picked = viewingCharacter?.picked.orFalse(),
+                preloadCharacter = preloadCharacter,
+                onDismiss = {
+                    viewingCharacter = null
+                    onDismissBottomSheet.invoke()
+                },
+                onSelectPartner = { character ->
+                    viewingCharacter = null
+                    onSelectPartner(character)
+                }
+            )
         }
     }
 }
@@ -431,7 +430,7 @@ private fun CharacterItemContent(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = stringResource(id = R.string.character_gain_induction),
-                style = WalkieTheme.typography.body2.copy(color = colors.gray400),
+                style = WalkieTheme.typography.body2.copy(color = colors.gray400, textAlign = TextAlign.Center),
             )
         } else {
             Text(
@@ -457,7 +456,8 @@ private fun CharacterItemContent(
 @Composable
 fun CharacterDetailBottomSheet(
     sheetState: SheetState,
-    character: WalkieCharacterDetail,
+    preloadCharacter: WalkieCharacter,
+    characterUiState: BaseUiState<WalkieCharacterDetail?>,
     picked: Boolean,
     onDismiss: () -> Unit,
     onSelectPartner: (WalkieCharacterDetail) -> Unit
@@ -469,6 +469,7 @@ fun CharacterDetailBottomSheet(
 
     // 화면 상단에서 94dp만큼 떨어진 위치에서 시작하도록 계산
     val sheetHeight = screenHeight - 94.dp
+    val character = characterUiState.data
 
     Box(modifier = Modifier.fillMaxSize()) {
         ModalBottomSheet(
@@ -485,11 +486,15 @@ fun CharacterDetailBottomSheet(
                 .height(sheetHeight)
                 .align(Alignment.BottomCenter)
         ) {
-            CharacterDetailContent(
-                character = character,
-                onSelectPartner = onSelectPartner,
-                picked = picked
-            )
+            if (characterUiState.isShowShimmer) {
+                SkeletonCharacterDetailComponent(preloadCharacter)
+            } else if (character != null) {
+                CharacterDetailContent(
+                    character = character,
+                    onSelectPartner = onSelectPartner,
+                    picked = picked
+                )
+            }
         }
     }
 }
@@ -519,6 +524,79 @@ fun CharacterDetailContent(
             isAlreadySelected = picked,
             onSelectPartner = onSelectPartner
         )
+    }
+}
+
+@Composable
+private fun SkeletonCharacterDetailComponent(
+    character: WalkieCharacter = WalkieCharacter.ofEmpty(),
+    isAlreadySelected: Boolean = false
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colors.white)
+            .padding(bottom = 30.dp, start = 16.dp, end = 16.dp)
+    ) {
+        Image(
+            painter = painterResource(id = character.characterImageResId),
+            contentDescription = stringResource(id = character.characterNameResId),
+            modifier = Modifier.size(180.dp)
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = stringResource(id = character.characterNameResId),
+            style = WalkieTheme.typography.head3.copy(color = colors.gray700)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = stringResource(R.string.character_detail_wise_saying),
+            style = WalkieTheme.typography.body2.copy(color = colors.gray500),
+            textAlign = TextAlign.Center,
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(57.dp)
+                    .height(36.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .shimmerEffect()
+            )
+            Box(
+                modifier = Modifier
+                    .width(57.dp)
+                    .height(36.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .shimmerEffect()
+            )
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(36.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .shimmerEffect()
+        )
+        val buttonText = if (isAlreadySelected) {
+            stringResource(R.string.character_already_selected)
+        } else {
+            stringResource(R.string.character_partner_select)
+        }
+
+        Spacer(modifier = Modifier.weight(1F))
+        PrimaryButton(
+            text = buttonText,
+        ) {}
     }
 }
 
@@ -629,7 +707,10 @@ private fun CharacterHistoryItem(info: CharacterObtainInfo) {
             )
 
             Text(
-                text = stringResource(R.string.character_hatched_date_description, DateUtil.convertDateFormat(info.obtainedDate)),
+                text = stringResource(
+                    R.string.character_hatched_date_description,
+                    DateUtil.convertDateFormat(info.obtainedDate)
+                ),
                 style = WalkieTheme.typography.body2.copy(color = colors.gray500)
             )
         }
@@ -658,9 +739,7 @@ private fun CharacterSelectButton(
     }
 }
 
-@PreviewScreenSizes
 @Composable
-@Preview
 private fun PreviewHatchingCharacterScreen() {
     WalkieTheme {
         HatchingCharacterScreen(
@@ -677,7 +756,11 @@ private fun PreviewHatchingCharacterScreen() {
                         emptyList()
                     )
                 ),
-                characterDetail = MutableStateFlow(null),
+                characterDetail = MutableStateFlow(
+                    BaseUiState(
+                        isShowShimmer = true, null
+                    )
+                ),
             ),
             onSelectPartner = {},
             onClickPartner = {},
