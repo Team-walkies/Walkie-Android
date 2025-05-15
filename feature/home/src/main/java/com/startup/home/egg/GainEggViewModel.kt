@@ -8,10 +8,7 @@ import com.startup.domain.provider.StepDataStore
 import com.startup.common.base.BaseUiState
 import com.startup.domain.usecase.egg.GetGainEggList
 import com.startup.domain.usecase.walk.UpdateWalkingEgg
-import com.startup.home.egg.model.GainEggViewModelEvent
-import com.startup.home.egg.model.GainEggViewState
-import com.startup.home.egg.model.GainEggViewStateImpl
-import com.startup.home.egg.model.MyEggModel.Companion.toUiModel
+import com.startup.model.egg.MyEggModel.Companion.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch

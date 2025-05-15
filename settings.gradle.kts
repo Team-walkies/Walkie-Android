@@ -26,6 +26,6 @@ rootProject.name = "Walkie"
 include(
     ":app",
     ":navigation",
-    ":core:data", ":core:domain", ":core:design-system", ":core:common", ":core:resource",
+    ":core:data", ":core:domain", ":core:design-system", ":core:common", ":core:resource", ":core:model",
     ":feature:login", ":feature:home",":feature:stepcounter", ":feature:spot"
 )

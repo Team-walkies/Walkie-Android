@@ -61,11 +61,9 @@ import com.startup.design_system.widget.button.PrimaryButton
 import com.startup.design_system.widget.tag.TagMedium
 import com.startup.domain.model.character.CharacterObtainInfo
 import com.startup.home.R
-import com.startup.home.character.model.CharacterKind
-import com.startup.home.character.model.HatchingCharacterViewState
-import com.startup.home.character.model.HatchingCharacterViewStateImpl
-import com.startup.home.character.model.WalkieCharacter
-import com.startup.home.character.model.WalkieCharacterDetail
+import com.startup.model.character.CharacterKind
+import com.startup.model.character.WalkieCharacter
+import com.startup.model.character.WalkieCharacterDetail
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 

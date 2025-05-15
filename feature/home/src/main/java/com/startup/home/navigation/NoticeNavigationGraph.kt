@@ -11,10 +11,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.startup.common.base.NavigationEvent
 import com.startup.domain.model.notice.Notice
-import com.startup.home.mypage.NoticeDetailScreen
-import com.startup.home.mypage.NoticeScreen
+import com.startup.home.mypage.NoticeScreenNavigationEvent
 import com.startup.home.mypage.NoticeViewModel
-import com.startup.home.mypage.model.NoticeScreenNavigationEvent
+import com.startup.home.mypage.screen.NoticeDetailScreen
+import com.startup.home.mypage.screen.NoticeScreen
 
 @Composable
 fun NoticeNavigationGraph(

@@ -31,9 +31,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.startup.common.event.EventContainer
 import com.startup.design_system.widget.toast.ShowToast
-import com.startup.home.main.HomeScreen
+import com.startup.home.main.screen.HomeScreen
 import com.startup.home.main.HomeViewModel
-import com.startup.home.mypage.MyPageScreen
+import com.startup.home.mypage.screen.MyPageScreen
 import com.startup.home.mypage.MyPageViewModel
 import com.startup.home.navigation.BottomNavItem
 import com.startup.home.navigation.HomeScreenNav

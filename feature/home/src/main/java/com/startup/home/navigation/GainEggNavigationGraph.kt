@@ -6,11 +6,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.startup.home.egg.EggGainProbabilityScreen
-import com.startup.home.egg.GainEggScreen
+import com.startup.home.egg.screen.EggGainProbabilityScreen
 import com.startup.home.egg.GainEggScreenNavigationEvent
 import com.startup.home.egg.GainEggViewModel
-import com.startup.home.egg.model.GainEggUiEvent
+import com.startup.home.egg.GainEggUiEvent
+import com.startup.home.egg.screen.GainEggScreen
 
 @Composable
 fun GainEggNavigationGraph(
