@@ -8,13 +8,10 @@ import com.startup.common.util.Printer
 import com.startup.domain.usecase.character.GetCurrentHatchedCharacter
 import com.startup.domain.usecase.character.GetHatchedCharacterDetail
 import com.startup.domain.usecase.walk.UpdateWalkingCharacter
-import com.startup.home.character.model.HatchingCharacterViewModelEvent
-import com.startup.home.character.model.HatchingCharacterViewState
-import com.startup.home.character.model.HatchingCharacterViewStateImpl
-import com.startup.home.character.model.WalkieCharacter
-import com.startup.home.character.model.WalkieCharacter.Companion.toUiModel
-import com.startup.home.character.model.WalkieCharacterDetail
-import com.startup.home.character.model.WalkieCharacterDetail.Companion.toUiModel
+import com.startup.model.character.WalkieCharacter
+import com.startup.model.character.WalkieCharacter.Companion.toUiModel
+import com.startup.model.character.WalkieCharacterDetail
+import com.startup.model.character.WalkieCharacterDetail.Companion.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

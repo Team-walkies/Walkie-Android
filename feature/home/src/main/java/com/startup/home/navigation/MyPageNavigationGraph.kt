@@ -35,17 +35,17 @@ import com.startup.design_system.widget.toast.ShowToast
 import com.startup.home.ErrorToastEvent
 import com.startup.home.MainScreenNavigationEvent
 import com.startup.home.R
-import com.startup.home.mypage.MyInfoScreen
+import com.startup.home.mypage.MyInfoUIEvent
 import com.startup.home.mypage.MyPageViewModel
-import com.startup.home.mypage.PersonalInfoPolicyScreen
-import com.startup.home.mypage.PushSettingScreen
-import com.startup.home.mypage.RequestUserOpinionScreen
-import com.startup.home.mypage.ServiceTermScreen
-import com.startup.home.mypage.UnlinkScreen
-import com.startup.home.mypage.model.MyInfoUIEvent
-import com.startup.home.mypage.model.PushSettingUIEvent
-import com.startup.home.mypage.model.UnlinkUiEvent
-import com.startup.home.notification.NotificationListScreen
+import com.startup.home.mypage.PushSettingUIEvent
+import com.startup.home.mypage.UnlinkUiEvent
+import com.startup.home.mypage.screen.MyInfoScreen
+import com.startup.home.mypage.screen.PersonalInfoPolicyScreen
+import com.startup.home.mypage.screen.PushSettingScreen
+import com.startup.home.mypage.screen.RequestUserOpinionScreen
+import com.startup.home.mypage.screen.ServiceTermScreen
+import com.startup.home.mypage.screen.UnlinkScreen
+import com.startup.home.notification.screen.NotificationListScreen
 
 @Composable
 fun MyPageNavigationGraph(

@@ -7,10 +7,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.startup.home.MainScreenNavigationEvent
-import com.startup.home.spot.SpotArchiveScreen
+import com.startup.home.spot.screen.SpotArchiveScreen
 import com.startup.home.spot.SpotArchiveViewModel
-import com.startup.home.spot.SpotReviewModifyScreen
-import com.startup.home.spot.model.SpotArchiveUiEvent
+import com.startup.home.spot.screen.SpotReviewModifyScreen
+import com.startup.home.spot.SpotArchiveUiEvent
 
 @Composable
 fun SpotArchiveNavigationGraph(parentNavController: NavHostController, spotArchiveViewModel: SpotArchiveViewModel = hiltViewModel(), onNavigationEvent: (MainScreenNavigationEvent) -> Unit) {

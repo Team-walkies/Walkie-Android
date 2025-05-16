@@ -114,6 +114,8 @@
 -keep class com.startup.common.event.** { *; }
 -keep class com.startup.common.extension.** { *; }
 
+# Model
+-keep class com.startup.model.** { *; }
 
 # Login
 -keep class com.startup.login.navigation.** { *; }

@@ -40,7 +40,6 @@ import com.startup.common.util.OsVersions
 import com.startup.common.util.UsePermissionHelper
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.widget.modal.PrimaryTwoButtonModal
-import com.startup.home.character.model.CharacterFactory
 import com.startup.home.main.HomeViewModel
 import com.startup.home.navigation.HomeNavigationGraph
 import com.startup.home.navigation.MainScreenNav
@@ -395,11 +394,6 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                     val eggKind = hatchingInfoState.data.eggKind
 
                     val characterName = stringResource(id = character.characterNameResId)
-                    val allCharacters = CharacterFactory.getAllCharacters()
-                    val foundCharacter = allCharacters.find {
-                        it.imageResource == character.characterImageResId
-                    }
-                    val characterRank = foundCharacter?.rarity?.ordinal?.minus(1) ?: 0
                     val eggRank = eggKind.ordinal - 1
 
                     EggHatchingAnimation(

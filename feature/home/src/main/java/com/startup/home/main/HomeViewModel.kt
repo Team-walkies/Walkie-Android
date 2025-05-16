@@ -19,11 +19,12 @@ import com.startup.domain.usecase.profile.GetMyData
 import com.startup.domain.usecase.spot.GetRecordedSpotCount
 import com.startup.domain.usecase.egg.UpdateEggOfStepCount
 import com.startup.home.HomeScreenViewModelEvent
-import com.startup.home.character.model.WalkieCharacter
-import com.startup.home.character.model.WalkieCharacter.Companion.toUiModel
-import com.startup.home.egg.model.EggKind
-import com.startup.home.egg.model.MyEggModel
-import com.startup.home.egg.model.MyEggModel.Companion.toUiModel
+import com.startup.model.character.WalkieCharacter
+import com.startup.model.character.WalkieCharacter.Companion.ofEmpty
+import com.startup.model.character.WalkieCharacter.Companion.toUiModel
+import com.startup.model.egg.EggKind
+import com.startup.model.egg.MyEggModel
+import com.startup.model.egg.MyEggModel.Companion.toUiModel
 import com.startup.stepcounter.service.StepCounterService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

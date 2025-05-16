@@ -16,9 +16,6 @@ import com.startup.domain.usecase.notification.UpdateTodayStepNotiEnabled
 import com.startup.home.ErrorToastEvent
 import com.startup.home.MainScreenNavigationEvent
 import com.startup.home.R
-import com.startup.home.mypage.model.MyInfoViewModelEvent
-import com.startup.home.mypage.model.MyInfoViewState
-import com.startup.home.mypage.model.MyInfoViewStateImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch

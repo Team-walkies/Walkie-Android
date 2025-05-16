@@ -44,7 +44,7 @@ import com.startup.login.R
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.ui.noRippleClickable
 import com.startup.login.login.model.LoginUiEvent
-import com.startup.login.login.model.OnBoardingPagerItem
+import com.startup.model.login.OnBoardingPagerItem
 import kotlinx.coroutines.delay
 
 @Composable

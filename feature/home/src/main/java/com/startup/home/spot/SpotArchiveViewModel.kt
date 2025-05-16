@@ -8,12 +8,10 @@ import com.startup.common.util.DateUtil.getStartOfWeek
 import com.startup.common.util.Printer
 import com.startup.domain.usecase.review.DeleteReview
 import com.startup.domain.usecase.review.GetRangeOfWeekReviewList
-import com.startup.home.spot.model.CalendarModel
-import com.startup.home.spot.model.ReviewModel
-import com.startup.home.spot.model.ReviewModel.Companion.toUiModel
-import com.startup.home.spot.model.SpotArchiveViewState
-import com.startup.home.spot.model.SpotArchiveViewStateImpl
-import com.startup.home.spot.model.WeekFetchDirection
+import com.startup.model.spot.CalendarModel
+import com.startup.model.spot.ReviewModel
+import com.startup.model.spot.ReviewModel.Companion.toUiModel
+import com.startup.model.spot.WeekFetchDirection
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
