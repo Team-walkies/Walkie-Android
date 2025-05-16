@@ -5,7 +5,7 @@ import com.google.gson.JsonParseException
 import com.startup.common.util.ClientException
 import com.startup.common.util.NetworkTemporaryException
 import com.startup.common.util.NoCharacterException
-import com.startup.common.util.SessionExpireException
+import com.startup.common.util.ResponseErrorException
 import com.startup.common.util.UnknownException
 import retrofit2.HttpException
 import java.io.InterruptedIOException
@@ -34,6 +34,7 @@ fun handleException(e: Throwable): Throwable {
             else -> throw e
         }
 
+        is ResponseErrorException -> throw e
         is NoCharacterException -> throw e
         is SocketTimeoutException,
         is ConnectException,
