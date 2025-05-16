@@ -70,7 +70,8 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
                 val errorDialog by viewModel.errorDialog.collectAsStateWithLifecycle()
                 if (errorDialog != null) {
                     ErrorModal(
-                        subTitle = stringResource(R.string.dialog_user_account_withdrawn_exception),
+                        title = stringResource(R.string.dialog_user_account_withdrawn_exception_title),
+                        subTitle = stringResource(R.string.dialog_user_account_withdrawn_exception_subtitle),
                         positiveText = stringResource(R.string.dialog_positive),
                         onDismiss = {
                             viewModel.onClearErrorDialog()
