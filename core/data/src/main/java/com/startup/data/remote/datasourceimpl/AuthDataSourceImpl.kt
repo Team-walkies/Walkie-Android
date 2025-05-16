@@ -72,9 +72,9 @@ internal class AuthDataSourceImpl @Inject constructor(
 
     override fun logOut(): Flow<Unit> = flow {
         handleExceptionIfNeed {
+            emitRemote(memberService.logoutService())
             kakaoLogoutHelper.logout()
             logoutManager.logout()
-            emitRemote(memberService.logoutService())
         }
     }
 
