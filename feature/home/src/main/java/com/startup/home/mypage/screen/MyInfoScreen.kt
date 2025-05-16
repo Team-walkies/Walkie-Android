@@ -22,17 +22,16 @@ import com.startup.design_system.widget.actionbar.PageActionBarType
 import com.startup.design_system.widget.toggle.ToggleWithText
 import com.startup.home.R
 import com.startup.home.mypage.MyInfoUIEvent
-import com.startup.home.mypage.MyInfoViewState
-import com.startup.home.mypage.MyInfoViewStateImpl
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun MyInfoScreen(
-    viewState: MyInfoViewState,
+    isProfileAccessFlow: StateFlow<Boolean>,
     uiEventSender: (MyInfoUIEvent) -> Unit,
     onNavigationEvent: (NavigationEvent) -> Unit
 ) {
-    val isProfileAccess by viewState.isProfileAccess.collectAsState()
+    val isProfileAccess by isProfileAccessFlow.collectAsState()
     Printer.e("LMH", "isProfileAccess $isProfileAccess")
     Column(
         modifier = Modifier
@@ -75,13 +74,7 @@ fun MyInfoScreen(
 private fun PreviewMyInfoScreen() {
     WalkieTheme {
         MyInfoScreen(
-            viewState = MyInfoViewStateImpl(
-                isNotificationEnabledEggHatched = MutableStateFlow(false),
-                isProfileAccess = MutableStateFlow(false),
-                isNotificationEnabledTodayStep = MutableStateFlow(false),
-                isNotificationEnabledSpotArrive = MutableStateFlow(false),
-                userInfo = MutableStateFlow(null)
-            ),
+            MutableStateFlow(false),
             {}, {}
         )
     }

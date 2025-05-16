@@ -20,20 +20,20 @@ import com.startup.design_system.widget.actionbar.PageActionBar
 import com.startup.design_system.widget.actionbar.PageActionBarType
 import com.startup.design_system.widget.toggle.ToggleWithText
 import com.startup.home.R
-import com.startup.home.mypage.MyInfoViewState
-import com.startup.home.mypage.MyInfoViewStateImpl
 import com.startup.home.mypage.PushSettingUIEvent
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun PushSettingScreen(
-    viewState: MyInfoViewState,
+    isNotificationEnabledEggHatchedFlow: StateFlow<Boolean>,
+    isNotificationEnabledSpotArriveFlow: StateFlow<Boolean>,
     uiEventSender: (PushSettingUIEvent) -> Unit,
     onNavigationEvent: (NavigationEvent) -> Unit
 ) {
     /*val isTodayStepNotiEnabled by viewState.isNotificationEnabledTodayStep.collectAsState()*/
-    val isArriveSpotNotiEnabled by viewState.isNotificationEnabledSpotArrive.collectAsState()
-    val isEggHatchedNotiEnabled by viewState.isNotificationEnabledEggHatched.collectAsState()
+    val isArriveSpotNotiEnabled by isNotificationEnabledEggHatchedFlow.collectAsState()
+    val isEggHatchedNotiEnabled by isNotificationEnabledSpotArriveFlow.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -84,12 +84,7 @@ fun PushSettingScreen(
 private fun PreviewPushSettingScreen() {
     WalkieTheme {
         PushSettingScreen(
-            MyInfoViewStateImpl(
-                isNotificationEnabledEggHatched = MutableStateFlow(false),
-                isProfileAccess = MutableStateFlow(false),
-                isNotificationEnabledTodayStep = MutableStateFlow(false),
-                isNotificationEnabledSpotArrive = MutableStateFlow(false),
-                userInfo = MutableStateFlow(null)
-            ), {}, {})
+            MutableStateFlow(false),
+            MutableStateFlow(false), {}, {})
     }
 }
