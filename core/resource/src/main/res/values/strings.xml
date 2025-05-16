@@ -219,5 +219,6 @@
     <string name="toast_home_back_press">한 번 더 누르면 워키가 종료됩니다</string>
     <string name="toast_common_error">일시적 오류가 발생했습니다. 잠시후 다시 시도해주세요.</string>
     
-    <string name="dialog_user_account_withdrawn_exception">해당 아이디는 이미 탈퇴 처리된 계정입니다.\n자세한 사항은 이메일로 문의해 주시면 안내해 드리겠습니다.\n📧 이메일: walkieofficial@gmail.com</string>
+    <string name="dialog_user_account_withdrawn_exception_title">탈퇴 처리된 계정</string>
+    <string name="dialog_user_account_withdrawn_exception_subtitle">해당 아이디는 탈퇴 처리된 계정입니다.\n자세한 사항은 이메일로 문의해 주시면 안내해 드리겠습니다.\n📧 이메일: walkieofficial@gmail.com</string>
 </resources>
