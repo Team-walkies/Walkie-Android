@@ -1,18 +1,20 @@
 package com.startup.home.mypage
 
 import androidx.lifecycle.viewModelScope
+import com.startup.common.base.BaseUiState
 import com.startup.common.base.BaseViewModel
 import com.startup.common.util.Printer
-import com.startup.domain.usecase.profile.ChangeUserProfileVisibility
-import com.startup.domain.usecase.notification.GetArriveSpotNotiEnabled
-import com.startup.domain.usecase.notification.GetEggHatchedNotiEnabled
-import com.startup.domain.usecase.profile.GetMyData
-import com.startup.domain.usecase.notification.GetTodayStepNotiEnabled
+import com.startup.domain.model.member.UserInfo
 import com.startup.domain.usecase.auth.Logout
 import com.startup.domain.usecase.auth.Unlink
+import com.startup.domain.usecase.notification.GetArriveSpotNotiEnabled
+import com.startup.domain.usecase.notification.GetEggHatchedNotiEnabled
+import com.startup.domain.usecase.notification.GetTodayStepNotiEnabled
 import com.startup.domain.usecase.notification.UpdateArriveSpotNotiEnabled
 import com.startup.domain.usecase.notification.UpdateEggHatchedNotiEnabled
 import com.startup.domain.usecase.notification.UpdateTodayStepNotiEnabled
+import com.startup.domain.usecase.profile.ChangeUserProfileVisibility
+import com.startup.domain.usecase.profile.GetMyData
 import com.startup.home.ErrorToastEvent
 import com.startup.home.MainScreenNavigationEvent
 import com.startup.home.R
@@ -62,8 +64,17 @@ class MyPageViewModel @Inject constructor(
             .stateInViewModel(false),
         userInfo = getMyData
             .invoke(Unit)
-            .catch { }
-            .stateInViewModel(null)
+            .map {
+                BaseUiState(isShowShimmer = false, data = it) }
+            .catch {
+                emit(BaseUiState(isShowShimmer = false, data = UserInfo.ofEmpty()))
+            }
+            .stateInViewModel(
+                initialValue = BaseUiState(
+                    isShowShimmer = true,
+                    data = UserInfo.ofEmpty()
+                )
+            )
     )
     override val state: MyInfoViewState get() = _state
 

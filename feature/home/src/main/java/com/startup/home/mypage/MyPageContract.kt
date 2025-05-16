@@ -2,6 +2,7 @@ package com.startup.home.mypage
 
 import com.startup.common.base.BaseEvent
 import com.startup.common.base.BaseState
+import com.startup.common.base.BaseUiState
 import com.startup.common.base.ScreenNavigationEvent
 import com.startup.common.base.UiEvent
 import com.startup.domain.model.member.UserInfo
@@ -14,7 +15,7 @@ interface MyInfoViewState : BaseState {
     val isNotificationEnabledSpotArrive: StateFlow<Boolean>
     val isNotificationEnabledEggHatched: StateFlow<Boolean>
     val isNotificationEnabledTodayStep: StateFlow<Boolean>
-    val userInfo : StateFlow<UserInfo?>
+    val userInfo : StateFlow<BaseUiState<UserInfo>>
 }
 
 interface NoticeViewState : BaseState {
@@ -31,7 +32,7 @@ class MyInfoViewStateImpl(
     override val isNotificationEnabledSpotArrive: StateFlow<Boolean>,
     override val isNotificationEnabledEggHatched: StateFlow<Boolean>,
     override val isNotificationEnabledTodayStep: StateFlow<Boolean>,
-    override val userInfo: StateFlow<UserInfo?>
+    override val userInfo: StateFlow<BaseUiState<UserInfo>>
 ) : MyInfoViewState
 
 sealed interface MyInfoUIEvent : UiEvent {

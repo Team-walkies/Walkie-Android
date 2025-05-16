@@ -137,14 +137,15 @@ fun MyPageNavigationGraph(
             ) {
                 composable(MyPageScreenNav.MyInfo.route) {
                     MyInfoScreen(
-                        viewState = myPageViewModel.state,
+                        isProfileAccessFlow = myPageViewModel.state.isProfileAccess,
                         uiEventSender = ::handleMyInfoUiEvent,
                         onNavigationEvent = ::handleNavigationEvent
                     )
                 }
                 composable(MyPageScreenNav.PushSetting.route) {
                     PushSettingScreen(
-                        viewState = myPageViewModel.state,
+                        isNotificationEnabledEggHatchedFlow = myPageViewModel.state.isNotificationEnabledEggHatched,
+                        isNotificationEnabledSpotArriveFlow = myPageViewModel.state.isNotificationEnabledSpotArrive,
                         uiEventSender = ::handlePushSettingUiEvent,
                         onNavigationEvent = ::handleNavigationEvent
                     )

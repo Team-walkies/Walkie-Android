@@ -16,4 +16,20 @@ data class UserInfo(
     val recordedSpot: Int,
     val userCharacterId: Long,
     val eggId: Long
-)
+) {
+    companion object {
+        fun ofEmpty(): UserInfo = UserInfo(
+            memberId = -1,
+            memberEmail = "",
+            memberNickName = "",
+            isPublic = false,
+            memberTier = "",
+            providerId = "",
+            provider = "",
+            exploredSpot = 0,
+            recordedSpot = 0,
+            userCharacterId = -1,
+            eggId = -1
+        )
+    }
+}
