@@ -1,7 +1,7 @@
 package com.startup.home.spot.model
 
 import com.startup.common.util.DateUtil
-import com.startup.common.util.formatWithLocale
+import com.startup.common.extension.formatWithLocale
 import com.startup.domain.model.review.Review
 import com.startup.home.character.model.WalkieCharacter
 import java.time.LocalDate

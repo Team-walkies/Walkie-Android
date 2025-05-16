@@ -5,22 +5,21 @@ import com.startup.common.base.BaseState
 import com.startup.common.base.BaseViewModel
 import com.startup.common.base.UiEvent
 import com.startup.common.event.EventContainer
-import com.startup.common.util.BaseUiState
+import com.startup.common.base.BaseUiState
 import com.startup.common.util.Printer
 import com.startup.domain.model.egg.UpdateStepData
 import com.startup.domain.model.member.UserInfo
 import com.startup.domain.provider.StepDataStore
 import com.startup.domain.repository.LocationRepository
-import com.startup.domain.usecase.GetCurrentWalkCharacter
-import com.startup.domain.usecase.GetCurrentWalkEgg
-import com.startup.domain.usecase.GetGainEggCount
-import com.startup.domain.usecase.GetHatchedCharacterCount
-import com.startup.domain.usecase.GetMyData
-import com.startup.domain.usecase.GetRecordedSpotCount
-import com.startup.domain.usecase.UpdateEggOfStepCount
+import com.startup.domain.usecase.walk.GetCurrentWalkCharacter
+import com.startup.domain.usecase.walk.GetCurrentWalkEgg
+import com.startup.domain.usecase.egg.GetGainEggCount
+import com.startup.domain.usecase.character.GetHatchedCharacterCount
+import com.startup.domain.usecase.profile.GetMyData
+import com.startup.domain.usecase.spot.GetRecordedSpotCount
+import com.startup.domain.usecase.egg.UpdateEggOfStepCount
 import com.startup.home.HomeScreenViewModelEvent
 import com.startup.home.character.model.WalkieCharacter
-import com.startup.home.character.model.WalkieCharacter.Companion.ofEmpty
 import com.startup.home.character.model.WalkieCharacter.Companion.toUiModel
 import com.startup.home.egg.model.EggKind
 import com.startup.home.egg.model.MyEggModel
@@ -106,7 +105,7 @@ class HomeViewModel @Inject constructor(
                                     play = false,
                                     nowStep = 0,
                                     needStep = 0,
-                                    walkieCharacter = ofEmpty()
+                                    walkieCharacter = WalkieCharacter.ofEmpty()
                                 )
                             )
                         )
@@ -115,7 +114,7 @@ class HomeViewModel @Inject constructor(
                 BaseUiState(
                     isShowShimmer = true,
                     data = MyEggModel(
-                        walkieCharacter = ofEmpty(),
+                        walkieCharacter = WalkieCharacter.ofEmpty(),
                         eggKind = EggKind.Empty,
                         obtainedDate = "",
                         obtainedPosition = "",

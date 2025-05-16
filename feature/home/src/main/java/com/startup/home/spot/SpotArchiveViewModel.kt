@@ -2,12 +2,12 @@ package com.startup.home.spot
 
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel
-import com.startup.common.util.BaseUiState
+import com.startup.common.base.BaseUiState
 import com.startup.common.util.DateUtil
 import com.startup.common.util.DateUtil.getStartOfWeek
 import com.startup.common.util.Printer
-import com.startup.domain.usecase.DeleteReview
-import com.startup.domain.usecase.GetRangeOfWeekReviewList
+import com.startup.domain.usecase.review.DeleteReview
+import com.startup.domain.usecase.review.GetRangeOfWeekReviewList
 import com.startup.home.spot.model.CalendarModel
 import com.startup.home.spot.model.ReviewModel
 import com.startup.home.spot.model.ReviewModel.Companion.toUiModel

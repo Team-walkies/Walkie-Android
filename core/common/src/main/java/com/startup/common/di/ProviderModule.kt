@@ -2,8 +2,8 @@ package com.startup.common.di
 
 import com.startup.common.provider.LocationProvider
 import com.startup.common.provider.LocationProviderImpl
-import com.startup.common.util.ResourceProvider
-import com.startup.common.util.ResourceProviderImpl
+import com.startup.common.provider.ResourceProvider
+import com.startup.common.provider.ResourceProviderImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

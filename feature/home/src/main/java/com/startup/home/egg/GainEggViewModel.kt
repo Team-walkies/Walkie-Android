@@ -5,9 +5,9 @@ import com.startup.common.base.BaseViewModel
 import com.startup.common.event.EventContainer
 import com.startup.common.util.Printer
 import com.startup.domain.provider.StepDataStore
-import com.startup.common.util.BaseUiState
-import com.startup.domain.usecase.GetGainEggList
-import com.startup.domain.usecase.UpdateWalkingEgg
+import com.startup.common.base.BaseUiState
+import com.startup.domain.usecase.egg.GetGainEggList
+import com.startup.domain.usecase.walk.UpdateWalkingEgg
 import com.startup.home.egg.model.GainEggViewModelEvent
 import com.startup.home.egg.model.GainEggViewState
 import com.startup.home.egg.model.GainEggViewStateImpl

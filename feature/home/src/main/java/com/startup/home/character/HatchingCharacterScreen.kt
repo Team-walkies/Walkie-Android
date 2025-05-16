@@ -48,8 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.startup.common.base.NavigationEvent
 import com.startup.common.extension.orFalse
+import com.startup.common.base.BaseUiState
 import com.startup.common.extension.shimmerEffect
-import com.startup.common.util.BaseUiState
 import com.startup.common.util.DateUtil
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.ui.WalkieTheme.colors

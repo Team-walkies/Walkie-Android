@@ -35,7 +35,7 @@ import com.startup.design_system.ui.noRippleClickable
 import com.startup.login.login.model.NickNameSettingEvent
 import com.startup.login.login.model.NickNameViewState
 import com.startup.login.login.model.NickNameViewStateImpl
-import com.startup.common.util.hasSpecialCharacters
+import com.startup.common.extension.hasSpecialCharacters
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable

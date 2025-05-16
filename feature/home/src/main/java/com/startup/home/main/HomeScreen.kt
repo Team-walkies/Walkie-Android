@@ -51,10 +51,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.startup.common.extension.moveToAppDetailSetting
 import com.startup.common.extension.shimmerEffect
 import com.startup.common.extension.shimmerEffectGray200
-import com.startup.common.util.BaseUiState
-import com.startup.common.util.formatWithLocale
-import com.startup.common.util.withBold
-import com.startup.common.util.withUnderline
+import com.startup.common.base.BaseUiState
+import com.startup.common.extension.formatWithLocale
+import com.startup.common.extension.withBold
+import com.startup.common.extension.withUnderline
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.ui.noRippleClickable
 import com.startup.design_system.widget.actionbar.MainLogoActionBar

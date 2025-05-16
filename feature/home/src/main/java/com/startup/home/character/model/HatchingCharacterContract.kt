@@ -2,7 +2,7 @@ package com.startup.home.character.model
 
 import com.startup.common.base.BaseEvent
 import com.startup.common.base.BaseState
-import com.startup.common.util.BaseUiState
+import com.startup.common.base.BaseUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
