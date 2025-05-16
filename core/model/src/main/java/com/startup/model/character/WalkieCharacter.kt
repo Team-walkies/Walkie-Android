@@ -58,7 +58,7 @@ data class WalkieCharacter(
                 CharacterKind.Jellyfish
             }
             val characterRankKind = CharacterRankKind.rankOfCharacterRankKind(rank)
-            val (imageResource, nameResId) = characterRankKind.getCharacterNameAndImageWithTypeOfClass(characterKind, clazz)
+            val (nameResId, imageResource) = characterRankKind.getCharacterNameAndImageWithTypeOfClass(characterKind, clazz)
             return WalkieCharacter(
                 characterId = characterId,
                 characterKind = characterKind,
