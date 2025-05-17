@@ -53,6 +53,14 @@
             android:enabled="true"
             android:exported="false" />
 
+        <receiver
+            android:name="com.startup.stepcounter.broadcastReciver.DailyResetReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.DATE_CHANGED" />
+            </intent-filter>
+        </receiver>
         <service
             android:name="com.startup.stepcounter.service.WalkieStepForegroundService"
             android:exported="false"
