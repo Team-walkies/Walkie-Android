@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -38,6 +39,7 @@ import com.startup.common.extension.getAppVersion
 import com.startup.common.extension.noRippleClickable
 import com.startup.common.extension.openBrowser
 import com.startup.common.extension.orZero
+import com.startup.common.extension.shimmerEffect
 import com.startup.common.extension.withColor
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.widget.actionbar.MainActionBar
@@ -54,7 +56,7 @@ fun MyPageScreen(
 ) {
     val context = LocalContext.current
     var isLogoutDialogShow by remember { mutableStateOf(false) }
-    val userInfo by myInfoViewState.userInfo.collectAsStateWithLifecycle()
+    val userInfoUiState by myInfoViewState.userInfo.collectAsStateWithLifecycle()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -69,30 +71,38 @@ fun MyPageScreen(
                 .verticalScroll(state = rememberScrollState())
                 .padding(bottom = 50.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            if (userInfoUiState.isShowShimmer) {
+                SkeletonUserInfo()
+            } else {
+                val userInfo = userInfoUiState.data
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = userInfo.memberNickName,
+                        style = WalkieTheme.typography.head2.copy(color = WalkieTheme.colors.gray700)
+                    )
+                    Text(
+                        text = stringResource(R.string.user),
+                        style = WalkieTheme.typography.head2.copy(color = WalkieTheme.colors.gray500)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    UserTierTag(
+                        userInfo.memberTier,
+                        textColor = WalkieTheme.colors.blue400,
+                        backgroundColor = WalkieTheme.colors.blue50
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = userInfo?.memberNickName.orEmpty(),
-                    style = WalkieTheme.typography.head2.copy(color = WalkieTheme.colors.gray700)
-                )
-                Text(
-                    text = stringResource(R.string.user),
-                    style = WalkieTheme.typography.head2.copy(color = WalkieTheme.colors.gray500)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                UserTierTag(
-                    userInfo?.memberTier.orEmpty(),
-                    textColor = WalkieTheme.colors.blue400,
-                    backgroundColor = WalkieTheme.colors.blue50
+                    stringResource(
+                        R.string.current_explored_spot_count_desc,
+                        userInfo.exploredSpot.orZero()
+                    ).withColor(
+                        userInfo.exploredSpot.orZero().toString(),
+                        WalkieTheme.colors.blue400
+                    ),
+                    style = WalkieTheme.typography.head5.copy(color = WalkieTheme.colors.gray500)
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                stringResource(
-                    R.string.current_explored_spot_count_desc,
-                    userInfo?.exploredSpot.orZero()
-                ).withColor(userInfo?.exploredSpot.orZero().toString(), WalkieTheme.colors.blue400),
-                style = WalkieTheme.typography.head5.copy(color = WalkieTheme.colors.gray500)
-            )
             Spacer(modifier = Modifier.height(20.dp))
             // 설정
             SettingColumnComponent(stringResource(R.string.setting),
@@ -201,7 +211,9 @@ fun MyPageScreen(
                 )
                 Text(
                     modifier = Modifier.noRippleClickable {
-                        onNavigationEvent.invoke(MyPageScreenNavigationEvent.MoveToUnlink(userInfo?.memberNickName.orEmpty()))
+                        if (!userInfoUiState.isShowShimmer) {
+                            onNavigationEvent.invoke(MyPageScreenNavigationEvent.MoveToUnlink(userInfoUiState.data.memberNickName))
+                        }
                     },
                     text = stringResource(R.string.unlink),
                     style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray400)
@@ -243,6 +255,40 @@ private sealed interface RightMenuType {
     data class Text(val content: String) : RightMenuType
     data class Arrow(@DrawableRes val iconResId: Int = R.drawable.ic_arrow_right) : RightMenuType
     data object Not : RightMenuType
+}
+
+@Composable
+private fun SkeletonUserInfo() {
+    Column(
+        modifier = Modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Row {
+            Box(
+                modifier = Modifier
+                    .width(108.dp)
+                    .height(34.dp)
+                    .clip(shape = RoundedCornerShape(99.dp))
+                    .shimmerEffect()
+            ) {}
+            Spacer(modifier = Modifier.width(8.dp))
+            Box(
+                modifier = Modifier
+                    .width(65.dp)
+                    .height(34.dp)
+                    .clip(shape = RoundedCornerShape(99.dp))
+                    .shimmerEffect()
+            ) {}
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(24.dp)
+                .padding(end = 103.dp)
+                .clip(shape = RoundedCornerShape(99.dp))
+                .shimmerEffect()
+        ) {}
+    }
 }
 
 @Composable
