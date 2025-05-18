@@ -97,8 +97,8 @@ fun ErrorModal(
 fun PreviewErrorModal() {
     WalkieTheme {
         ErrorModal(
-            title = "",
-            subTitle = stringResource(R.string.dialog_user_account_withdrawn_exception),
+            title = stringResource(R.string.dialog_user_account_withdrawn_exception_title),
+            subTitle = stringResource(R.string.dialog_user_account_withdrawn_exception_subtitle),
             positiveText = "확인",
             onDismiss = {},
             onClickPositive = {}
