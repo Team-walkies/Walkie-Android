@@ -18,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -40,6 +41,8 @@ import com.startup.common.util.OsVersions
 import com.startup.common.util.UsePermissionHelper
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.widget.modal.PrimaryTwoButtonModal
+import com.startup.ga.AnalyticsHelper
+import com.startup.ga.LocalAnalyticsHelper
 import com.startup.home.main.HomeViewModel
 import com.startup.home.navigation.HomeNavigationGraph
 import com.startup.home.navigation.MainScreenNav
@@ -82,6 +85,13 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
             applicationContext,
             SpotNavigatorEntryPoint::class.java
         ).spotNavigatorNavigator()
+    }
+
+    private val analyticsHelper: AnalyticsHelper by lazy {
+        EntryPointAccessors.fromApplication(
+            applicationContext,
+            AnalyticsHelperEntryPoint::class.java
+        ).analyticsHelper()
     }
 
     override fun handleNavigationEvent(navigationEventFlow: Flow<NavigationEvent>) {
@@ -148,9 +158,13 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
             }
         }
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            MainScreen()
-            HandlePermissionComponents()
+        CompositionLocalProvider(
+            LocalAnalyticsHelper provides analyticsHelper,
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                MainScreen()
+                HandlePermissionComponents()
+            }
         }
     }
 
@@ -427,6 +441,11 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
     @InstallIn(SingletonComponent::class)
     interface SpotNavigatorEntryPoint {
         fun spotNavigatorNavigator(): SpotModuleNavigator
+    }
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface AnalyticsHelperEntryPoint {
+        fun analyticsHelper(): AnalyticsHelper
     }
 
     @EntryPoint

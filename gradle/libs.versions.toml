@@ -128,4 +128,4 @@ walkie-android-library-compose = { id = "walkie.android.library.compose", versio
 walkie-android-library = { id = "walkie.android.library", version = "unspecified" }
 walkie-kotlin-library = { id = "walkie.kotlin.library", version = "unspecified" }
 walkie-compose-library = { id = "walkie.compose.library", version = "unspecified" }
-walkie-firebase = { id = "com.startup.convention.firebase" }
+walkie-firebase = { id = "walkie.firebase", version = "unspecified" }

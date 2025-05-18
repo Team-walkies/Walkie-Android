@@ -117,6 +117,9 @@
 # Model
 -keep class com.startup.model.** { *; }
 
+# GA
+-keep class com.startup.ga.** { *; }
+
 # Login
 -keep class com.startup.login.navigation.** { *; }
 -keep class com.startup.login.di.** { *; }
