@@ -179,9 +179,6 @@ class HomeViewModel @Inject constructor(
     }
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            stepCounter.checkAndResetForNewDay()
-        }
         observeEggHatchingEvents()
         processUserInfo()
         setupTargetSteps()

@@ -17,6 +17,8 @@ interface StepDataStore {
     suspend fun isLastResetToday(): Boolean
     suspend fun saveLastResetDate()
     suspend fun saveTodaySteps(steps: Int)
+    suspend fun addTodaySteps(stepsToAdd: Int)
     suspend fun getTodaySteps(): Int
     suspend fun resetTodaySteps()
+    suspend fun checkAndResetForNewDay(): Int?
 }
