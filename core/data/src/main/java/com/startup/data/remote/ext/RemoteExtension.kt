@@ -12,8 +12,8 @@ internal suspend fun <T : BaseResponse<R>, R> FlowCollector<R>.emitRemote(
     if (specificErrorCode != null && item.status == specificErrorCode) {
         throw ResponseErrorException(item.message.orEmpty(), item.status)
     }
-    if (item.status !in 200..299) {
-        throw ResponseErrorException(item.message.orEmpty(), (item.status ?: -1))
+    if (item.status != null && item.status !in 200..299) {
+        throw ResponseErrorException(item.message.orEmpty(), (item.status))
     }
     emit(item.data.requireNotNull())
 }

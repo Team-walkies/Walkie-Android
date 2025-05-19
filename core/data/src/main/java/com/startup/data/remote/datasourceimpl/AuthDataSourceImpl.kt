@@ -1,6 +1,7 @@
 package com.startup.data.remote.datasourceimpl
 
 import androidx.datastore.preferences.core.Preferences
+import com.startup.common.util.ClientException
 import com.startup.common.util.Printer
 import com.startup.common.util.ResponseErrorException
 import com.startup.common.util.UserAuthNotFoundException
@@ -35,14 +36,16 @@ internal class AuthDataSourceImpl @Inject constructor(
 ) : AuthDataSource {
 
     override fun login(kakaoToken: String): Flow<Unit> = flow {
-        emitRemote(
-            authService.login(
-                LoginRequest(
-                    provider = "kakao",
-                    loginAccessToken = kakaoToken
+        handleExceptionIfNeed {
+            emitRemote(
+                authService.login(
+                    LoginRequest(
+                        provider = "kakao",
+                        loginAccessToken = kakaoToken
+                    )
                 )
             )
-        )
+        }
     }.map {
         if (it == null || it.accessToken.isNullOrBlank()) {
             throw UserAuthNotFoundException(
@@ -55,7 +58,7 @@ internal class AuthDataSourceImpl @Inject constructor(
         tokenDataStoreProvider.putValue(refreshTokenKey, it.refreshToken!!)
     }.catch {
         Printer.e("LMH", " EXCEPTION $it")
-        if (it is UserAuthNotFoundException || it is ResponseErrorException || it is HttpException) {
+        if (it is UserAuthNotFoundException || it is ResponseErrorException || it is HttpException || it is ClientException) {
             throw it
         } else {
             throw ResponseErrorException("로그인 오류")
@@ -84,15 +87,17 @@ internal class AuthDataSourceImpl @Inject constructor(
     }
 
     override fun joinWalkie(providerToken: String, nickName: String): Flow<Unit> = flow {
-        emitRemote(
-            authService.join(
-                JoinRequest(
-                    provider = "kakao",
-                    loginAccessToken = providerToken,
-                    nickName = nickName
+        handleExceptionIfNeed {
+            emitRemote(
+                authService.join(
+                    JoinRequest(
+                        provider = "kakao",
+                        loginAccessToken = providerToken,
+                        nickName = nickName
+                    )
                 )
             )
-        )
+        }
     }.map {
         tokenDataStoreProvider.putValue(accessTokenKey, it.accessToken!!)
         tokenDataStoreProvider.putValue(refreshTokenKey, it.refreshToken!!)

@@ -4,6 +4,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseViewModel
 import com.startup.common.provider.ResourceProvider
+import com.startup.common.util.ClientException
 import com.startup.common.util.ResponseErrorException
 import com.startup.common.util.UserAccountWithdrawnException
 import com.startup.common.util.UserAuthNotFoundException
@@ -55,7 +56,7 @@ class LoginViewModel @Inject constructor(
                         _state.placeHolder.update { nickName }
                     }
                     notifyEvent(LoginScreenNavigationEvent.MoveToNickNameSettingScreen)
-                } else if ((exception is ResponseErrorException && exception.code == 401) || (exception is HttpException && exception.code() == 401)) {
+                } else if ((exception is ResponseErrorException && exception.code == 401) || (exception is HttpException && exception.code() == 401) || (exception is ClientException && exception.code == 401)) {
                     _errorDialog.update { UserAccountWithdrawnException() }
                 }
             }.onEach {
