@@ -2,25 +2,24 @@ package com.startup.home.main
 
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseState
+import com.startup.common.base.BaseUiState
 import com.startup.common.base.BaseViewModel
 import com.startup.common.base.UiEvent
 import com.startup.common.event.EventContainer
-import com.startup.common.base.BaseUiState
 import com.startup.common.util.Printer
 import com.startup.domain.model.egg.UpdateStepData
 import com.startup.domain.model.member.UserInfo
 import com.startup.domain.provider.StepDataStore
 import com.startup.domain.repository.LocationRepository
-import com.startup.domain.usecase.walk.GetCurrentWalkCharacter
-import com.startup.domain.usecase.walk.GetCurrentWalkEgg
-import com.startup.domain.usecase.egg.GetGainEggCount
 import com.startup.domain.usecase.character.GetHatchedCharacterCount
+import com.startup.domain.usecase.egg.GetGainEggCount
+import com.startup.domain.usecase.egg.UpdateEggOfStepCount
 import com.startup.domain.usecase.profile.GetMyData
 import com.startup.domain.usecase.spot.GetRecordedSpotCount
-import com.startup.domain.usecase.egg.UpdateEggOfStepCount
+import com.startup.domain.usecase.walk.GetCurrentWalkCharacter
+import com.startup.domain.usecase.walk.GetCurrentWalkEgg
 import com.startup.home.HomeScreenViewModelEvent
 import com.startup.model.character.WalkieCharacter
-import com.startup.model.character.WalkieCharacter.Companion.ofEmpty
 import com.startup.model.character.WalkieCharacter.Companion.toUiModel
 import com.startup.model.egg.EggKind
 import com.startup.model.egg.MyEggModel
@@ -200,7 +199,12 @@ class HomeViewModel @Inject constructor(
                             eggKind = _state.currentWalkEggUiState.value.data.eggKind
                         )
                     )
-                    processUserInfo()
+                    _state.userInfo.value?.let {
+                        updateEggWithLocationData(
+                            it.eggId,
+                            dataStore.getEggCurrentSteps()
+                        )
+                    }
                 } else {
                     _hatchingInfo.value = BaseUiState(
                         isShowShimmer = false,
@@ -225,6 +229,7 @@ class HomeViewModel @Inject constructor(
 
     private fun updateStepProgress(userInfo: UserInfo) {
         viewModelScope.launch {
+            if (userInfo.eggId == 0L || dataStore.getHatchingTargetStep() == 0) return@launch
             val remainingStep = dataStore.getHatchingTargetStep() - dataStore.getEggCurrentSteps()
 
             if (remainingStep > 0) {
@@ -232,8 +237,8 @@ class HomeViewModel @Inject constructor(
                 Printer.e("JUNWOO", "remainingStep : $remainingStep")
                 updateStepWithStepCount(userInfo.eggId, dataStore.getEggCurrentSteps())
             } else {
-                // 목표 달성한 경우 - 위치 정보 포함하여 업데이트
-                updateEggWithLocationData(userInfo.eggId, dataStore.getEggCurrentSteps())
+                // 목표 달성한 경우 - 부화 애니메이션 동작
+                EventContainer.triggerHatchingAnimation()
             }
         }
     }
