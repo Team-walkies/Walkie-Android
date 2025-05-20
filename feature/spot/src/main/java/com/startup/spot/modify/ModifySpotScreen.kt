@@ -8,6 +8,7 @@ import android.webkit.WebViewClient
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -60,6 +61,7 @@ internal fun ModifySpotScreen(
     }
     Column(
         modifier = Modifier
+            .safeDrawingPadding()
             .fillMaxSize()
             .background(WalkieTheme.colors.white)
     ) {

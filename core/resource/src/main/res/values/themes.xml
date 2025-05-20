@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Walkie" parent="android:Theme.Material.Light.NoActionBar" >
+    <style name="Theme.Walkie" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
 
     </style>
 
     <style name="Theme.Walkie.Splash" parent="android:Theme.Material.Light.NoActionBar">
         <item name="postSplashScreenTheme">@style/Theme.Walkie</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="windowSplashScreenBackground">@color/white</item>
     </style>
 
