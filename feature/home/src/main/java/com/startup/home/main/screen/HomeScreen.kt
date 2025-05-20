@@ -48,11 +48,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.startup.common.base.BaseUiState
+import com.startup.common.extension.formatWithLocale
 import com.startup.common.extension.moveToAppDetailSetting
 import com.startup.common.extension.shimmerEffect
 import com.startup.common.extension.shimmerEffectGray200
-import com.startup.common.base.BaseUiState
-import com.startup.common.extension.formatWithLocale
 import com.startup.common.extension.withBold
 import com.startup.common.extension.withUnderline
 import com.startup.design_system.ui.WalkieTheme
@@ -65,10 +65,10 @@ import com.startup.home.HomeScreenNavigationEvent
 import com.startup.home.R
 import com.startup.home.main.HomeViewState
 import com.startup.model.character.WalkieCharacter
-import com.startup.model.egg.EggLayoutModel
-import com.startup.model.egg.getEggLayoutModel
 import com.startup.model.egg.EggKind
+import com.startup.model.egg.EggLayoutModel
 import com.startup.model.egg.MyEggModel
+import com.startup.model.egg.getEggLayoutModel
 import com.startup.model.home.HistoryItemModel
 
 data class HomePermissionState(
@@ -614,7 +614,7 @@ private fun EggContent(
         val eggSize = minOf(screenWidth - 12.dp, maxEggSize) // 좌우 패딩 6dp씩 고려
 
         // 이펙트 이미지
-        if (eggModel.eggKind == EggKind.Empty) {
+        if (eggModel.eggKind != EggKind.Empty) {
             eggAttribute.effectDrawable?.let { drawableRes ->
                 Image(
                     modifier = Modifier
