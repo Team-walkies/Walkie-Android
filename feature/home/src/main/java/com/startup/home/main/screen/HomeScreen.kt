@@ -35,16 +35,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -125,10 +125,10 @@ private fun HomeContent(
     // 스크롤 필요 여부 계산
     val configuration = LocalConfiguration.current
     val screenHeightDp = configuration.screenHeightDp.dp
-    val topPadding = paddingValues.calculateTopPadding()
-    val availableHeight = screenHeightDp - topPadding - 50.dp
-    val minRequiredHeight = 431.dp + 18.dp + 180.dp
-    val needsScroll = minRequiredHeight > availableHeight
+    val availableHeight = screenHeightDp - 93.dp  // 상하단 패딩 50dp + 43dp 제외
+    val halfAvailableHeight = availableHeight / 2  // 나머지 영역의 절반
+    val needsScroll = halfAvailableHeight < 360.dp  // 이 값이 360dp보다 작으면 스크롤 필요
+
 
     val stepCountState by viewState.stepsUiState.collectAsStateWithLifecycle()
     val myEggModelState by viewState.currentWalkEggUiState.collectAsStateWithLifecycle()
@@ -192,12 +192,16 @@ private fun EggAndPartnerSection(
     val permissionState = LocalHomePermissionState.current
     val context = LocalContext.current
 
+    val configuration = LocalConfiguration.current
+    val screenHeightDp = configuration.screenHeightDp.dp
+    val eggAreaHeight = (screenHeightDp * 0.5f).coerceAtLeast(360.dp)
     val analyticsHelper = LocalAnalyticsHelper.current
+    
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .then(
-                if (useFixedHeight) Modifier.height(431.dp)
+                if (useFixedHeight) Modifier.height(eggAreaHeight + 60.dp) // ~~ 함께 걷는중 영역도 고려
                 else Modifier.fillMaxHeight()
             )
     ) {
@@ -208,18 +212,22 @@ private fun EggAndPartnerSection(
                 modifier = Modifier
                     .fillMaxWidth()
                     .then(
-                        if (useFixedHeight) Modifier.height(371.dp)
-                        else Modifier
-                            .weight(1f)
-                            .heightIn(min = 371.dp)
+                        if (useFixedHeight)
+                            Modifier.height(maxOf(eggAreaHeight, 360.dp))
+                        else
+                            Modifier
+                                .weight(1f)
+                                .heightIn(min = 360.dp)
                     )
+
                     .clip(RoundedCornerShape(20.dp))
             ) {
                 EggLayout(
                     modifier = Modifier.fillMaxSize(),
                     stepCountState = stepCountState,
                     eggModelState = eggModelState,
-                    onNavigationEvent = onNavigationEvent
+                    onNavigationEvent = onNavigationEvent,
+                    eggAreaHeight = eggAreaHeight.coerceAtLeast(360.dp)
                 )
             }
 
@@ -280,7 +288,6 @@ private fun EggAndPartnerSection(
                     Image(
                         modifier = Modifier
                             .size(120.dp)
-                            .offset(x = (-8).dp)
                             .noRippleClickable {
                                 analyticsHelper.logEvent(EventNameConst.MAIN_CHARACTER)
                             },
@@ -567,6 +574,7 @@ fun EggLayout(
     stepCountState: BaseUiState<Pair<Int, Int>>,
     eggModelState: BaseUiState<MyEggModel>,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
+    eggAreaHeight: Dp
 ) {
     val eggAttribute = if (!eggModelState.isShowShimmer) {
         getEggLayoutModel(eggModelState.data.eggKind)
@@ -576,6 +584,8 @@ fun EggLayout(
     val analyticsHelper = LocalAnalyticsHelper.current
     Box(
         modifier = modifier
+            .height(maxOf(eggAreaHeight, 360.dp))
+            .fillMaxWidth()
             .background(
                 brush = Brush.verticalGradient(
                     colorStops = arrayOf(
@@ -596,12 +606,15 @@ fun EggLayout(
                     .shimmerEffect()
             )
         } else {
+            val actualBlueAreaHeight = maxOf(eggAreaHeight, 360.dp)
+
             EggContent(
                 eggStep = stepCountState.data.first,
                 todayStep = stepCountState.data.second,
                 eggModel = eggModelState.data,
                 eggAttribute = eggAttribute,
-                onNavigationEvent = onNavigationEvent
+                onNavigationEvent = onNavigationEvent,
+                eggBoxHeight = actualBlueAreaHeight
             )
         }
     }
@@ -615,17 +628,15 @@ private fun EggContent(
     eggModel: MyEggModel,
     eggAttribute: EggLayoutModel,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
+    eggBoxHeight: Dp
 ) {
     val permissionState = LocalHomePermissionState.current
 
+    val eggHeight = eggBoxHeight * 0.57f // 알 높이는 알 영역 높이의 57%
+    val eggWidth = eggHeight * 1.3f // 알 너비는 알 높이의 1.3배
+
     Box(modifier = Modifier.fillMaxSize()) {
         StepInformation(step = todayStep)
-
-        // 화면 너비에 맞게 크기 조정
-        val maxEggSize = 360.dp
-        val configuration = LocalConfiguration.current
-        val screenWidth = configuration.screenWidthDp.dp
-        val eggSize = minOf(screenWidth - 12.dp, maxEggSize) // 좌우 패딩 6dp씩 고려
 
         // 이펙트 이미지
         if (eggModel.eggKind != EggKind.Empty) {
@@ -633,19 +644,18 @@ private fun EggContent(
                 Image(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .offset(y = 78.dp)
+                        .height(eggBoxHeight * 0.87f) // 알 Box 영역의 87% 높이 적용
                         .align(Alignment.BottomCenter),
                     painter = painterResource(drawableRes),
                     contentDescription = stringResource(R.string.desc_empty_egg),
-                    contentScale = ContentScale.FillWidth
+                    contentScale = ContentScale.FillBounds
                 )
             }
         }
 
         Column(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .offset(y = 78.dp),
+                .align(Alignment.BottomCenter),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
         ) {
@@ -656,7 +666,7 @@ private fun EggContent(
                         eggModel.needStep
                     )).formatWithLocale(),
                     modifier = Modifier
-                        .offset(y = 30.dp)
+                        .offset(y = 25.dp)
                         .zIndex(5f),
                 )
             }
@@ -664,15 +674,12 @@ private fun EggContent(
             // 알 이미지
             Box {
                 Image(
-                    modifier = Modifier.size(eggSize),
+                    modifier = Modifier
+                        .width(eggWidth)  // 계산된 너비 적용
+                        .height(eggHeight), // 계산된 높이 적용
                     painter = painterResource(eggAttribute.eggDrawable),
-                    colorFilter = if (eggModel.eggKind == EggKind.Empty) {
-                        ColorFilter.tint(
-                            WalkieTheme.colors.blue300,
-                            blendMode = BlendMode.SrcIn
-                        )
-                    } else null,
                     contentDescription = stringResource(R.string.desc_empty_egg),
+                    contentScale = ContentScale.Crop
                 )
 
                 // 알 선택 텍스트
@@ -685,7 +692,7 @@ private fun EggContent(
                         style = WalkieTheme.typography.head5,
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
-                            .offset(y = (-151).dp)
+                            .offset(y = -eggHeight * 0.3f) // 알 높이의 30%만큼 위로 이동
                             .noRippleClickable {
                                 onNavigationEvent.invoke(HomeScreenNavigationEvent.MoveToGainEgg)
                             },

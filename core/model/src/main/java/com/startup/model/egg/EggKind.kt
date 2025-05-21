@@ -15,10 +15,10 @@ enum class EggKind(
     @StringRes val eggInfoStrRedId: Int
 ) {
     Empty(R.string.desc_empty_egg, R.drawable.img_empty_egg, 0F, eggInfoStrRedId = -1),
-    Normal(R.string.clazz_normal, R.drawable.egg_1, 0.65F, eggInfoStrRedId = R.string.normal_egg_info),
-    Rare(R.string.clazz_rare, R.drawable.egg_2, 0.2F,eggInfoStrRedId = R.string.rare_egg_info),
-    Epic(R.string.clazz_epic, R.drawable.egg_3, 0.12F, eggInfoStrRedId = R.string.epic_egg_info),
-    Legend(R.string.clazz_legend, R.drawable.egg_4, 0.03F,eggInfoStrRedId = R.string.legend_egg_info);
+    Normal(R.string.clazz_normal, R.drawable.egg_normal, 0.65F, eggInfoStrRedId = R.string.normal_egg_info),
+    Rare(R.string.clazz_rare, R.drawable.egg_rare, 0.2F, eggInfoStrRedId = R.string.rare_egg_info),
+    Epic(R.string.clazz_epic, R.drawable.egg_epic, 0.12F, eggInfoStrRedId = R.string.epic_egg_info),
+    Legend(R.string.clazz_legend, R.drawable.egg_legend, 0.03F, eggInfoStrRedId = R.string.legend_egg_info);
 
     @Composable
     fun getTextColor(): Color {
