@@ -157,10 +157,9 @@ internal class WalkieStepForegroundService @Inject constructor() : Service(), Se
     /**
      * 걸음수 저장 및 notification에 걸음수 업데이트
      */
-    private fun handleSteps(context: Context, eggCurrentStep: Int, todaySteps: Int) {
+    private fun handleSteps(context: Context, eggCurrentStep: Int) {
         serviceScope.launch {
             stepDataStore.saveEggCurrentSteps(eggCurrentStep)
-            stepDataStore.saveTodaySteps(todaySteps)
             val targetSteps = stepDataStore.getHatchingTargetStep()
             val isAlreadyReached = stepDataStore.isTargetReached()
 
@@ -189,16 +188,16 @@ internal class WalkieStepForegroundService @Inject constructor() : Service(), Se
             val stepGap = currentSensorValue - lastSensorValue
             if (stepGap > 0) {
                 serviceScope.launch {
+
+                    stepDataStore.checkAndResetForNewDay()
                     val currentEggSteps = stepDataStore.getEggCurrentSteps()
                     val newSteps = currentEggSteps + stepGap
 
-                    val todaySteps = stepDataStore.getTodaySteps()
-                    val newTodayStep = todaySteps + stepGap
+                    stepDataStore.addTodaySteps(stepGap)
 
                     handleSteps(
                         this@WalkieStepForegroundService,
                         eggCurrentStep = newSteps,
-                        todaySteps = newTodayStep
                     )
                 }
             }
@@ -208,7 +207,7 @@ internal class WalkieStepForegroundService @Inject constructor() : Service(), Se
 
     private fun handleAccelerometerSensor(event: SensorEvent) {
         stepDetector.handleAccelerometerSensor(event) {
-            handleSteps(this, 0, 0)
+            handleSteps(this, 0)
         }
     }
 

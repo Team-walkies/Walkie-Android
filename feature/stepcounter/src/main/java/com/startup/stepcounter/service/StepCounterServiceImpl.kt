@@ -35,17 +35,6 @@ class StepCounterServiceImpl @Inject constructor(
     }
 
     override suspend fun checkAndResetForNewDay(): Int? {
-        // 이미 오늘 초기화했는지 확인
-        if (stepDataStore.isLastResetToday()) {
-            return null  // 이미 초기화됨
-        }
-        // 현재 걸음 수 가져오기
-        val currentSteps = stepDataStore.getTodaySteps()
-        // 걸음 수 초기화
-        stepDataStore.resetTodaySteps()
-        // 마지막 초기화 날짜 업데이트
-        stepDataStore.saveLastResetDate()
-        // 이전 걸음 수 반환
-        return currentSteps
+       return stepDataStore.checkAndResetForNewDay()
     }
 }
