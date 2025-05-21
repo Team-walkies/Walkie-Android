@@ -295,8 +295,6 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
         val navController = rememberNavController()
         val snackBarHostState = SnackbarHostState()
 
-        val hatchingInfo by viewModel.hatchingInfo.collectAsStateWithLifecycle()
-
         Scaffold(
             snackbarHost = {
                 // 원래 코드 유지
@@ -400,23 +398,21 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                 }
             }
 
-            hatchingInfo.let {
-                val hatchingInfoState by viewModel.hatchingInfo.collectAsStateWithLifecycle()
+            val hatchingInfoState by viewModel.hatchingInfo.collectAsStateWithLifecycle()
 
-                if (hatchingInfoState.data.isHatching) {
-                    val character = hatchingInfoState.data.character
-                    val eggKind = hatchingInfoState.data.eggKind
+            if (hatchingInfoState.data.isHatching) {
+                val character = hatchingInfoState.data.character
+                val eggKind = hatchingInfoState.data.eggKind
 
-                    val characterName = stringResource(id = character.characterNameResId)
-                    val eggRank = eggKind.ordinal - 1
+                val characterName = stringResource(id = character.characterNameResId)
+                val eggRank = eggKind.ordinal - 1
 
-                    EggHatchingAnimation(
-                        characterName = characterName,
-                        characterImageResId = character.characterImageResId,
-                        eggRank = eggRank,
-                        onDismiss = { viewModel.onHatchingAnimationDismissed() }
-                    )
-                }
+                EggHatchingAnimation(
+                    characterName = characterName,
+                    characterImageResId = character.characterImageResId,
+                    eggRank = eggRank,
+                    onDismiss = { viewModel.onHatchingAnimationDismissed() }
+                )
             }
         }
     }

@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
@@ -235,7 +236,14 @@ class HomeViewModel @Inject constructor(
                 updateStepWithStepCount(userInfo.eggId, dataStore.getEggCurrentSteps())
             } else {
                 // 목표 달성한 경우 - 부화 애니메이션 동작
-                EventContainer.triggerHatchingAnimation()
+                viewModelScope.launch {
+                    _state.currentWalkEggUiState
+                        .filter { !it.isShowShimmer && it.data.eggKind != EggKind.Empty }
+                        .take(1)
+                        .collect {
+                            EventContainer.triggerHatchingAnimation()
+                        }
+                }
             }
         }
     }
@@ -263,14 +271,11 @@ class HomeViewModel @Inject constructor(
                         latitude = locationData.latitude,
                         longitude = locationData.longitude
                     )
-                ).onEach {
-                    // 알 부화 처리 이후 홈 리프레시
-                    viewModelScope.launch {
-                        notifyViewModelEvent(HomeScreenViewModelEvent.RefreshHome)
-                    }
-                }.catch {}.launchIn(viewModelScope)
-
-                stepCounter.resetEggStep()
+                ).catch {}.onCompletion {
+                    stepCounter.resetEggStep()
+                    EventContainer.triggerNotificationUpdate()
+                    notifyViewModelEvent(HomeScreenViewModelEvent.RefreshHome)
+                }.launchIn(viewModelScope)
             }
         }
     }
@@ -278,7 +283,6 @@ class HomeViewModel @Inject constructor(
     private fun setupTargetSteps() {
         viewModelScope.launch {
             _state.currentWalkEggUiState
-                .filter { it.data.needStep > 0 }
                 .take(1)
                 .collect { currentEgg ->
                     dataStore.setHatchingTargetStep(target = currentEgg.data.needStep)
