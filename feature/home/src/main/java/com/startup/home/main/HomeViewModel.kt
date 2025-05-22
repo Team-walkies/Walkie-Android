@@ -197,9 +197,10 @@ class HomeViewModel @Inject constructor(
                             eggKind = _state.currentWalkEggUiState.value.data.eggKind
                         )
                     )
-                    _state.userInfo.value?.let {
+                    val currentEggState = _state.currentWalkEggUiState.value
+                    if (!currentEggState.isShowShimmer && currentEggState.data.eggId != 0L) {
                         updateEggWithLocationData(
-                            it.eggId,
+                            currentEggState.data.eggId,
                             dataStore.getEggCurrentSteps()
                         )
                     }
