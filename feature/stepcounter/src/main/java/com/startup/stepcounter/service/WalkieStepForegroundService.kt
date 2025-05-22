@@ -62,6 +62,7 @@ internal class WalkieStepForegroundService @Inject constructor() : Service(), Se
         super.onCreate()
         initStepSensor()
         startForegroundService()
+        observeNotificationUpdateEvents()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -153,6 +154,22 @@ internal class WalkieStepForegroundService @Inject constructor() : Service(), Se
             }
         }
     }
+
+    private fun observeNotificationUpdateEvents() {
+        serviceScope.launch {
+            EventContainer.updateNotificationFlow.collect {
+                val currentSteps = stepDataStore.getEggCurrentSteps()
+                val targetStep = 0
+
+                updateStepNotification(
+                    this@WalkieStepForegroundService,
+                    currentSteps,
+                    targetStep
+                )
+            }
+        }
+    }
+
 
     /**
      * 걸음수 저장 및 notification에 걸음수 업데이트
