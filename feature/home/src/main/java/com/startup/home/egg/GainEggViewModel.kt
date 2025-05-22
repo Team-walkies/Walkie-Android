@@ -50,6 +50,7 @@ class GainEggViewModel @Inject constructor(
                 if (needStep > 0) {
                     dataStore.setHatchingTargetStep(target = needStep)
                     dataStore.saveEggCurrentSteps(steps = nowStep) // 알이 변경되었으므로 걸음수를 eggModel의 nowStep으로 초기화
+                    dataStore.setCurrentWalkEggId(eggId = eggId)
                     Printer.d(
                         "JUNWOO",
                         "Target step set: $needStep, Current steps set to: $nowStep"

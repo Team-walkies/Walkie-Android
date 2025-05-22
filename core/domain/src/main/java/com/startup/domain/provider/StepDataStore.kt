@@ -7,6 +7,8 @@ interface StepDataStore {
     suspend fun saveEggCurrentSteps(steps: Int)
     suspend fun getHatchingTargetStep(): Int
     suspend fun setHatchingTargetStep(target: Int)
+    suspend fun getCurrentWalkEggId(): Long
+    suspend fun setCurrentWalkEggId(eggId: Long)
     suspend fun resetHatchingSteps()
     suspend fun isTargetReached(): Boolean
     suspend fun setTargetReached(reached: Boolean)

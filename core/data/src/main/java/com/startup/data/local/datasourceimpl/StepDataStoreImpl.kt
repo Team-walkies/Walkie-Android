@@ -26,6 +26,7 @@ class StepDataStoreImpl @Inject constructor(
     private companion object {
         private val TODAY_STEPS = intPreferencesKey("today_steps")
         private val CURRENT_STEPS = intPreferencesKey("current_steps")
+        private val CURRENT_WALK_EGG_ID = longPreferencesKey("current_walk_egg_id")
         private val TARGET_STEP = intPreferencesKey("target_step")
         private val TARGET_REACHED = booleanPreferencesKey("target_reached")
         private val LAST_RESET_TIME = longPreferencesKey("last_reset_time")
@@ -73,6 +74,16 @@ class StepDataStoreImpl @Inject constructor(
     override suspend fun setHatchingTargetStep(target: Int) {
         context.dataStore.edit { preferences ->
             preferences[TARGET_STEP] = target
+        }
+    }
+
+    override suspend fun getCurrentWalkEggId(): Long {
+        return context.dataStore.data.first()[CURRENT_WALK_EGG_ID] ?: 0
+    }
+
+    override suspend fun setCurrentWalkEggId(eggId: Long) {
+        context.dataStore.edit { preferences ->
+            preferences[CURRENT_WALK_EGG_ID] = eggId
         }
     }
 
