@@ -8,12 +8,16 @@ import com.startup.data.remote.dto.request.member.MemberNickNameRequest
 import com.startup.domain.model.character.MyCharacterWithWalk
 import com.startup.domain.model.egg.MyEgg
 import com.startup.domain.model.member.UserInfo
+import com.startup.domain.provider.StepDataStore
 import com.startup.domain.repository.MemberRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-internal class MemberRepositoryImpl @Inject constructor(private val memberDataSource: MemberDataSource): MemberRepository {
+internal class MemberRepositoryImpl @Inject constructor(
+    private val memberDataSource: MemberDataSource,
+    private val stepDataStore: StepDataStore
+) : MemberRepository {
     override fun getUserInfo(): Flow<UserInfo> = memberDataSource.getUserInfo().map { it.toDomain() }
 
     override fun modifyUserInfo(memberNickname: String): Flow<Unit> = memberDataSource.modifyUserInfo(
@@ -24,7 +28,11 @@ internal class MemberRepositoryImpl @Inject constructor(private val memberDataSo
         WalkingEggRequest(eggId)
     )
 
-    override fun getWalkingEgg(): Flow<MyEgg> = memberDataSource.getWalkingEgg().map { it.toDomain() }
+    override fun getWalkingEgg(): Flow<MyEgg> = memberDataSource.getWalkingEgg().map {
+        val myEgg = it.toDomain()
+        stepDataStore.setCurrentWalkEggId(myEgg.eggId)
+        myEgg
+    }
 
     override fun modifyWalkingCharacter(characterId: Long): Flow<Unit> = memberDataSource.modifyWalkingCharacter(
         CharacterIdRequest(characterId)
