@@ -29,7 +29,7 @@ fun buildWalkieNotification(context: Context, step: Int, target: Int = 0): Notif
     createNotificationChannel(context)
 
     if (target == 0) {
-        return NotificationCompat.Builder(context, WALKIE_EGG_INDUCTION_NOTIFICATION_CHANNEL_ID)
+        return NotificationCompat.Builder(context, WALKIE_STEP_NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_walkie_notification)
             .setContentTitle(context.getString(R.string.notification_default_title))
             .setContentText(context.getString(R.string.notification_default_message))

@@ -13,7 +13,7 @@ object EventContainer {
 
     val hatchingAnimationFlow: SharedFlow<Boolean> = _hatchingAnimationFlow.asSharedFlow()
 
-    private val _updateNotificationFlow = MutableSharedFlow<Boolean>(
+    private val _updateNotificationFlow = MutableSharedFlow<Int>(
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
@@ -34,8 +34,8 @@ object EventContainer {
         _homeRefreshEventFlow.emit(Unit)
     }
 
-    suspend fun triggerNotificationUpdate() {
-        _updateNotificationFlow.emit(true)
+    suspend fun triggerNotificationUpdate(targetStep: Int) {
+        _updateNotificationFlow.emit(targetStep)
     }
 
 }

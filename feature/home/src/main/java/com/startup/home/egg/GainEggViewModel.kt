@@ -6,6 +6,7 @@ import com.startup.common.event.EventContainer
 import com.startup.common.util.Printer
 import com.startup.domain.provider.StepDataStore
 import com.startup.common.base.BaseUiState
+import com.startup.common.event.EventContainer.triggerNotificationUpdate
 import com.startup.domain.usecase.egg.GetGainEggList
 import com.startup.domain.usecase.walk.UpdateWalkingEgg
 import com.startup.model.egg.MyEggModel.Companion.toUiModel
@@ -51,6 +52,7 @@ class GainEggViewModel @Inject constructor(
                     dataStore.setHatchingTargetStep(target = needStep)
                     dataStore.saveEggCurrentSteps(steps = nowStep) // 알이 변경되었으므로 걸음수를 eggModel의 nowStep으로 초기화
                     dataStore.setCurrentWalkEggId(eggId = eggId)
+                    triggerNotificationUpdate(targetStep = needStep)
                     Printer.d(
                         "JUNWOO",
                         "Target step set: $needStep, Current steps set to: $nowStep"

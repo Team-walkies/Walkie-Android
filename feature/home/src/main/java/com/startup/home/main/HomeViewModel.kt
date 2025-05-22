@@ -273,7 +273,7 @@ class HomeViewModel @Inject constructor(
                     )
                 ).catch {}.onCompletion {
                     stepCounter.resetEggStep()
-                    EventContainer.triggerNotificationUpdate()
+                    EventContainer.triggerNotificationUpdate(0)
                     notifyViewModelEvent(HomeScreenViewModelEvent.RefreshHome)
                 }.launchIn(viewModelScope)
             }
@@ -283,10 +283,15 @@ class HomeViewModel @Inject constructor(
     private fun setupTargetSteps() {
         viewModelScope.launch {
             _state.currentWalkEggUiState
+                .filter { !it.isShowShimmer }
                 .take(1)
                 .collect { currentEgg ->
-                    dataStore.setHatchingTargetStep(target = currentEgg.data.needStep)
-                    Printer.e("JUNWOO", "Target step set: ${currentEgg.data.needStep}")
+                    val targetStep = if (currentEgg.data.eggKind == EggKind.Empty) {
+                        0
+                    } else {
+                        currentEgg.data.needStep // 알이 있으면 실제 목표값
+                    }
+                    dataStore.setHatchingTargetStep(target = targetStep)
                 }
         }
     }
