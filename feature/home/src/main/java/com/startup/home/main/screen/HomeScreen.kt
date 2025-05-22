@@ -61,6 +61,9 @@ import com.startup.design_system.widget.actionbar.MainLogoActionBar
 import com.startup.design_system.widget.modal.PrimaryTwoButtonModal
 import com.startup.design_system.widget.permission.PermissionInduction
 import com.startup.design_system.widget.speechbubble.SpeechBubble
+import com.startup.ga.EventNameConst
+import com.startup.ga.LocalAnalyticsHelper
+import com.startup.ga.logEvent
 import com.startup.home.HomeScreenNavigationEvent
 import com.startup.home.R
 import com.startup.home.main.HomeViewState
@@ -189,6 +192,7 @@ private fun EggAndPartnerSection(
     val permissionState = LocalHomePermissionState.current
     val context = LocalContext.current
 
+    val analyticsHelper = LocalAnalyticsHelper.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -276,7 +280,10 @@ private fun EggAndPartnerSection(
                     Image(
                         modifier = Modifier
                             .size(120.dp)
-                            .offset(x = (-8).dp),
+                            .offset(x = (-8).dp)
+                            .noRippleClickable {
+                                analyticsHelper.logEvent(EventNameConst.MAIN_CHARACTER)
+                            },
                         painter = painterResource(walkieCharacterState.data.characterImageResId),
                         contentDescription = stringResource(R.string.desc_partner)
                     )
@@ -328,12 +335,16 @@ fun PermissionSection(
 
 @Composable
 private fun PartnerInfoBox(partnerName: String) {
+    val analyticsHelper = LocalAnalyticsHelper.current
     Box(
         modifier = Modifier
             .height(52.dp)
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(WalkieTheme.colors.gray100),
+            .background(WalkieTheme.colors.gray100)
+            .noRippleClickable {
+                analyticsHelper.logEvent(EventNameConst.MAIN_TOGETHER)
+            },
         contentAlignment = Alignment.CenterStart,
     ) {
         Text(
@@ -562,7 +573,7 @@ fun EggLayout(
     } else {
         getEggLayoutModel(EggKind.Empty)
     }
-
+    val analyticsHelper = LocalAnalyticsHelper.current
     Box(
         modifier = modifier
             .background(
@@ -572,7 +583,10 @@ fun EggLayout(
                         1f to eggAttribute.endGradient
                     )
                 )
-            ),
+            )
+            .noRippleClickable {
+                analyticsHelper.logEvent(EventNameConst.MAIN_BLUE_CARD)
+            },
         contentAlignment = Alignment.Center
     ) {
         if (stepCountState.isShowShimmer || eggModelState.isShowShimmer) {

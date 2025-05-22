@@ -52,6 +52,9 @@ import com.startup.model.spot.CalendarModel
 import com.startup.model.spot.ReviewModel
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.ui.noRippleClickable
+import com.startup.ga.EventNameConst
+import com.startup.ga.LocalAnalyticsHelper
+import com.startup.ga.logEvent
 import com.startup.home.spot.component.BottomSheetMonthCalendarComponent
 import com.startup.home.spot.component.BottomSheetReviewOption
 import com.startup.home.spot.SpotArchiveUiEvent
@@ -96,6 +99,7 @@ internal fun SpotArchiveScreen(
             }
         }
     val today = LocalDate.now()
+    val analyticsHelper = LocalAnalyticsHelper.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -216,6 +220,7 @@ internal fun SpotArchiveScreen(
                 isCalendarBottomModalShow = false
             },
             onSelectDay = {
+                analyticsHelper.logEvent(EventNameConst.SPOT_CALENDAR_MOVE)
                 uiEventSender.invoke(SpotArchiveUiEvent.OnDateChanged(CalendarModel(it, true)))
                 isCalendarBottomModalShow = false
             },

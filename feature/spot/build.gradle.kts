@@ -14,6 +14,10 @@ android {
     }
 }
 
+dependencies {
+    implementation(project(":core:ga"))
+}
+
 fun getProperty(propertyKey: String): String {
     return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
 }

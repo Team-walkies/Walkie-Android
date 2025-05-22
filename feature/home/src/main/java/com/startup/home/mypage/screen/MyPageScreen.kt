@@ -44,6 +44,9 @@ import com.startup.common.extension.withColor
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.widget.actionbar.MainActionBar
 import com.startup.design_system.widget.modal.ErrorTwoButtonModal
+import com.startup.ga.EventNameConst
+import com.startup.ga.LocalAnalyticsHelper
+import com.startup.ga.logEvent
 import com.startup.home.MyPageScreenNavigationEvent
 import com.startup.home.R
 import com.startup.home.mypage.MyInfoViewState
@@ -57,6 +60,7 @@ fun MyPageScreen(
     val context = LocalContext.current
     var isLogoutDialogShow by remember { mutableStateOf(false) }
     val userInfoUiState by myInfoViewState.userInfo.collectAsStateWithLifecycle()
+    val analyticsHelper = LocalAnalyticsHelper.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -158,6 +162,7 @@ fun MyPageScreen(
                     )
                     .padding(16.dp)
                     .noRippleClickable {
+                        analyticsHelper.logEvent(EventNameConst.MY_PAGE_SURVEY)
                         context.openBrowser(WalkieWebConstants.FAQ_URL)
                     }
             ) {

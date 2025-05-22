@@ -31,10 +31,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.startup.common.event.EventContainer
 import com.startup.design_system.widget.toast.ShowToast
-import com.startup.home.main.screen.HomeScreen
 import com.startup.home.main.HomeViewModel
-import com.startup.home.mypage.screen.MyPageScreen
+import com.startup.home.main.screen.HomeScreen
 import com.startup.home.mypage.MyPageViewModel
+import com.startup.home.mypage.screen.MyPageScreen
 import com.startup.home.navigation.BottomNavItem
 import com.startup.home.navigation.HomeScreenNav
 import com.startup.home.navigation.MainScreenNav
@@ -66,7 +66,6 @@ fun MainBottomNavigationScreen(
         }
     val isHomeRefresh by navController.currentBackStackEntryFlow.map { !canNavigateBack && it.destination.route == MainScreenNav.BottomNavigation.route }
         .collectAsStateWithLifecycle(false)
-
     BackHandler(enabled = !canNavigateBack) {
         if (backPressedOnce) {
             (context as? Activity)?.finish()
