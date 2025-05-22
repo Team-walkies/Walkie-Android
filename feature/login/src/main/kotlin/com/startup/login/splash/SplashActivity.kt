@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,6 +88,7 @@ class SplashActivity : BaseActivity<SplashUiEvent, SplashNavigationEvent>() {
 private fun SplashScreenCompose() {
     BoxWithConstraints(
         modifier = Modifier
+            .safeDrawingPadding()
             .fillMaxSize()
             .background(Color.White),
         contentAlignment = Alignment.TopCenter
