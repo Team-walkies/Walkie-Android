@@ -106,7 +106,7 @@ private fun createNotificationChannel(context: Context) {
 private fun createPendingIntent(context: Context): PendingIntent {
     val deepLinkIntent = Intent(Intent.ACTION_VIEW).apply {
         data = Uri.parse("walkie://splash")
-        flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
     }
 
     return PendingIntent.getActivity(
