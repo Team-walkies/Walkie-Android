@@ -157,13 +157,10 @@ internal class WalkieStepForegroundService @Inject constructor() : Service(), Se
 
     private fun observeNotificationUpdateEvents() {
         serviceScope.launch {
-            EventContainer.updateNotificationFlow.collect {
-                val currentSteps = stepDataStore.getEggCurrentSteps()
-                val targetStep = 0
-
+            EventContainer.updateNotificationFlow.collect { targetStep ->
                 updateStepNotification(
                     this@WalkieStepForegroundService,
-                    currentSteps,
+                    stepDataStore.getEggCurrentSteps(),
                     targetStep
                 )
             }
