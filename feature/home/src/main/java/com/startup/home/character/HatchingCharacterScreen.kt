@@ -653,7 +653,7 @@ private fun CharacterInfoTags(characterDetail: WalkieCharacterDetail) {
                 .padding(vertical = 8.dp, horizontal = 16.dp)
         ) {
             Text(
-                text = stringResource(R.string.format_int, 1), // 임시로 1로 고정
+                text = stringResource(R.string.format_int, characterDetail.character.count),
                 style = WalkieTheme.typography.head6.copy(color = colors.gray700),
             )
             Text(
