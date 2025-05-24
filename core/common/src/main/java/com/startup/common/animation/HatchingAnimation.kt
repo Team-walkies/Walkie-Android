@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -174,27 +175,34 @@ fun EggHatchingAnimation(
                 )
             }
 
-            // 로티 영역 - 정중앙
+            // 알 깨지는 로티 - 정중앙
             Box(
                 modifier = Modifier
                     .size(200.dp)
                     .align(Alignment.Center),
                 contentAlignment = Alignment.Center
             ) {
-                // 알 깨지는 로티
                 AnimatedLottie(
                     composition = eggCrackingComposition,
                     progress = eggCrackingAnimationState,
                     visible = showEggLottie,
                     size = 200.dp
                 )
+            }
 
-                // 팡 터지는 로티
+            // 팡 터지는 로티 - 정중앙 (크기 제한 없음)
+            Box(
+                modifier = Modifier.align(Alignment.Center),
+                contentAlignment = Alignment.Center
+            ) {
+                val configuration = LocalConfiguration.current
+                val screenHeight = configuration.screenHeightDp.dp
+
                 AnimatedLottie(
                     composition = explosionComposition,
                     progress = explosionAnimationState,
                     visible = showExplosionLottie,
-                    size = 250.dp
+                    size = screenHeight * 0.8f
                 )
             }
         }
@@ -428,7 +436,9 @@ fun AnimatedGlowImage(
         Image(
             painter = painterResource(id = R.drawable.img_glow),
             contentDescription = null,
-            modifier = modifier.alpha(alpha)
+            modifier = modifier
+                .alpha(alpha)
+                .size(200.dp)
         )
     }
 }
