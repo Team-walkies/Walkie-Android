@@ -198,7 +198,7 @@
     <string name="permission_essential_dialog_title">접근권한 허용</string>
     <string name="permission_essential_dialog_message">원활한 서비스 이용을 위해\n‘위치’, ‘신체활동’ 권한을 모두 허용해 주세요</string>
     <string name="permission_location_dialog_title">위치 권한 허용</string>
-    <string name="permission_location_dialog_message">스팟을 탐색하기 위해 백그라운드 동작 시의 위치 정보 접근을 허가해 주세요.\n\n 1. 워키 정보에서 `권한` 선택\n 2. 앱 권한에서 `위치` 선택\n 3. 위치를 ‘항상 허용’으로 변경</string>
+    <string name="permission_location_dialog_message">앱이 백그라운드에서도 원활히 작동하려면, 위치 권한을 ‘항상 허용’으로 설정해야 해요.\n\n 1. 워키 정보에서 `권한` 선택\n 2. 앱 권한에서 `위치` 선택\n 3. 위치를 ‘항상 허용’으로 변경</string>
     <string name="permission_activity_recognition_title">신체활동 권한 허용</string>
     <string name="permission_activity_recognition_message">걸음 수 측정을 위해 권한이 필요해요</string>
     <string name="permission_dialog_message">원할한 서비스이용을 위해 권한이 필요해요</string>
