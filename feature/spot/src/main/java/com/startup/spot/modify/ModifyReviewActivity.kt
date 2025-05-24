@@ -13,6 +13,7 @@ import com.startup.spot.ModifyReviewEvent
 import com.startup.spot.ModifyReviewNavigationEvent
 import com.startup.spot.ModifyReviewUiEvent
 import com.startup.design_system.ui.WalkieTheme
+import com.startup.spot.BuildConfig
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,7 +37,7 @@ class ModifyReviewActivity : BaseActivity<ModifyReviewUiEvent, ModifyReviewNavig
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            WebView.setWebContentsDebuggingEnabled(true)
+            WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
             WalkieTheme {
                 BackHandler {}
                 CookieManager.getInstance().removeAllCookies(null)

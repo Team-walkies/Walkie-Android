@@ -33,7 +33,7 @@ class SpotActivity : BaseActivity<SpotUiEvent, SpotNavigationEvent>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            WebView.setWebContentsDebuggingEnabled(true)
+            WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
             WalkieTheme {
                 BackHandler {}
                 CookieManager.getInstance().removeAllCookies(null)
