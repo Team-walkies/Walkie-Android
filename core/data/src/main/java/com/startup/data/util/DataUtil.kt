@@ -7,6 +7,7 @@ import com.startup.common.util.NetworkTemporaryException
 import com.startup.common.util.NoCharacterException
 import com.startup.common.util.ResponseErrorException
 import com.startup.common.util.UnknownException
+import com.startup.common.util.UserAuthNotFoundException
 import retrofit2.HttpException
 import java.io.InterruptedIOException
 import java.net.ConnectException
@@ -34,7 +35,7 @@ fun handleException(e: Throwable): Throwable {
             else -> throw e
         }
 
-        is ResponseErrorException -> throw e
+        is ResponseErrorException, is UserAuthNotFoundException -> throw e
         is NoCharacterException -> throw e
         is SocketTimeoutException,
         is ConnectException,
