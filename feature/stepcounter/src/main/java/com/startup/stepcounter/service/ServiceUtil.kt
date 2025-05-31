@@ -11,7 +11,7 @@ import com.startup.common.util.UsePermissionHelper.isGrantedPermissions
 
 object ServiceUtil {
 
-    fun startForegroundService(context: Context) {
+    fun startStepTracking(context: Context) {
         val intent = Intent(context, WalkieStepForegroundService::class.java)
 
         try {

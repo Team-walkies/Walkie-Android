@@ -1,11 +1,11 @@
-package com.startup.stepcounter.service
+package com.startup.domain.provider
 
 import kotlinx.coroutines.flow.Flow
 
 interface StepCounterService {
     fun observeSteps(): Flow<Pair<Int, Int>>
-    suspend fun resetEggStep()
     fun startCounting()
     fun stopCounting()
+    suspend fun resetEggStep()
     suspend fun checkAndResetForNewDay(): Int?
 }

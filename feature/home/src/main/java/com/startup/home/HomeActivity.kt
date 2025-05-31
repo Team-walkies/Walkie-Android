@@ -1,7 +1,5 @@
 package com.startup.home
 
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,6 +37,8 @@ import com.startup.common.util.BatteryOptimizationHelper
 import com.startup.common.util.OsVersions
 import com.startup.common.util.UsePermissionHelper
 import com.startup.design_system.ui.WalkieTheme
+import com.startup.domain.provider.DateChangeListener
+import com.startup.domain.provider.DateChangeNotifier
 import com.startup.ga.AnalyticsHelper
 import com.startup.ga.LocalAnalyticsHelper
 import com.startup.home.main.HomeViewModel
@@ -50,7 +50,6 @@ import com.startup.home.permission.PermissionManager
 import com.startup.home.permission.PermissionUiEvent
 import com.startup.navigation.LoginModuleNavigator
 import com.startup.navigation.SpotModuleNavigator
-import com.startup.stepcounter.broadcastReciver.DailyResetReceiver
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,14 +59,18 @@ import kotlinx.coroutines.flow.Flow
 
 @AndroidEntryPoint
 class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
-    DailyResetReceiver.OnDateChangedListener {
+    DateChangeListener {
 
     override val viewModel: HomeViewModel by viewModels<HomeViewModel>()
 
     private lateinit var permissionManager: PermissionManager
 
-    // 날짜 변경 수신기
-    private val dailyResetReceiver = DailyResetReceiver()
+    private val dateChangeNotifier: DateChangeNotifier by lazy {
+        EntryPointAccessors.fromApplication(
+            applicationContext,
+            DateChangeNotifierEntryPoint::class.java
+        ).dateChangeNotifier()
+    }
 
     // Activity Result Launchers - 권한 관련 Intent 처리용
     private val settingsLauncher = registerForActivityResult(
@@ -171,12 +174,8 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
     }
 
     private fun registerDailyResetReceiver() {
-        dailyResetReceiver.setOnDateChangedListener(this)
-
-        val filter = IntentFilter().apply {
-            addAction(Intent.ACTION_DATE_CHANGED)
-        }
-        registerReceiver(dailyResetReceiver, filter)
+        dateChangeNotifier.setListener(this)
+        dateChangeNotifier.startListening()
     }
 
     override fun onDateChanged() {
@@ -346,14 +345,20 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
     }
 
     override fun onDestroy() {
-        unregisterReceiver(dailyResetReceiver)
-        dailyResetReceiver.removeOnDateChangedListener()
+        dateChangeNotifier.stopListening()
+        dateChangeNotifier.removeListener()
         super.onDestroy()
     }
 
     override fun navigateToLogin() {
         loginModuleNavigator.navigateLoginView(this)
         finish()
+    }
+
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface DateChangeNotifierEntryPoint {
+        fun dateChangeNotifier(): DateChangeNotifier
     }
 
     @EntryPoint

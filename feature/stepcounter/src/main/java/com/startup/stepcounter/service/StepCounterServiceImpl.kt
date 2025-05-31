@@ -3,13 +3,15 @@ package com.startup.stepcounter.service
 import android.content.Context
 import android.content.Intent
 import com.startup.common.util.OsVersions
+import com.startup.domain.provider.StepCounterService
 import com.startup.domain.provider.StepDataStore
-import com.startup.stepcounter.service.ServiceUtil.startForegroundService
+import com.startup.stepcounter.service.ServiceUtil.startStepTracking
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import javax.inject.Singleton
 
-
+@Singleton
 class StepCounterServiceImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val stepDataStore: StepDataStore
@@ -18,7 +20,7 @@ class StepCounterServiceImpl @Inject constructor(
 
     override fun startCounting() {
         if (OsVersions.isGreaterThanOrEqualsO()) {
-            startForegroundService(context)
+            startStepTracking(context)
         } else {
             context.startService(Intent(context, WalkieStepForegroundService::class.java))
         }
@@ -35,6 +37,6 @@ class StepCounterServiceImpl @Inject constructor(
     }
 
     override suspend fun checkAndResetForNewDay(): Int? {
-       return stepDataStore.checkAndResetForNewDay()
+        return stepDataStore.checkAndResetForNewDay()
     }
 }

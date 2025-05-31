@@ -3,7 +3,7 @@ package com.startup.stepcounter.broadcastReciver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.startup.stepcounter.service.ServiceUtil.startForegroundService
+import com.startup.stepcounter.service.ServiceUtil.startStepTracking
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Objects
 import javax.inject.Inject
@@ -17,7 +17,7 @@ internal class PackageChangedReceiver @Inject constructor() : BroadcastReceiver(
     override fun onReceive(context: Context?, intent: Intent?) {
         if (Objects.equals(intent?.action, Intent.ACTION_MY_PACKAGE_REPLACED)) {
             context?.let {
-                startForegroundService(it)
+                startStepTracking(it)
             }
         }
     }

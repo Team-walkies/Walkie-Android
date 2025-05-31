@@ -7,6 +7,5 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:stepcounter"))
     implementation(project(":core:ga"))
 }
