@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -50,10 +49,10 @@ class HomeViewModel @Inject constructor(
     private val dataStore: StepDataStore,
     private val locationRepository: LocationRepository,
     private val updateEggOfStepCount: UpdateEggOfStepCount,
+    private val getCurrentWalkEgg: GetCurrentWalkEgg,
     getGainEggCount: GetGainEggCount,
     getHatchedCharacterCount: GetHatchedCharacterCount,
     getMyData: GetMyData,
-    getCurrentWalkEgg: GetCurrentWalkEgg,
     getCurrentRecordedSpotCount: GetRecordedSpotCount,
     getCurrentWalkCharacter: GetCurrentWalkCharacter,
 ) : BaseViewModel() {
@@ -98,32 +97,14 @@ class HomeViewModel @Inject constructor(
                         emit(
                             BaseUiState(
                                 isShowShimmer = false,
-                                data = MyEggModel(
-                                    eggKind = EggKind.Empty,
-                                    obtainedDate = "",
-                                    obtainedPosition = "",
-                                    eggId = 0,
-                                    play = false,
-                                    nowStep = 0,
-                                    needStep = 0,
-                                    walkieCharacter = WalkieCharacter.ofEmpty()
-                                )
+                                data = MyEggModel.empty()
                             )
                         )
                     }
             }.stateInViewModel(
                 BaseUiState(
                     isShowShimmer = true,
-                    data = MyEggModel(
-                        walkieCharacter = WalkieCharacter.ofEmpty(),
-                        eggKind = EggKind.Empty,
-                        obtainedDate = "",
-                        obtainedPosition = "",
-                        eggId = 0,
-                        play = false,
-                        nowStep = 0,
-                        needStep = 0
-                    )
+                    data = MyEggModel.empty()
                 )
             ),
         currentWalkCharacterUiState = viewModelEvent.filter { it == HomeScreenViewModelEvent.RefreshHome }
@@ -189,21 +170,16 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             EventContainer.hatchingAnimationFlow.collect { isHatching ->
                 if (isHatching) {
-                    _hatchingInfo.value = BaseUiState(
-                        isShowShimmer = false,
-                        data = HatchingAnimationCharacterData(
-                            isHatching = true,
-                            character = _state.currentWalkEggUiState.value.data.walkieCharacter,
-                            eggKind = _state.currentWalkEggUiState.value.data.eggKind
-                        )
-                    )
-                    val currentEggState = _state.currentWalkEggUiState.value
-                    if (!currentEggState.isShowShimmer && currentEggState.data.eggId != 0L) {
-                        updateEggWithLocationData(
-                            currentEggState.data.eggId,
-                            dataStore.getEggCurrentSteps()
-                        )
-                    }
+                    getCurrentWalkEgg.invoke(Unit)
+                        .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
+                        .catch { emit(BaseUiState(isShowShimmer = false, data = MyEggModel.empty())) }
+                        .collect { eggState ->
+                            updateHatchingInfo(eggState.data)
+
+                            if (eggState.data.eggId != 0L) {
+                                updateEggWithLocationData(eggState.data.eggId, dataStore.getEggCurrentSteps())
+                            }
+                        }
                 } else {
                     _hatchingInfo.value = BaseUiState(
                         isShowShimmer = false,
@@ -212,6 +188,17 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun updateHatchingInfo(eggModel: MyEggModel) {
+        _hatchingInfo.value = BaseUiState(
+            isShowShimmer = false,
+            data = HatchingAnimationCharacterData(
+                isHatching = true,
+                character = eggModel.walkieCharacter,
+                eggKind = eggModel.eggKind
+            )
+        )
     }
 
     private fun processUserInfo() {

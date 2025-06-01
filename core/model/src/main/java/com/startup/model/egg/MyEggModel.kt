@@ -34,6 +34,17 @@ data class MyEggModel(
             )
         )
 
+        fun empty() = MyEggModel(
+            eggKind = EggKind.Empty,
+            obtainedDate = "",
+            obtainedPosition = "",
+            eggId = 0,
+            play = false,
+            nowStep = 0,
+            needStep = 0,
+            walkieCharacter = WalkieCharacter.ofEmpty()
+        )
+
         fun List<MyEggModel>.currentPlayEgg(): MyEggModel? = find { it.play }
     }
 
