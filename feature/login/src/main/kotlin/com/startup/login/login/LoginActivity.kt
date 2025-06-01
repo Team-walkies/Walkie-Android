@@ -39,27 +39,22 @@ import com.startup.login.login.model.LoginScreenNavigationEvent
 import com.startup.login.login.model.LoginUiEvent
 import com.startup.login.login.model.NickNameSettingEvent
 import com.startup.login.navigation.LoginScreenNav
-import com.startup.login.splash.SplashActivity
 import com.startup.navigation.HomeModuleNavigator
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
     override val viewModel: LoginViewModel by viewModels()
 
-    // KSP 는 필드 주입이 안 됨
-    private val homeModuleNavigator: HomeModuleNavigator by lazy {
-        EntryPointAccessors.fromApplication(
-            applicationContext,
-            SplashActivity.HomeModuleNavigatorEntryPoint::class.java
-        ).homeModuleNavigator()
-    }
+    @Inject
+    lateinit var homeModuleNavigator: HomeModuleNavigator
+
     private val kaKaoLoginClient by lazy { KaKaoLoginClient() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -207,5 +202,4 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
             }
         }
     }
-
 }

@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -12,7 +13,7 @@ java {
 
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = "17"
     }
 }
 
@@ -21,7 +22,6 @@ dependencies {
     implementation(libs.kotlin.gradlePlugin)
     implementation(libs.compose.gradlePlugin)
     implementation(libs.room.gradlePlugin)
-    implementation(libs.hilt.gradlePlugin)
     implementation(libs.ksp.gradlePlugin)
     implementation(libs.google.services.gradlePlugin)
     implementation(libs.firebase.crashlytics.gradlePlugin)

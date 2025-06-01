@@ -27,28 +27,19 @@ import com.startup.design_system.ui.WalkieTheme
 import com.startup.login.R
 import com.startup.login.login.LoginActivity
 import com.startup.navigation.HomeModuleNavigator
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SplashActivity : BaseActivity<SplashUiEvent, SplashNavigationEvent>() {
     override val viewModel: SplashViewModel by viewModels<SplashViewModel>()
 
-
-    // KSP 는 필드 주입이 안 됨
-    private val homeModuleNavigator: HomeModuleNavigator by lazy {
-        EntryPointAccessors.fromApplication(
-            applicationContext,
-            HomeModuleNavigatorEntryPoint::class.java
-        ).homeModuleNavigator()
-    }
+    @Inject
+    lateinit var homeModuleNavigator: HomeModuleNavigator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,13 +66,6 @@ class SplashActivity : BaseActivity<SplashUiEvent, SplashNavigationEvent>() {
     }
 
     override fun handleUiEvent(uiEvent: SplashUiEvent) {}
-
-
-    @EntryPoint
-    @InstallIn(SingletonComponent::class)
-    interface HomeModuleNavigatorEntryPoint {
-        fun homeModuleNavigator(): HomeModuleNavigator
-    }
 }
 
 @Composable
