@@ -26,8 +26,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,12 +72,6 @@ import com.startup.model.egg.MyEggModel
 import com.startup.model.egg.getEggLayoutModel
 import com.startup.model.home.HistoryItemModel
 
-data class HomePermissionState(
-    val showActivityRecognitionAlert: Boolean = false,
-    val showBackgroundLocationAlert: Boolean = false
-)
-
-val LocalHomePermissionState = compositionLocalOf { HomePermissionState() }
 
 @Composable
 fun HomeScreen(
@@ -87,30 +79,22 @@ fun HomeScreen(
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit
 ) {
     val scrollState = rememberScrollState()
-    val showActivityRecognitionAlert by state.showActivityPermissionAlert.collectAsStateWithLifecycle()
-    val showBackgroundLocationAlert by state.showBackgroundPermissionAlert.collectAsStateWithLifecycle()
 
-    val permissionState = HomePermissionState(
-        showActivityRecognitionAlert = showActivityRecognitionAlert,
-        showBackgroundLocationAlert = showBackgroundLocationAlert
-    )
 
-    CompositionLocalProvider(LocalHomePermissionState provides permissionState) {
-        Scaffold(
-            topBar = {
-                MainLogoActionBar(isExistAlarm = false, isShowAlarmIcon = false) {
-                    onNavigationEvent.invoke(HomeScreenNavigationEvent.MoveToNotification)
-                }
-            },
-            containerColor = WalkieTheme.colors.white
-        ) { paddingValues ->
-            HomeContent(
-                paddingValues = paddingValues,
-                scrollState = scrollState,
-                viewState = state,
-                onNavigationEvent = onNavigationEvent
-            )
-        }
+    Scaffold(
+        topBar = {
+            MainLogoActionBar(isExistAlarm = false, isShowAlarmIcon = false) {
+                onNavigationEvent.invoke(HomeScreenNavigationEvent.MoveToNotification)
+            }
+        },
+        containerColor = WalkieTheme.colors.white
+    ) { paddingValues ->
+        HomeContent(
+            paddingValues = paddingValues,
+            scrollState = scrollState,
+            viewState = state,
+            onNavigationEvent = onNavigationEvent
+        )
     }
 }
 
@@ -133,6 +117,9 @@ private fun HomeContent(
     val stepCountState by viewState.stepsUiState.collectAsStateWithLifecycle()
     val myEggModelState by viewState.currentWalkEggUiState.collectAsStateWithLifecycle()
     val walkieCharacterState by viewState.currentWalkCharacterUiState.collectAsStateWithLifecycle()
+
+    val showActivityRecognitionPermissionAlert by viewState.showActivityRecognitionPermissionAlert.collectAsStateWithLifecycle()
+    val showBackgroundLocationPermissionAlert by viewState.showBackgroundLocationPermissionAlert.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
@@ -157,6 +144,8 @@ private fun HomeContent(
                     stepCountState = stepCountState,
                     eggModelState = myEggModelState,
                     walkieCharacterState = walkieCharacterState,
+                    showActivityRecognitionPermissionAlert = showActivityRecognitionPermissionAlert,
+                    showBackgroundLocationPermissionAlert = showBackgroundLocationPermissionAlert,
                     onNavigationEvent = onNavigationEvent,
                     useFixedHeight = false
                 )
@@ -166,6 +155,8 @@ private fun HomeContent(
                 stepCountState = stepCountState,
                 eggModelState = myEggModelState,
                 walkieCharacterState = walkieCharacterState,
+                showActivityRecognitionPermissionAlert = showActivityRecognitionPermissionAlert,
+                showBackgroundLocationPermissionAlert = showBackgroundLocationPermissionAlert,
                 onNavigationEvent = onNavigationEvent,
                 useFixedHeight = true
             )
@@ -185,18 +176,18 @@ private fun EggAndPartnerSection(
     stepCountState: BaseUiState<Pair<Int, Int>>,
     eggModelState: BaseUiState<MyEggModel>,
     walkieCharacterState: BaseUiState<WalkieCharacter>,
+    showActivityRecognitionPermissionAlert: Boolean,
+    showBackgroundLocationPermissionAlert: Boolean,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
     useFixedHeight: Boolean
 ) {
 
-    val permissionState = LocalHomePermissionState.current
     val context = LocalContext.current
-
     val configuration = LocalConfiguration.current
     val screenHeightDp = configuration.screenHeightDp.dp
     val eggAreaHeight = (screenHeightDp * 0.5f).coerceAtLeast(360.dp)
     val analyticsHelper = LocalAnalyticsHelper.current
-    
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -226,6 +217,8 @@ private fun EggAndPartnerSection(
                     modifier = Modifier.fillMaxSize(),
                     stepCountState = stepCountState,
                     eggModelState = eggModelState,
+                    showActivityRecognitionPermissionAlert = showActivityRecognitionPermissionAlert,
+                    showBackgroundLocationPermissionAlert = showBackgroundLocationPermissionAlert,
                     onNavigationEvent = onNavigationEvent,
                     eggAreaHeight = eggAreaHeight.coerceAtLeast(360.dp)
                 )
@@ -254,7 +247,7 @@ private fun EggAndPartnerSection(
             ) {
 
                 PermissionSection(
-                    showPermission = permissionState.showActivityRecognitionAlert,
+                    showPermission = showActivityRecognitionPermissionAlert,
                     permissionTitle = R.string.permission_activity_recognition_alert,
                     dialogTitleResId = R.string.permission_activity_recognition_title,
                     dialogMessageResId = R.string.permission_activity_recognition_message,
@@ -264,7 +257,7 @@ private fun EggAndPartnerSection(
                 )
 
                 PermissionSection(
-                    showPermission = permissionState.showBackgroundLocationAlert,
+                    showPermission = showBackgroundLocationPermissionAlert,
                     permissionTitle = R.string.permission_background_location_alert,
                     dialogTitleResId = R.string.permission_location_dialog_title,
                     dialogMessageResId = R.string.permission_location_dialog_message,
@@ -276,7 +269,7 @@ private fun EggAndPartnerSection(
                 Row(
                     modifier = Modifier.align(alignment = Alignment.End),
                 ) {
-                    if (permissionState.showBackgroundLocationAlert || permissionState.showActivityRecognitionAlert) {
+                    if (showActivityRecognitionPermissionAlert || showBackgroundLocationPermissionAlert) {
                         Image(
                             modifier = Modifier
                                 .width(35.dp)
@@ -573,6 +566,8 @@ fun EggLayout(
     modifier: Modifier = Modifier,
     stepCountState: BaseUiState<Pair<Int, Int>>,
     eggModelState: BaseUiState<MyEggModel>,
+    showActivityRecognitionPermissionAlert: Boolean,
+    showBackgroundLocationPermissionAlert: Boolean,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
     eggAreaHeight: Dp
 ) {
@@ -613,6 +608,8 @@ fun EggLayout(
                 todayStep = stepCountState.data.second,
                 eggModel = eggModelState.data,
                 eggAttribute = eggAttribute,
+                showActivityRecognitionPermissionAlert = showActivityRecognitionPermissionAlert,
+                showBackgroundLocationPermissionAlert = showBackgroundLocationPermissionAlert,
                 onNavigationEvent = onNavigationEvent,
                 eggBoxHeight = actualBlueAreaHeight
             )
@@ -627,10 +624,11 @@ private fun EggContent(
     eggStep: Int,
     eggModel: MyEggModel,
     eggAttribute: EggLayoutModel,
+    showActivityRecognitionPermissionAlert: Boolean,
+    showBackgroundLocationPermissionAlert: Boolean,
     onNavigationEvent: (HomeScreenNavigationEvent) -> Unit,
     eggBoxHeight: Dp
 ) {
-    val permissionState = LocalHomePermissionState.current
 
     val eggHeight = eggBoxHeight * 0.57f // 알 높이는 알 영역 높이의 57%
     val eggWidth = eggHeight * 1.3f // 알 너비는 알 높이의 1.3배
@@ -684,8 +682,8 @@ private fun EggContent(
 
                 // 알 선택 텍스트
                 if (eggModel.eggKind == EggKind.Empty &&
-                    !permissionState.showActivityRecognitionAlert &&
-                    !permissionState.showBackgroundLocationAlert
+                    !showActivityRecognitionPermissionAlert &&
+                    !showBackgroundLocationPermissionAlert
                 ) {
                     Text(
                         text = stringResource(R.string.home_choice_egg).withUnderline(),

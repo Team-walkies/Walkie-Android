@@ -120,8 +120,8 @@ class HomeViewModel @Inject constructor(
                         )
                     }
             }.stateInViewModel(BaseUiState(isShowShimmer = true, data = WalkieCharacter.ofEmpty())),
-        showActivityPermissionAlert = _showActivityPermissionAlert.stateInViewModel(false),
-        showBackgroundPermissionAlert = _showBackgroundLocationPermissionAlert.stateInViewModel(
+        showActivityRecognitionPermissionAlert = _showActivityPermissionAlert.stateInViewModel(false),
+        showBackgroundLocationPermissionAlert = _showBackgroundLocationPermissionAlert.stateInViewModel(
             false
         ),
         userInfo = getMyData.invoke(Unit).catch { }.stateInViewModel(null)
@@ -302,7 +302,7 @@ class HomeViewModel @Inject constructor(
         _showActivityPermissionAlert.value = show
     }
 
-    fun setBackgroundLocationPermssionAlertState(show: Boolean) {
+    fun setBackgroundLocationPermissionAlertState(show: Boolean) {
         _showBackgroundLocationPermissionAlert.value = show
     }
 }
@@ -314,8 +314,8 @@ interface HomeViewState : BaseState {
     val currentRecordedSpotCountUiState: StateFlow<BaseUiState<Int>>
     val currentWalkEggUiState: StateFlow<BaseUiState<MyEggModel>>
     val currentWalkCharacterUiState: StateFlow<BaseUiState<WalkieCharacter>>
-    val showActivityPermissionAlert: StateFlow<Boolean>
-    val showBackgroundPermissionAlert: StateFlow<Boolean>
+    val showActivityRecognitionPermissionAlert: StateFlow<Boolean>
+    val showBackgroundLocationPermissionAlert: StateFlow<Boolean>
     val userInfo: StateFlow<UserInfo?>
 }
 
@@ -326,8 +326,8 @@ class HomeViewStateImpl(
     override val currentRecordedSpotCountUiState: StateFlow<BaseUiState<Int>>,
     override val currentWalkEggUiState: StateFlow<BaseUiState<MyEggModel>>,
     override val currentWalkCharacterUiState: StateFlow<BaseUiState<WalkieCharacter>>,
-    override val showActivityPermissionAlert: StateFlow<Boolean>,
-    override val showBackgroundPermissionAlert: StateFlow<Boolean>,
+    override val showActivityRecognitionPermissionAlert: StateFlow<Boolean>,
+    override val showBackgroundLocationPermissionAlert: StateFlow<Boolean>,
     override val userInfo: StateFlow<UserInfo?>
 ) : HomeViewState
 

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,17 +14,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -37,19 +35,17 @@ import com.startup.common.animation.EggHatchingAnimation
 import com.startup.common.base.BaseActivity
 import com.startup.common.base.NavigationEvent
 import com.startup.common.base.UiEvent
+import com.startup.common.util.BatteryOptimizationHelper
 import com.startup.common.util.OsVersions
 import com.startup.common.util.UsePermissionHelper
 import com.startup.design_system.ui.WalkieTheme
-import com.startup.design_system.widget.modal.PrimaryTwoButtonModal
 import com.startup.ga.AnalyticsHelper
 import com.startup.ga.LocalAnalyticsHelper
 import com.startup.home.main.HomeViewModel
 import com.startup.home.navigation.HomeNavigationGraph
 import com.startup.home.navigation.MainScreenNav
 import com.startup.home.navigation.MyPageNavigationGraph
-import com.startup.home.permission.EssentialPermissionBottomSheet
-import com.startup.home.permission.NotificationPermissionBottomSheet
-import com.startup.home.permission.PermissionBottomSheet
+import com.startup.home.permission.HandlePermissionComponents
 import com.startup.home.permission.PermissionManager
 import com.startup.home.permission.PermissionUiEvent
 import com.startup.navigation.LoginModuleNavigator
@@ -65,6 +61,7 @@ import kotlinx.coroutines.flow.Flow
 @AndroidEntryPoint
 class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
     DailyResetReceiver.OnDateChangedListener {
+
     override val viewModel: HomeViewModel by viewModels<HomeViewModel>()
 
     private lateinit var permissionManager: PermissionManager
@@ -72,7 +69,22 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
     // 날짜 변경 수신기
     private val dailyResetReceiver = DailyResetReceiver()
 
-    // KSP는 필드 주입이 안 됨
+    // Activity Result Launchers - 권한 관련 Intent 처리용
+    private val settingsLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        // 설정에서 돌아온 후 배터리 최적화 단계로 진행
+        permissionManager.proceedToBatteryOptimization()
+    }
+
+    private val batteryOptimizationLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        // 배터리 최적화 설정에서 돌아온 후 알림 권한 단계로 진행
+        permissionManager.proceedToNotification()
+    }
+
+    // KSP는 필드 주입이 안 되므로 EntryPoint 사용
     private val loginModuleNavigator: LoginModuleNavigator by lazy {
         EntryPointAccessors.fromApplication(
             applicationContext,
@@ -94,6 +106,31 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
         ).analyticsHelper()
     }
 
+    private val permissionCallbacks = object : PermissionManager.PermissionManagerCallbacks {
+        override fun startStepCounterService() {
+            if (OsVersions.isGreaterThanOrEqualsO()) {
+                viewModel.startCounting()
+            } else {
+                viewModel.stopCounting()
+            }
+        }
+
+        override fun emitUiEvent(event: UiEvent) {
+            viewModel.emitUiEvent(event)
+        }
+
+        override fun launchPermissionSettings() {
+            val intent = UsePermissionHelper.getPermissionSettingsIntent(this@HomeActivity)
+            settingsLauncher.launch(intent)
+        }
+
+        override fun launchBatteryOptimizationSettings() {
+            val intent =
+                BatteryOptimizationHelper.getBatteryOptimizationSettingsIntent(this@HomeActivity)
+            batteryOptimizationLauncher.launch(intent)
+        }
+    }
+
     override fun handleNavigationEvent(navigationEventFlow: Flow<NavigationEvent>) {
     }
 
@@ -104,30 +141,38 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
             }
 
             is PermissionUiEvent.ShowBackgroundLocationAlert -> {
-                viewModel.setBackgroundLocationPermssionAlertState(uiEvent.show)
+                viewModel.setBackgroundLocationPermissionAlertState(uiEvent.show)
+            }
+
+            is PermissionUiEvent.UpdateAllPermissionAlerts -> {
+                viewModel.setActivityPermissionAlertState(uiEvent.showActivityAlert)
+                viewModel.setBackgroundLocationPermissionAlertState(uiEvent.showLocationAlert)
             }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        permissionManager = PermissionManager(
-            activity = this,
-            viewModel = viewModel
-        )
-        permissionManager.checkPermissions()
-        dailyResetReceiver.setOnDateChangedListener(this)
+        setupPermissionManager()
         registerDailyResetReceiver()
-
         setContent {
             WalkieTheme {
-                MainScreenWithPermissionBottomSheet()
+                MainScreenWithPermissionComponents()
             }
         }
     }
 
+    private fun setupPermissionManager() {
+        permissionManager = PermissionManager(
+            context = this,
+            callbacks = permissionCallbacks
+        )
+        permissionManager.checkPermissions()
+    }
 
     private fun registerDailyResetReceiver() {
+        dailyResetReceiver.setOnDateChangedListener(this)
+
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_DATE_CHANGED)
         }
@@ -138,18 +183,10 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
         viewModel.resetTodayStepCount()
     }
 
-    fun startStepCounterService() {
-        if (OsVersions.isGreaterThanOrEqualsO()) {
-            viewModel.startCounting()
-        } else {
-            viewModel.stopCounting()
-        }
-    }
-
     @Composable
-    fun MainScreenWithPermissionBottomSheet() {
-
+    fun MainScreenWithPermissionComponents() {
         val lifecycleOwner = LocalLifecycleOwner.current
+
         LaunchedEffect(Unit) {
             lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiEventFlow.collect { event ->
@@ -163,123 +200,9 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 MainScreen()
-                HandlePermissionComponents()
-            }
-        }
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun HandlePermissionComponents() {
-        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-        val permissionUiState = permissionManager.permissionUiState
-        val permissionStates = permissionManager.permissionStates
-
-        if (permissionUiState.showPermissionSettingsDialog) {
-            val activityPermissionGranted = UsePermissionHelper.isGrantedPermissions(
-                this@HomeActivity,
-                *UsePermissionHelper.getTypeOfPermission(UsePermissionHelper.Permission.ACTIVITY_RECOGNITION)
-            )
-
-            val locationPermissionGranted = UsePermissionHelper.isGrantedPermissions(
-                this@HomeActivity,
-                *UsePermissionHelper.getTypeOfPermission(UsePermissionHelper.Permission.FOREGROUND_LOCATION)
-            )
-
-            val bothPermissionsDenied = !activityPermissionGranted && !locationPermissionGranted
-            val onlyActivityDenied = !activityPermissionGranted && locationPermissionGranted
-            val onlyLocationDenied = activityPermissionGranted && !locationPermissionGranted
-
-            val titleResId = when {
-                bothPermissionsDenied -> R.string.permission_essential_dialog_title
-                onlyActivityDenied -> R.string.permission_activity_recognition_title
-                onlyLocationDenied -> R.string.permission_location_dialog_title
-                else -> R.string.permission_essential_dialog_title
-            }
-
-            val messageResId = when {
-                bothPermissionsDenied -> R.string.permission_essential_dialog_message
-                onlyActivityDenied -> R.string.permission_activity_recognition_message
-                onlyLocationDenied -> R.string.permission_location_dialog_message
-                else -> R.string.permission_essential_dialog_message
-            }
-
-            val textAlign = when {
-                bothPermissionsDenied || onlyActivityDenied -> TextAlign.Center
-                onlyLocationDenied -> TextAlign.Start
-                else -> TextAlign.Center
-            }
-
-            PrimaryTwoButtonModal(
-                title = stringResource(titleResId),
-                subTitle = stringResource(messageResId),
-                negativeText = stringResource(R.string.permission_dialog_negative),
-                positiveText = stringResource(R.string.permission_dialog_positive),
-                onClickNegative = {
-                    permissionManager.closePermissionSettingsDialog()
-                },
-                onClickPositive = {
-                    permissionManager.closePermissionSettingsDialog(goToSettings = true)
-                },
-                textAlign = textAlign
-            )
-        }
-
-        // 필수 권한 바텀 시트
-        if (permissionUiState.showEssentialPermissionSheet) {
-            PermissionBottomSheet(
-                sheetState = sheetState,
-                onDismissRequest = {
-                    permissionManager.handleEssentialPermissionDismiss()
-                }
-            ) {
-                EssentialPermissionBottomSheet(
-                    permissions = permissionStates,
-                    onAllPermissionsGranted = {
-                        permissionManager.onEssentialPermissionsGranted()
-                    },
-                    onShowRationale = {
-                        permissionManager.handlePermissionRationale()
-                    },
-                    onNeverAskAgain = {
-                        permissionManager.handleNeverAskAgainPermissions()
-                    }
-                )
-            }
-        }
-
-        // 알림 권한 바텀 시트
-        if (permissionUiState.showNotificationPermissionSheet) {
-            PermissionBottomSheet(
-                sheetState = sheetState,
-                onDismissRequest = {
-                    permissionManager.handleNotificationPermissionEvents(
-                        PermissionManager.NotificationAction.DISMISS
-                    )
-                }
-            ) {
-                NotificationPermissionBottomSheet(
-                    onDismiss = {
-                        permissionManager.handleNotificationPermissionEvents(
-                            PermissionManager.NotificationAction.DISMISS
-                        )
-                    },
-                    onAllowPermission = {
-                        permissionManager.handleNotificationPermissionEvents(
-                            PermissionManager.NotificationAction.ALLOW
-                        )
-                    },
-                    onShowRationale = {
-                        permissionManager.handleNotificationPermissionEvents(
-                            PermissionManager.NotificationAction.SHOW_RATIONALE
-                        )
-                    },
-                    onNeverAskAgain = {
-                        permissionManager.handleNotificationPermissionEvents(
-                            PermissionManager.NotificationAction.NEVER_ASK_AGAIN
-                        )
-                    }
+                HandlePermissionComponents(
+                    context = this@HomeActivity,
+                    permissionManager = permissionManager
                 )
             }
         }
@@ -438,6 +361,7 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
     interface SpotNavigatorEntryPoint {
         fun spotNavigatorNavigator(): SpotModuleNavigator
     }
+
     @EntryPoint
     @InstallIn(SingletonComponent::class)
     interface AnalyticsHelperEntryPoint {
