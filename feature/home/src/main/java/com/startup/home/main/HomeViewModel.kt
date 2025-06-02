@@ -9,6 +9,7 @@ import com.startup.common.event.EventContainer
 import com.startup.common.util.Printer
 import com.startup.domain.model.egg.UpdateStepData
 import com.startup.domain.model.member.UserInfo
+import com.startup.domain.provider.StepCounterService
 import com.startup.domain.provider.StepDataStore
 import com.startup.domain.repository.LocationRepository
 import com.startup.domain.usecase.character.GetHatchedCharacterCount
@@ -24,7 +25,6 @@ import com.startup.model.character.WalkieCharacter.Companion.toUiModel
 import com.startup.model.egg.EggKind
 import com.startup.model.egg.MyEggModel
 import com.startup.model.egg.MyEggModel.Companion.toUiModel
-import com.startup.stepcounter.service.StepCounterService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,7 +45,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val stepCounter: StepCounterService,
+    private val stepCounterService: StepCounterService,
     private val dataStore: StepDataStore,
     private val locationRepository: LocationRepository,
     private val updateEggOfStepCount: UpdateEggOfStepCount,
@@ -62,7 +62,7 @@ class HomeViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _state = HomeViewStateImpl(
-        stepsUiState = stepCounter.observeSteps()
+        stepsUiState = stepCounterService.observeSteps()
             .map { BaseUiState(isShowShimmer = false, data = it) }
             .stateInViewModel(BaseUiState(isShowShimmer = true, data = Pair(0, 0))),
 
@@ -260,7 +260,7 @@ class HomeViewModel @Inject constructor(
                         longitude = locationData.longitude
                     )
                 ).catch {}.onCompletion {
-                    stepCounter.resetEggStep()
+                    stepCounterService.resetEggStep()
                     EventContainer.triggerNotificationUpdate(0)
                     notifyViewModelEvent(HomeScreenViewModelEvent.RefreshHome)
                 }.launchIn(viewModelScope)
@@ -285,16 +285,16 @@ class HomeViewModel @Inject constructor(
     }
 
     fun startCounting() {
-        stepCounter.startCounting()
+        stepCounterService.startCounting()
     }
 
     fun stopCounting() {
-        stepCounter.stopCounting()
+        stepCounterService.stopCounting()
     }
 
     fun resetTodayStepCount() {
         viewModelScope.launch(Dispatchers.IO) {
-            stepCounter.checkAndResetForNewDay()
+            stepCounterService.checkAndResetForNewDay()
         }
     }
 
