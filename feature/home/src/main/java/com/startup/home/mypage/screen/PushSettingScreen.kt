@@ -27,13 +27,12 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun PushSettingScreen(
     isNotificationEnabledEggHatchedFlow: StateFlow<Boolean>,
-    isNotificationEnabledSpotArriveFlow: StateFlow<Boolean>,
     uiEventSender: (PushSettingUIEvent) -> Unit,
     onNavigationEvent: (NavigationEvent) -> Unit
 ) {
     /*val isTodayStepNotiEnabled by viewState.isNotificationEnabledTodayStep.collectAsState()*/
-    val isArriveSpotNotiEnabled by isNotificationEnabledEggHatchedFlow.collectAsState()
-    val isEggHatchedNotiEnabled by isNotificationEnabledSpotArriveFlow.collectAsState()
+    /*val isArriveSpotNotiEnabled by isNotificationEnabledSpotArriveFlow.collectAsState()*/
+    val isEggHatchedNotiEnabled by isNotificationEnabledEggHatchedFlow.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -58,14 +57,14 @@ fun PushSettingScreen(
                     uiEventSender.invoke(PushSettingUIEvent.OnChangedTodayStepNoti(it))
                 }
             )*/
-            ToggleWithText(
+            /*ToggleWithText(
                 title = stringResource(R.string.push_setting_spot_arrive_title),
                 subTitle = stringResource(R.string.push_setting_spot_arrive_sub_title),
                 checked = isArriveSpotNotiEnabled,
                 onCheckedChanged = {
                     uiEventSender.invoke(PushSettingUIEvent.OnChangedArriveSpotNoti(it))
                 }
-            )
+            )*/
             ToggleWithText(
                 title = stringResource(R.string.push_setting_egg_hatch_title),
                 subTitle = stringResource(R.string.push_setting_egg_hatch_sub_title),
@@ -78,13 +77,13 @@ fun PushSettingScreen(
     }
 }
 
-
 @PreviewScreenSizes
 @Composable
 private fun PreviewPushSettingScreen() {
     WalkieTheme {
         PushSettingScreen(
             MutableStateFlow(false),
-            MutableStateFlow(false), {}, {})
+            {}, {}
+        )
     }
 }
