@@ -8,31 +8,25 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.startup.common.base.BaseActivity
+import com.startup.design_system.ui.WalkieTheme
 import com.startup.navigation.LoginModuleNavigator
+import com.startup.spot.BuildConfig
 import com.startup.spot.ModifyReviewEvent
 import com.startup.spot.ModifyReviewNavigationEvent
 import com.startup.spot.ModifyReviewUiEvent
-import com.startup.design_system.ui.WalkieTheme
-import com.startup.spot.BuildConfig
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ModifyReviewActivity : BaseActivity<ModifyReviewUiEvent, ModifyReviewNavigationEvent>() {
     override val viewModel: ModifyReviewViewModel by viewModels<ModifyReviewViewModel>()
-    private val loginModuleNavigator: LoginModuleNavigator by lazy {
-        EntryPointAccessors.fromApplication(
-            applicationContext,
-            LoginNavigatorEntryPoint::class.java
-        ).loginNavigatorNavigator()
-    }
+
+    @Inject
+    lateinit var  loginModuleNavigator: LoginModuleNavigator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,11 +72,5 @@ class ModifyReviewActivity : BaseActivity<ModifyReviewUiEvent, ModifyReviewNavig
     override fun navigateToLogin() {
         loginModuleNavigator.navigateLoginView(this)
         finish()
-    }
-
-    @EntryPoint
-    @InstallIn(SingletonComponent::class)
-    interface LoginNavigatorEntryPoint {
-        fun loginNavigatorNavigator(): LoginModuleNavigator
     }
 }

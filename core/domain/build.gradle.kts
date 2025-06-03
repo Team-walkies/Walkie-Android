@@ -5,6 +5,4 @@ plugins {
 
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
-    ksp(libs.hilt.compiler)
-    implementation(libs.hilt.core)
 }

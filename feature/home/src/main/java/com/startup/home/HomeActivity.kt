@@ -50,12 +50,9 @@ import com.startup.home.permission.PermissionManager
 import com.startup.home.permission.PermissionUiEvent
 import com.startup.navigation.LoginModuleNavigator
 import com.startup.navigation.SpotModuleNavigator
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
@@ -65,12 +62,8 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
 
     private lateinit var permissionManager: PermissionManager
 
-    private val dateChangeNotifier: DateChangeNotifier by lazy {
-        EntryPointAccessors.fromApplication(
-            applicationContext,
-            DateChangeNotifierEntryPoint::class.java
-        ).dateChangeNotifier()
-    }
+    @Inject
+    lateinit var dateChangeNotifier: DateChangeNotifier
 
     // Activity Result Launchers - 권한 관련 Intent 처리용
     private val settingsLauncher = registerForActivityResult(
@@ -87,27 +80,14 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
         permissionManager.proceedToNotification()
     }
 
-    // KSP는 필드 주입이 안 되므로 EntryPoint 사용
-    private val loginModuleNavigator: LoginModuleNavigator by lazy {
-        EntryPointAccessors.fromApplication(
-            applicationContext,
-            LoginNavigatorEntryPoint::class.java
-        ).loginNavigatorNavigator()
-    }
+    @Inject
+    lateinit var loginModuleNavigator: LoginModuleNavigator
 
-    private val spotModuleNavigator: SpotModuleNavigator by lazy {
-        EntryPointAccessors.fromApplication(
-            applicationContext,
-            SpotNavigatorEntryPoint::class.java
-        ).spotNavigatorNavigator()
-    }
+    @Inject
+    lateinit var spotModuleNavigator: SpotModuleNavigator
 
-    private val analyticsHelper: AnalyticsHelper by lazy {
-        EntryPointAccessors.fromApplication(
-            applicationContext,
-            AnalyticsHelperEntryPoint::class.java
-        ).analyticsHelper()
-    }
+    @Inject
+    lateinit var analyticsHelper: AnalyticsHelper
 
     private val permissionCallbacks = object : PermissionManager.PermissionManagerCallbacks {
         override fun startStepCounterService() {
@@ -353,29 +333,5 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
     override fun navigateToLogin() {
         loginModuleNavigator.navigateLoginView(this)
         finish()
-    }
-
-    @EntryPoint
-    @InstallIn(SingletonComponent::class)
-    interface DateChangeNotifierEntryPoint {
-        fun dateChangeNotifier(): DateChangeNotifier
-    }
-
-    @EntryPoint
-    @InstallIn(SingletonComponent::class)
-    interface SpotNavigatorEntryPoint {
-        fun spotNavigatorNavigator(): SpotModuleNavigator
-    }
-
-    @EntryPoint
-    @InstallIn(SingletonComponent::class)
-    interface AnalyticsHelperEntryPoint {
-        fun analyticsHelper(): AnalyticsHelper
-    }
-
-    @EntryPoint
-    @InstallIn(SingletonComponent::class)
-    interface LoginNavigatorEntryPoint {
-        fun loginNavigatorNavigator(): LoginModuleNavigator
     }
 }
