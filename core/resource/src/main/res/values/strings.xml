@@ -173,7 +173,7 @@
     <string name="push_setting_spot_arrive_title">스팟 도착 알림</string>
     <string name="push_setting_spot_arrive_sub_title">스팟에 도착하면 알려드려요</string>
     <string name="push_setting_egg_hatch_title">알 부화 알림</string>
-    <string name="push_setting_egg_hatch_sub_title">알이 부회하면 알려드려요</string>
+    <string name="push_setting_egg_hatch_sub_title">알이 부화하면 알려드려요</string>
     <string name="push_setting_today_step_title">오늘의 걸음 수</string>
     <string name="push_setting_today_step_sub_title">하루 걸음 수를 알려드려요</string>
 
