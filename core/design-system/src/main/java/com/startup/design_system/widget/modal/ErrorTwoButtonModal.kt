@@ -53,13 +53,13 @@ fun ErrorTwoButtonModal(
             ) {
                 Text(
                     title,
-                    style = WalkieTheme.typography.head4.copy(color = WalkieTheme.colors.gray700)
+                    style = WalkieTheme.typography.head4.copy(color = WalkieTheme.colors.gray700, textAlign = TextAlign.Center)
                 )
                 if (subTitle.isNotEmpty()) {
                     Spacer(Modifier.height(4.dp))
                     Text(
                         subTitle,
-                        style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
+                        style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500, textAlign = TextAlign.Center)
                     )
                 }
                 Spacer(Modifier.height(20.dp))

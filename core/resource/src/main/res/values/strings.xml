@@ -221,4 +221,7 @@
     
     <string name="dialog_user_account_withdrawn_exception_title">탈퇴 처리된 계정</string>
     <string name="dialog_user_account_withdrawn_exception_subtitle">해당 아이디는 탈퇴 처리된 계정입니다.\n자세한 사항은 이메일로 문의해 주시면 안내해 드리겠습니다.\n📧 이메일: walkieofficial@gmail.com</string>
+    <string name="dialog_force_update_title">워키를 안전한 버전으로\n업데이트 해주세요</string>
+    <string name="dialog_force_update_sub_title">여러 사용성과 안전성을 업데이트했어요</string>
+    <string name="dialog_force_update_positive_btn">업데이트</string>
 </resources>
