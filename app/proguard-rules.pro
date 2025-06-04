@@ -146,12 +146,18 @@
 -keep class dagger.hilt.android.lifecycle.HiltViewModel
 # Hilt internal 처리용
 
+-keepclassmembers class * {
+    @dagger.hilt.android.AndroidEntryPoint *;
+    @javax.inject.Inject *;
+}
 # EntryPoint로 정의된 클래스
 -keep interface com.startup.**.*EntryPoint
 -keep class com.startup.**.*EntryPoint { *; }
+-keep class **_MembersInjector { *; }
 
 # 🔐 Hilt DI 구성요소
 -keep class dagger.hilt.** { *; }
+-keep class javax.inject.** { *; }
 -keep class androidx.hilt.** { *; }
 -keep class **_HiltModules* { *; }
 -keep class **_GeneratedInjector { *; }
