@@ -1,6 +1,7 @@
 package com.startup.data.di
 
-import com.startup.common.util.SessionManager
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.startup.data.BuildConfig
 import com.startup.data.annotations.AuthHttpClient
 import com.startup.data.annotations.AuthRetrofit
@@ -39,6 +40,10 @@ internal object NetworkModule {
             HttpLoggingInterceptor.Level.NONE
         }
     }
+
+    @Provides
+    @Singleton
+    fun provideRemoteConfig() = Firebase.remoteConfig
 
     @Provides
     @Singleton

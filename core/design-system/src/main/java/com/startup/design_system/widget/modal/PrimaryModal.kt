@@ -28,14 +28,15 @@ fun PrimaryModal(
     title: String = "",
     subTitle: String = "",
     positiveText: String = "",
+    backOrOutSideDismissBlock : Boolean = false,
     onClickPositive: () -> Unit,
     onDismiss: () -> Unit
 ) {
     Dialog(
         onDismissRequest = { onDismiss() },
         properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true,
+            dismissOnBackPress = !backOrOutSideDismissBlock,
+            dismissOnClickOutside = !backOrOutSideDismissBlock,
         )
     ) {
         Card(
@@ -50,13 +51,13 @@ fun PrimaryModal(
             ) {
                 Text(
                     title,
-                    style = WalkieTheme.typography.head4.copy(color = WalkieTheme.colors.gray700)
+                    style = WalkieTheme.typography.head4.copy(color = WalkieTheme.colors.gray700, textAlign = TextAlign.Center)
                 )
                 if (subTitle.isNotEmpty()) {
                     Spacer(Modifier.height(4.dp))
                     Text(
                         subTitle,
-                        style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500)
+                        style = WalkieTheme.typography.body2.copy(color = WalkieTheme.colors.gray500, textAlign = TextAlign.Center)
                     )
                 }
                 Spacer(Modifier.height(20.dp))
@@ -68,14 +69,14 @@ fun PrimaryModal(
                         )
                         .fillMaxWidth()
                         .padding(vertical = 13.dp)
+                        .noRippleClickable {
+                            onClickPositive.invoke()
+                        }
                 ) {
                     Text(
                         modifier = Modifier
                             .wrapContentSize()
-                            .align(Alignment.Center)
-                            .noRippleClickable {
-                                onClickPositive.invoke()
-                            },
+                            .align(Alignment.Center),
                         text = positiveText,
                         style = WalkieTheme.typography.body1,
                         textAlign = TextAlign.Center,

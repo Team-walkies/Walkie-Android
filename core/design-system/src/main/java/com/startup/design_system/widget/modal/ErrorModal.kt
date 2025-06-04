@@ -53,7 +53,7 @@ fun ErrorModal(
                 if (title.isNotEmpty()) {
                     Text(
                         title,
-                        style = WalkieTheme.typography.head4.copy(color = WalkieTheme.colors.gray700)
+                        style = WalkieTheme.typography.head4.copy(color = WalkieTheme.colors.gray700, textAlign = TextAlign.Center)
                     )
                 }
                 if (subTitle.isNotEmpty()) {

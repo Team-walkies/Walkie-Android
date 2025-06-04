@@ -2,6 +2,7 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
     alias(libs.plugins.walkie.android.library)
+    alias(libs.plugins.walkie.firebase)
 }
 
 android {

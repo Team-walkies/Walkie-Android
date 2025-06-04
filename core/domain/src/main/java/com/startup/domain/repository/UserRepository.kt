@@ -11,4 +11,5 @@ interface UserRepository {
     suspend fun updateNotificationEggHatchEnabled(enabled: Boolean)
     fun getProfileAccessEnabled(): Flow<Boolean>
     suspend fun updateProfileAccessEnabled(enabled: Boolean)
+    suspend fun getMinAppVersionCode(): Long
 }
