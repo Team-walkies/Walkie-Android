@@ -145,7 +145,6 @@ fun MyPageNavigationGraph(
                 composable(MyPageScreenNav.PushSetting.route) {
                     PushSettingScreen(
                         isNotificationEnabledEggHatchedFlow = myPageViewModel.state.isNotificationEnabledEggHatched,
-                        isNotificationEnabledSpotArriveFlow = myPageViewModel.state.isNotificationEnabledSpotArrive,
                         uiEventSender = ::handlePushSettingUiEvent,
                         onNavigationEvent = ::handleNavigationEvent
                     )
