@@ -6,6 +6,7 @@ data class MyEgg(
     val needStep: Int,
     val nowStep: Int,
     val play: Boolean,
+    val characterRank: Int,
     val rank: Int,
     val obtainedDate: String,
     val obtainedPosition: String,

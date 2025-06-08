@@ -26,7 +26,7 @@ data class MyEggModel(
             obtainedPosition = obtainedPosition,
             walkieCharacter = WalkieCharacter.getTypeAndClassOfWalkieCharacter(
                 characterId = characterId,
-                rank = rank,
+                rank = characterRank,
                 clazz = characterClass,
                 type = type,
                 picked = false,
