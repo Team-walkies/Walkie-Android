@@ -70,6 +70,7 @@
     <string name="desc_character">캐릭터</string>
     <string name="desc_egg_empty">빈 알</string>
     <string name="desc_egg_play_icon">같이 걷는 알</string>
+    <string name="desc_onboarding_gift">첫선물</string>
 
     <string name="hatching_wait">잠깐,</string>
     <string name="hatching_coming_soon">알이 부화하려고 해요!</string>
@@ -134,9 +135,9 @@
     <string name="desc_calendar_review_option">리뷰 수정, 삭제 선택 버튼</string>
     <string name="desc_calendar_review_map_kind">리뷰 스팟 위치 종류</string>
     <string name="date_today">오늘</string>
-    <string name="get_character_introduce">%s님,\n환영해요</string>
-    <string name="get_character_introduce_sub_title">%s를 선물로 드릴게요</string>
-    <string name="get_character_action_button">함께 시작하자!</string>
+    <string name="get_gift_introduce">%s님,\n선물이 도착했어요!</string>
+    <string name="get_gift_introduce_sub_title">%s 1마리와 알 1개를 받았어요</string>
+    <string name="get_gift_action_button">함께 시작하자!</string>
     <string name="week_mon">월</string>
     <string name="week_the">화</string>
     <string name="week_wen">수</string>

@@ -68,7 +68,7 @@ class LoginViewModel @Inject constructor(
     fun onJoinWalkie(nickName: String) {
         _state.providerToken.value?.let { providerToken ->
             joinWalkie.invoke(providerToken to nickName).onEach {
-                notifyEvent(LoginScreenNavigationEvent.MoveToGetCharacterScreen(nickName))
+                notifyEvent(LoginScreenNavigationEvent.MoveToGetGiftScreen(nickName))
             }.catch { }.launchIn(viewModelScope)
         }
     }
