@@ -34,6 +34,7 @@ firebase-crashlytics-gradle = "3.0.2"
 kakao-sdk = "2.20.3"
 splash = "1.0.1"
 lottie = "6.6.3"
+leakcanary = "2.12"
 
 
 [libraries]
@@ -106,6 +107,7 @@ firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashly
 firebase-config = { group = "com.google.firebase", name = "firebase-config" }
 kakao-login = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao-sdk" }
 lottie = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
+leakcanary-android = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
