@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 sealed interface SplashUiEvent : UiEvent {
     data object RedirectPlayStore : SplashUiEvent
+    data object ExitApp : SplashUiEvent
 }
 
 interface SplashViewState : BaseState {
