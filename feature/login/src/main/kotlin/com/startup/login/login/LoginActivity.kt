@@ -33,7 +33,7 @@ import com.startup.common.util.Printer
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.widget.modal.ErrorModal
 import com.startup.login.R
-import com.startup.login.login.model.GetCharacterNavigationEvent
+import com.startup.login.login.model.GetGiftNavigationEvent
 import com.startup.login.login.model.LoginNavigationEvent
 import com.startup.login.login.model.LoginScreenNavigationEvent
 import com.startup.login.login.model.LoginUiEvent
@@ -144,7 +144,7 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
                             navController.navigate(LoginScreenNav.NickNameSetting.route)
                         }
 
-                        is LoginScreenNavigationEvent.MoveToGetCharacterScreen -> {
+                        is LoginScreenNavigationEvent.MoveToGetGiftScreen -> {
                             navController.navigate(LoginScreenNav.GetCharacter.route + "/${event.nickName}")
                         }
                     }
@@ -184,11 +184,11 @@ class LoginActivity : BaseActivity<LoginUiEvent, LoginNavigationEvent>() {
                                 navArgument("nickName") { type = NavType.StringType },
                             )
                         ) { navBackStackEntry ->
-                            GetCharacterScreen(
+                            GetGiftScreen(
                                 navBackStackEntry.arguments?.getString("nickName").orEmpty()
                             ) {
                                 when (it) {
-                                    GetCharacterNavigationEvent.MoveToMainActivity -> {
+                                    GetGiftNavigationEvent.MoveToMainActivity -> {
                                         homeModuleNavigator.moveToHomeActivity(this@LoginActivity)
                                         finish() // 홈 이동 이후, 로그인 액티비티 스택에서 제거
                                     }
