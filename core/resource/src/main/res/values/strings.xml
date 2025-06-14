@@ -218,10 +218,11 @@
     <string name="desc_calendar_select">캘린더로 일자 선택</string>
     <string name="toast_home_back_press">한 번 더 누르면 워키가 종료됩니다</string>
     <string name="toast_common_error">일시적 오류가 발생했습니다. 잠시후 다시 시도해주세요.</string>
-    
+
     <string name="dialog_user_account_withdrawn_exception_title">탈퇴 처리된 계정</string>
     <string name="dialog_user_account_withdrawn_exception_subtitle">해당 아이디는 탈퇴 처리된 계정입니다.\n자세한 사항은 이메일로 문의해 주시면 안내해 드리겠습니다.\n📧 이메일: walkieofficial@gmail.com</string>
-    <string name="dialog_force_update_title">워키를 안전한 버전으로\n업데이트 해주세요</string>
-    <string name="dialog_force_update_sub_title">여러 사용성과 안전성을 업데이트했어요</string>
+    <string name="bottomsheet_force_update_title">새로운 버전이 업데이트 되었어요</string>
+    <string name="bottomsheet_force_update_sub_title">유저분들의 의견을 반영하여 사용성을 개선했어요!\n지금 바로 업데이트하고 즐겨보세요</string>
+    <string name="bottomsheet_force_update_negative_btn">앱을 종료할게요</string>
     <string name="dialog_force_update_positive_btn">업데이트</string>
 </resources>
