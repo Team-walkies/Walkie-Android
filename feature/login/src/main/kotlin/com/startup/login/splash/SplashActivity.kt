@@ -24,11 +24,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import androidx.core.app.ActivityCompat.finishAffinity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.startup.common.base.BaseActivity
 import com.startup.design_system.ui.WalkieTheme
-import com.startup.design_system.widget.modal.PrimaryModal
+import com.startup.design_system.widget.bottom_sheet.ForceUpdateBottomSheet
 import com.startup.login.R
 import com.startup.login.login.LoginActivity
 import com.startup.navigation.HomeModuleNavigator
@@ -56,6 +57,10 @@ class SplashActivity : BaseActivity<SplashUiEvent, SplashNavigationEvent>() {
                     when (it) {
                         SplashUiEvent.RedirectPlayStore -> {
                             redirectToPlayStore()
+                        }
+
+                        SplashUiEvent.ExitApp -> {
+                            finishAffinity(this@SplashActivity)
                         }
                     }
                 }
@@ -127,13 +132,13 @@ private fun SplashScreenCompose(isForceUpdateDialogShowFlow: StateFlow<Boolean>,
             )
         }
         if (isForceUpdateDialogShow) {
-            PrimaryModal(
-                title = stringResource(R.string.dialog_force_update_title),
-                subTitle = stringResource(R.string.dialog_force_update_sub_title),
+            ForceUpdateBottomSheet(
+                title = stringResource(R.string.bottomsheet_force_update_title),
+                subTitle = stringResource(R.string.bottomsheet_force_update_sub_title),
+                negativeText = stringResource(R.string.bottomsheet_force_update_negative_btn),
                 positiveText = stringResource(R.string.dialog_force_update_positive_btn),
-                backOrOutSideDismissBlock = true,
-                onClickPositive = { uiEvent.invoke(SplashUiEvent.RedirectPlayStore) },
-                onDismiss = {}
+                exitApp = { uiEvent.invoke(SplashUiEvent.ExitApp) },
+                goToPlayStore = { uiEvent.invoke(SplashUiEvent.RedirectPlayStore) },
             )
         }
     }
