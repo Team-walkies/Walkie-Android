@@ -14,12 +14,12 @@ sealed interface LoginNavigationEvent : NavigationEvent {
 }
 sealed interface LoginScreenNavigationEvent : ScreenNavigationEvent {
     data object MoveToNickNameSettingScreen: LoginNavigationEvent
-    data class MoveToGetCharacterScreen(val nickName: String): LoginNavigationEvent
+    data class MoveToGetGiftScreen(val nickName: String): LoginNavigationEvent
 }
 
 
-sealed interface GetCharacterNavigationEvent : ScreenNavigationEvent {
-    data object MoveToMainActivity : GetCharacterNavigationEvent
+sealed interface GetGiftNavigationEvent : ScreenNavigationEvent {
+    data object MoveToMainActivity : GetGiftNavigationEvent
 }
 
 sealed interface LoginUiEvent : UiEvent {
