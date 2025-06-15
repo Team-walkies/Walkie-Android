@@ -93,4 +93,6 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:resource"))
     implementation(libs.kakao.login)
+    
+    debugImplementation(libs.leakcanary.android)
 }
