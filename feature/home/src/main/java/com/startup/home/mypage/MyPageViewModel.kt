@@ -1,9 +1,11 @@
 package com.startup.home.mypage
 
+import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseUiState
 import com.startup.common.base.BaseViewModel
 import com.startup.common.util.Printer
+import com.startup.common.util.UsePermissionHelper
 import com.startup.domain.model.member.UserInfo
 import com.startup.domain.usecase.auth.Logout
 import com.startup.domain.usecase.auth.Unlink
@@ -19,7 +21,9 @@ import com.startup.home.ErrorToastEvent
 import com.startup.home.MainScreenNavigationEvent
 import com.startup.home.R
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
@@ -41,7 +45,8 @@ class MyPageViewModel @Inject constructor(
     private val updateEggHatchedNotiEnabled: UpdateEggHatchedNotiEnabled,
     private val updateTodayStepNotiEnabled: UpdateTodayStepNotiEnabled,
     private val unlink: Unlink,
-    private val logout: Logout
+    private val logout: Logout,
+    @ApplicationContext private val context: Context,
 ) : BaseViewModel() {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _state: MyInfoViewStateImpl = MyInfoViewStateImpl(
@@ -65,7 +70,8 @@ class MyPageViewModel @Inject constructor(
         userInfo = getMyData
             .invoke(Unit)
             .map {
-                BaseUiState(isShowShimmer = false, data = it) }
+                BaseUiState(isShowShimmer = false, data = it)
+            }
             .catch {
                 emit(BaseUiState(isShowShimmer = false, data = UserInfo.ofEmpty()))
             }
@@ -74,7 +80,10 @@ class MyPageViewModel @Inject constructor(
                     isShowShimmer = true,
                     data = UserInfo.ofEmpty()
                 )
-            )
+            ),
+        isGrantNotificationPermission = MutableStateFlow(
+            UsePermissionHelper.isAppChannelNotificationOn(context = context)
+        )
     )
     override val state: MyInfoViewState get() = _state
 
@@ -102,6 +111,11 @@ class MyPageViewModel @Inject constructor(
             .onEach { notifyViewModelEvent(MyInfoViewModelEvent.OnChangedProfileVisibility) }
             .catch { Printer.e("LMH", "updateProfileAccess Error $it") }
             .launchIn(viewModelScope)
+    }
+
+    fun checkNotificationGranted() {
+        _state.isGrantNotificationPermission.value =
+            UsePermissionHelper.isAppChannelNotificationOn(context)
     }
 
     fun unLink() {

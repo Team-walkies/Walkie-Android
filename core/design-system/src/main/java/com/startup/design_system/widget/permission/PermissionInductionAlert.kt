@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,7 +46,8 @@ fun PermissionInduction(@StringRes title: Int, modifier: Modifier, onClick: () -
         Image(
             modifier = Modifier.size(16.dp),
             painter = painterResource(R.drawable.ic_danger),
-            contentDescription = null
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(color = WalkieTheme.colors.yellow100)
         )
         Spacer(Modifier.width(4.dp))
         Text(

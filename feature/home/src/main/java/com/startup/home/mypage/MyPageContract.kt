@@ -16,6 +16,7 @@ interface MyInfoViewState : BaseState {
     val isNotificationEnabledEggHatched: StateFlow<Boolean>
     val isNotificationEnabledTodayStep: StateFlow<Boolean>
     val userInfo : StateFlow<BaseUiState<UserInfo>>
+    val isGrantNotificationPermission: StateFlow<Boolean>
 }
 
 interface NoticeViewState : BaseState {
@@ -32,7 +33,8 @@ class MyInfoViewStateImpl(
     override val isNotificationEnabledSpotArrive: StateFlow<Boolean>,
     override val isNotificationEnabledEggHatched: StateFlow<Boolean>,
     override val isNotificationEnabledTodayStep: StateFlow<Boolean>,
-    override val userInfo: StateFlow<BaseUiState<UserInfo>>
+    override val userInfo: StateFlow<BaseUiState<UserInfo>>,
+    override val isGrantNotificationPermission: MutableStateFlow<Boolean>
 ) : MyInfoViewState
 
 sealed interface MyInfoUIEvent : UiEvent {
@@ -55,4 +57,5 @@ sealed interface PushSettingUIEvent : UiEvent {
     data class OnChangedTodayStepNoti(val enabled: Boolean) : PushSettingUIEvent
     data class OnChangedArriveSpotNoti(val enabled: Boolean) : PushSettingUIEvent
     data class OnChangedEggHatchedNoti(val enabled: Boolean) : PushSettingUIEvent
+    data object OnClickMoveNotificationSetting : PushSettingUIEvent
 }

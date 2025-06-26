@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -18,9 +19,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
@@ -30,6 +33,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.startup.common.base.NavigationEvent
+import com.startup.common.extension.moveToNotificationSetting
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.widget.toast.ShowToast
 import com.startup.home.ErrorToastEvent
@@ -60,6 +64,7 @@ fun MyPageNavigationGraph(
     var showErrorToast by remember { mutableStateOf(false) }
     var errorMessageResId by remember { mutableIntStateOf(R.string.toast_common_error) }
 
+    val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -77,6 +82,19 @@ fun MyPageNavigationGraph(
                     else -> {}
                 }
             }
+        }
+    }
+
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                myPageViewModel.checkNotificationGranted()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
     fun backPress() {
@@ -115,6 +133,10 @@ fun MyPageNavigationGraph(
             is PushSettingUIEvent.OnChangedEggHatchedNoti -> {
                 myPageViewModel.updateEggHatchedNoti(event.enabled)
             }
+
+            PushSettingUIEvent.OnClickMoveNotificationSetting -> {
+                context.moveToNotificationSetting()
+            }
         }
     }
 
@@ -145,6 +167,7 @@ fun MyPageNavigationGraph(
                 composable(MyPageScreenNav.PushSetting.route) {
                     PushSettingScreen(
                         isNotificationEnabledEggHatchedFlow = myPageViewModel.state.isNotificationEnabledEggHatched,
+                        isGrantNotificationPermissionFlow = myPageViewModel.state.isGrantNotificationPermission,
                         uiEventSender = ::handlePushSettingUiEvent,
                         onNavigationEvent = ::handleNavigationEvent
                     )

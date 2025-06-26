@@ -177,6 +177,8 @@
     <string name="push_setting_egg_hatch_sub_title">알이 부화하면 알려드려요</string>
     <string name="push_setting_today_step_title">오늘의 걸음 수</string>
     <string name="push_setting_today_step_sub_title">하루 걸음 수를 알려드려요</string>
+    <string name="push_setting_notification_permission_not_granted">기기 알림이 꺼져있어요</string>
+    <string name="push_setting_notification_permission_move_setting">알림 켜기</string>
 
     <string name="permission_activity_recognition_alert">신체활동 권한을 허용해 주세요</string>
     <string name="permission_background_location_alert">위치 접근 권한을 ‘항상 허용’으로 해주세요</string>
