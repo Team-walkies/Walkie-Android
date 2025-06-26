@@ -1,5 +1,7 @@
 package com.startup.home.character
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,9 +48,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.startup.common.base.BaseUiState
 import com.startup.common.base.NavigationEvent
 import com.startup.common.extension.orFalse
-import com.startup.common.base.BaseUiState
 import com.startup.common.extension.shimmerEffect
 import com.startup.common.util.DateUtil
 import com.startup.design_system.ui.WalkieTheme
@@ -98,10 +100,10 @@ fun HatchingCharacterScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(12.dp))
             Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
                 text = stringResource(R.string.hatching_characters),
                 style = WalkieTheme.typography.head2
             )
@@ -152,14 +154,21 @@ fun CharacterTabsContent(
             currentPage = pagerState.currentPage,
             onTabSelected = { index ->
                 coroutineScope.launch {
-                    pagerState.animateScrollToPage(index)
+                    pagerState.animateScrollToPage(
+                        page = index,
+                        animationSpec = tween(
+                            durationMillis = 250,
+                            easing = LinearEasing
+                        )
+                    )
                 }
             }
         )
 
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            pageSpacing = 16.dp
         ) { page ->
             CharacterContentByType(
                 viewState = viewState,
@@ -180,7 +189,7 @@ private fun CharacterTypeTabs(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.wrapContentWidth(),
+        modifier = modifier.wrapContentWidth().padding(start = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         characterTypes.forEachIndexed { index, type ->
@@ -269,7 +278,9 @@ fun CharacterGrid(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
     ) {
         Text(
             text = description,
