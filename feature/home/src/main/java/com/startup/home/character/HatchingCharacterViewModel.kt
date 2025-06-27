@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -56,22 +57,27 @@ class HatchingCharacterViewModel @Inject constructor(
                 .onEach { Printer.d("LMH", "Dino $it") }
                 .catch { emit(BaseUiState(isShowShimmer = false, data = emptyList())) }
         }.stateInViewModel(BaseUiState(isShowShimmer = true, data = emptyList())),
-        characterDetail = MutableStateFlow(BaseUiState(isShowShimmer = true, data = null)),
+        characterDetail = MutableStateFlow(BaseUiState(isShowShimmer = false, data = null)),
     )
 
     fun clearViewingPartner() {
-        _state.characterDetail.update { it.copy(isShowShimmer = true, data = null) }
+        _state.characterDetail.update { it.copy(isShowShimmer = false, data = null) }
     }
 
     fun onClickPartner(character: WalkieCharacter) {
         getHatchedCharacterDetail
             .invoke(character.characterId)
+            .onStart {
+                _state.characterDetail.update {
+                    it.copy(isShowShimmer = true)
+                }
+            }
             .map { it.toUiModel() }
             .onEach { item ->
                 _state.characterDetail.update {
                     it.copy(
                         isShowShimmer = false,
-                        data = item
+                        data = item.copy(picked = character.picked)
                     )
                 }
             }
@@ -82,7 +88,7 @@ class HatchingCharacterViewModel @Inject constructor(
     fun onSelectPartner(characterDetail: WalkieCharacterDetail) {
         clearViewingPartner()
         updateWalkingCharacter
-            .invoke(characterDetail.character.characterId)
+            .invoke(characterDetail.characterId)
             .onEach {
                 EventContainer.onRefreshEvent()
                 notifyViewModelEvent(HatchingCharacterViewModelEvent.FetchCharacterList)

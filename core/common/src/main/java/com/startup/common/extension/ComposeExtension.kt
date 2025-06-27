@@ -182,6 +182,35 @@ fun Modifier.shimmerEffectGray200(): Modifier = composed {
     }
 }
 
+fun Modifier.shimmerEffectGray50(): Modifier = composed {
+    var size by remember {
+        mutableStateOf(IntSize.Zero)
+    }
+    val transition = rememberInfiniteTransition()
+    val startOffsetX by transition.animateFloat(
+        initialValue = -2 * size.width.toFloat(),
+        targetValue = 2 * size.width.toFloat(),
+        animationSpec = infiniteRepeatable(
+            animation = tween(1500)
+        ),
+        label = ""
+    )
+
+    background(
+        brush = Brush.linearGradient(
+            colors = listOf(
+                WalkieTheme.colors.gray50,
+                WalkieTheme.colors.gray100,
+                WalkieTheme.colors.gray50,
+            ),
+            start = Offset(startOffsetX, 0f),
+            end = Offset(startOffsetX + size.width.toFloat(), 0f)
+        )
+    ).onGloballyPositioned {
+        size = it.size
+    }
+}
+
 fun Modifier.springClickable(
     scaleDown: Float = 0.8f,
     onClick: () -> Unit

@@ -6,5 +6,8 @@ data class CharacterDetail(
     val characterClass: Int,
     val characterCount: Int,
     val rank: Int,
+    val characterDescription: String,
+    val characterName: String,
+    val characterImageUrl: String,
     val obtainInfo: List<CharacterObtainInfo>
 )

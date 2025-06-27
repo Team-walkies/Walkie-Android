@@ -34,10 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,10 +45,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.startup.common.base.BaseUiState
 import com.startup.common.base.NavigationEvent
-import com.startup.common.extension.orFalse
-import com.startup.common.extension.shimmerEffect
+import com.startup.common.extension.shimmerEffectGray50
 import com.startup.common.util.DateUtil
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.ui.WalkieTheme.colors
@@ -95,7 +92,6 @@ fun HatchingCharacterScreen(
         val scrollState = rememberScrollState()
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         val characterDetailUiState by viewState.characterDetail.collectAsStateWithLifecycle()
-        var viewingCharacter: WalkieCharacter? by remember { mutableStateOf(null) }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -110,22 +106,17 @@ fun HatchingCharacterScreen(
             Spacer(modifier = Modifier.height(22.dp))
             CharacterTabsContent(viewState) {
                 onClickPartner(it)
-                viewingCharacter = it
             }
         }
 
-        viewingCharacter?.let { preloadCharacter ->
+        if (characterDetailUiState.isShowShimmer || characterDetailUiState.data != null) {
             CharacterDetailBottomSheet(
                 sheetState = sheetState,
                 characterUiState = characterDetailUiState,
-                picked = viewingCharacter?.picked.orFalse(),
-                preloadCharacter = preloadCharacter,
                 onDismiss = {
-                    viewingCharacter = null
                     onDismissBottomSheet.invoke()
                 },
                 onSelectPartner = { character ->
-                    viewingCharacter = null
                     onSelectPartner(character)
                 }
             )
@@ -189,7 +180,9 @@ private fun CharacterTypeTabs(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.wrapContentWidth().padding(start = 16.dp),
+        modifier = modifier
+            .wrapContentWidth()
+            .padding(start = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         characterTypes.forEachIndexed { index, type ->
@@ -439,7 +432,10 @@ private fun CharacterItemContent(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = stringResource(id = R.string.character_gain_induction),
-                style = WalkieTheme.typography.body2.copy(color = colors.gray400, textAlign = TextAlign.Center),
+                style = WalkieTheme.typography.body2.copy(
+                    color = colors.gray400,
+                    textAlign = TextAlign.Center
+                ),
             )
         } else {
             Text(
@@ -465,9 +461,7 @@ private fun CharacterItemContent(
 @Composable
 fun CharacterDetailBottomSheet(
     sheetState: SheetState,
-    preloadCharacter: WalkieCharacter,
     characterUiState: BaseUiState<WalkieCharacterDetail?>,
-    picked: Boolean,
     onDismiss: () -> Unit,
     onSelectPartner: (WalkieCharacterDetail) -> Unit
 ) {
@@ -496,12 +490,11 @@ fun CharacterDetailBottomSheet(
                 .align(Alignment.BottomCenter)
         ) {
             if (characterUiState.isShowShimmer) {
-                SkeletonCharacterDetailComponent(preloadCharacter)
+                SkeletonCharacterDetailComponent()
             } else if (character != null) {
                 CharacterDetailContent(
                     character = character,
                     onSelectPartner = onSelectPartner,
-                    picked = picked
                 )
             }
         }
@@ -510,7 +503,6 @@ fun CharacterDetailBottomSheet(
 
 @Composable
 fun CharacterDetailContent(
-    picked: Boolean,
     character: WalkieCharacterDetail,
     onSelectPartner: (WalkieCharacterDetail) -> Unit
 ) {
@@ -530,7 +522,7 @@ fun CharacterDetailContent(
         Spacer(modifier = Modifier.height(6.dp))
         CharacterSelectButton(
             character = character,
-            isAlreadySelected = picked,
+            isAlreadySelected = character.picked,
             onSelectPartner = onSelectPartner
         )
     }
@@ -538,7 +530,6 @@ fun CharacterDetailContent(
 
 @Composable
 private fun SkeletonCharacterDetailComponent(
-    character: WalkieCharacter = WalkieCharacter.ofEmpty(),
     isAlreadySelected: Boolean = false
 ) {
     Column(
@@ -548,53 +539,38 @@ private fun SkeletonCharacterDetailComponent(
             .background(colors.white)
             .padding(bottom = 30.dp, start = 16.dp, end = 16.dp)
     ) {
-        Image(
-            painter = painterResource(id = character.characterImageResId),
-            contentDescription = stringResource(id = character.characterNameResId),
-            modifier = Modifier.size(180.dp)
-        )
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = stringResource(id = character.characterNameResId),
-            style = WalkieTheme.typography.head3.copy(color = colors.gray700)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = stringResource(R.string.character_detail_wise_saying),
-            style = WalkieTheme.typography.body2.copy(color = colors.gray500),
-            textAlign = TextAlign.Center,
+        Box(
+            modifier = Modifier
+                .size(180.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .shimmerEffectGray50()
         )
 
         Spacer(modifier = Modifier.height(20.dp))
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .width(57.dp)
-                    .height(36.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .shimmerEffect()
-            )
-            Box(
-                modifier = Modifier
-                    .width(57.dp)
-                    .height(36.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .shimmerEffect()
-            )
-        }
+
+        Box(
+            modifier = Modifier
+                .width(57.dp)
+                .height(36.dp)
+                .clip(CircleShape)
+                .shimmerEffectGray50()
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        Box(
+            modifier = Modifier
+                .width(180.dp)
+                .height(36.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .shimmerEffectGray50()
+        )
         Spacer(modifier = Modifier.height(20.dp))
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(36.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .shimmerEffect()
+                .shimmerEffectGray50()
         )
         val buttonText = if (isAlreadySelected) {
             stringResource(R.string.character_already_selected)
@@ -618,16 +594,16 @@ private fun CharacterDetailScrollableContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        Image(
-            painter = painterResource(id = characterDetail.character.characterImageResId),
-            contentDescription = stringResource(id = characterDetail.character.characterNameResId),
+        AsyncImage(
+            model = characterDetail.characterImageUrl,
+            contentDescription = characterDetail.characterName,
             modifier = Modifier.size(180.dp)
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = stringResource(id = characterDetail.character.characterNameResId),
+            text = characterDetail.characterName,
             style = WalkieTheme.typography.head3.copy(color = colors.gray700)
         )
 
@@ -655,8 +631,8 @@ private fun CharacterInfoTags(characterDetail: WalkieCharacterDetail) {
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         TagMedium(
-            text = stringResource(characterDetail.character.rank.displayStrResId),
-            textColor = characterDetail.character.rank.getTextColor()
+            text = stringResource(characterDetail.rank.displayStrResId),
+            textColor = characterDetail.rank.getTextColor()
         )
         Row(
             modifier = Modifier
@@ -664,7 +640,7 @@ private fun CharacterInfoTags(characterDetail: WalkieCharacterDetail) {
                 .padding(vertical = 8.dp, horizontal = 16.dp)
         ) {
             Text(
-                text = stringResource(R.string.format_int, characterDetail.character.count),
+                text = stringResource(R.string.format_int, characterDetail.count),
                 style = WalkieTheme.typography.head6.copy(color = colors.gray700),
             )
             Text(
