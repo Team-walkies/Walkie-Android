@@ -18,6 +18,18 @@ fun Context.moveToAppDetailSetting() {
     }
 }
 
+fun Context.moveToNotificationSetting() {
+    try {
+        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+            startActivity(this)
+        }
+    } catch (e: Exception) {
+        Log.e("ContextExtension", "Context.moveToAppDetailSetting() Error")
+    }
+}
+
 fun Context.openBrowser(url: String) {
     try {
         val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))

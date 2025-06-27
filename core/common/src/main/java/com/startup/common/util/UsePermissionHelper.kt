@@ -1,6 +1,7 @@
 package com.startup.common.util
 
 import android.Manifest
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -107,6 +108,14 @@ object UsePermissionHelper {
         } else {
             return false
         }
+    }
+
+    fun isAppChannelNotificationOn(context: Context): Boolean {
+        if (OsVersions.isGreaterThanOrEqualsO()) {
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            return notificationManager.areNotificationsEnabled()
+        }
+        return false
     }
 
     fun getPermissionSettingsIntent(context: Context): Intent {
