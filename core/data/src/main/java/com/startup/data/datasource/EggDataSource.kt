@@ -1,5 +1,6 @@
 package com.startup.data.datasource
 
+import com.startup.data.remote.dto.response.egg.DailyEggResponse
 import com.startup.data.remote.dto.response.egg.EggCountResponse
 import com.startup.data.remote.dto.response.egg.EggDetailDto
 import com.startup.data.remote.dto.response.egg.MyEggResponse
@@ -12,4 +13,5 @@ interface EggDataSource {
     fun updateEggOfStepCount(request: UpdateEggOfStepCountRequest): Flow<EggStepUpdateResponse>
     fun getMyEggList(): Flow<MyEggResponse>
     fun getMyEggCount(): Flow<EggCountResponse>
+    fun getDailyEgg(): Flow<DailyEggResponse>
 }

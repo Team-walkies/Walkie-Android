@@ -30,12 +30,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.startup.common.extension.moveToNotificationSetting
 import com.startup.common.util.BatteryOptimizationHelper
 import com.startup.common.util.UsePermissionHelper
 import com.startup.common.util.rememberPermissionRequestDelegator
+import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.widget.button.PrimaryButton
 import com.startup.home.R
-import com.startup.design_system.ui.WalkieTheme
 
 data class PermissionState(
     val type: UsePermissionHelper.Permission,
@@ -205,11 +206,16 @@ fun NotificationPermissionBottomSheet(
     onNeverAskAgain: (List<String>) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
     val notificationPermissionDelegator = rememberPermissionRequestDelegator(
         permissions = listOf(UsePermissionHelper.Permission.POST_NOTIFICATIONS),
         doOnGranted = onAllowPermission,
         doOnShouldShowRequestPermissionRationale = onShowRationale,
-        doOnNeverAskAgain = onNeverAskAgain
+        doOnNeverAskAgain = {
+            context.moveToNotificationSetting()
+            onNeverAskAgain(it)
+        }
     )
 
     PermissionBottomSheetContainer(modifier = modifier) {

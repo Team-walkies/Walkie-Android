@@ -208,6 +208,7 @@
     <string name="permission_dialog_negative">취소</string>
     <string name="permission_dialog_positive">허용하기</string>
     <string name="dialog_positive">확인</string>
+    <string name="dialog_dismiss">닫기</string>
 
     <string name="unlink_header_title">탈퇴하기</string>
     <string name="unlink_title">%s이 떠나시다니,\n너무 아쉬워요</string>
@@ -228,4 +229,9 @@
     <string name="bottomsheet_force_update_sub_title">유저분들의 의견을 반영하여 사용성을 개선했어요!\n지금 바로 업데이트하고 즐겨보세요</string>
     <string name="bottomsheet_force_update_negative_btn">앱을 종료할게요</string>
     <string name="dialog_force_update_positive_btn">업데이트</string>
+
+    <string name="event_show">보러가기</string>
+    <string name="event_day_count">D-%d</string>
+    <string name="event_gift_title">알 1개를 선물 받았어요!</string>
+    <string name="event_until_end">이벤트 종료까지</string>
 </resources>

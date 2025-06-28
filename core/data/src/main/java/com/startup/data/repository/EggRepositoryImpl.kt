@@ -3,6 +3,7 @@ package com.startup.data.repository
 import com.startup.common.extension.orZero
 import com.startup.data.datasource.EggDataSource
 import com.startup.data.remote.dto.request.egg.UpdateEggOfStepCountRequest
+import com.startup.domain.model.egg.DailyEgg
 import com.startup.domain.model.egg.EggDetail
 import com.startup.domain.model.egg.MyEgg
 import com.startup.domain.model.egg.UpdateEggStepInfo
@@ -46,4 +47,7 @@ internal class EggRepositoryImpl @Inject constructor(
 
     override fun getMyEggCount(): Flow<Int> =
         eggDataSource.getMyEggCount().map { it.eggCount.orZero() }
+
+    override fun getDailyEgg(): Flow<DailyEgg> =
+        eggDataSource.getDailyEgg().map { it.toDomain() }
 }
