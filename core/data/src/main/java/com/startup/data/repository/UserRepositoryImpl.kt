@@ -73,7 +73,36 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun isEggEventEnabled() = withContext(Dispatchers.IO) {
+        withTimeout(3000) { // 3초 안에 fetch 못 하면 TimeoutCancellationException 발생 하도록
+            suspendCancellableCoroutine { cont ->
+                if (BuildConfig.DEBUG) {
+                    cont.resume(true) // 디버그에서는 기본적으로 활성화
+                } else {
+                    remoteConfig.fetchAndActivate()
+                        .addOnCompleteListener { task ->
+                            val result = runCatching {
+                                if (task.isSuccessful) {
+                                    val value = remoteConfig.getBoolean(KEY_EGG_EVENT_ENABLED)
+                                    Printer.d("LMH", "RemoteConfig eggEventEnabled: $value")
+                                    value
+                                } else {
+                                    Printer.e("LMH", "RemoteConfig 실패: ${task.exception}")
+                                    false
+                                }
+                            }.getOrElse {
+                                Printer.e("LMH", "RemoteConfig 예외: $it")
+                                false
+                            }
+                            if (cont.isActive) cont.resume(result)
+                        }
+                }
+            }
+        }
+    }
+
     companion object {
         private const val KEY_MIN_APP_VERSION = "AOS_MIN_APP_VERSION"
+        private const val KEY_EGG_EVENT_ENABLED = "EGG_EVENT_ENABLED"
     }
 }

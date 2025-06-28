@@ -113,6 +113,14 @@ fun MainBottomNavigationScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            homeViewModel.navigateToGainEgg.collect {
+                navController.navigate(MainScreenNav.HomeGraph.route + "/${HomeScreenNav.GainEgg.route}")
+            }
+        }
+    }
+
     fun handleHomeScreenNavigationEvent(navigationEvent: HomeScreenNavigationEvent) {
         when (navigationEvent) {
             HomeScreenNavigationEvent.MoveToGainEgg -> {

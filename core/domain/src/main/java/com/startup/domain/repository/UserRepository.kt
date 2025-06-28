@@ -12,4 +12,5 @@ interface UserRepository {
     fun getProfileAccessEnabled(): Flow<Boolean>
     suspend fun updateProfileAccessEnabled(enabled: Boolean)
     suspend fun getMinAppVersionCode(): Long
+    suspend fun isEggEventEnabled(): Boolean
 }

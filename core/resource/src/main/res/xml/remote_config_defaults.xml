@@ -4,4 +4,8 @@
     <key>AOS_MIN_APP_VERSION</key>
     <value>1</value>
   </entry>
+  <entry>
+    <key>EGG_EVENT_ENABLED</key>
+    <value>false</value>
+  </entry>
 </defaults>

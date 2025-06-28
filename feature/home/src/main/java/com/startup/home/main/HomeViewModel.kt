@@ -12,6 +12,7 @@ import com.startup.domain.model.member.UserInfo
 import com.startup.domain.provider.StepCounterService
 import com.startup.domain.provider.StepDataStore
 import com.startup.domain.repository.LocationRepository
+import com.startup.domain.repository.UserRepository
 import com.startup.domain.usecase.character.GetHatchedCharacterCount
 import com.startup.domain.usecase.egg.GetGainEggCount
 import com.startup.domain.usecase.egg.UpdateEggOfStepCount
@@ -43,11 +44,13 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val stepCounterService: StepCounterService,
     private val dataStore: StepDataStore,
     private val locationRepository: LocationRepository,
+    private val userRepository: UserRepository,
     private val updateEggOfStepCount: UpdateEggOfStepCount,
     private val getCurrentWalkEgg: GetCurrentWalkEgg,
     getGainEggCount: GetGainEggCount,
@@ -59,6 +62,12 @@ class HomeViewModel @Inject constructor(
 
     private val _showActivityPermissionAlert = MutableStateFlow(false)
     private val _showBackgroundLocationPermissionAlert = MutableStateFlow(false)
+    
+    private val _showEventModal = MutableStateFlow(false)
+    val showEventModal: StateFlow<Boolean> = _showEventModal
+    
+    private val _navigateToGainEgg = MutableSharedFlow<Unit>()
+    val navigateToGainEgg: SharedFlow<Unit> = _navigateToGainEgg.asSharedFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _state = HomeViewStateImpl(
@@ -298,12 +307,90 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun checkAndCallDailyApi() {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (dataStore.shouldCallDailyApi()) {
+                // TODO: 여기에 실제 API 호출 로직 추가
+                Printer.d("JUNWOO", "Daily API call needed - calling API...")
+                
+                // API 호출 후 성공시 마킹
+                dataStore.markDailyApiCalled()
+                Printer.d("JUNWOO", "Daily API call completed and marked")
+            } else {
+                Printer.d("JUNWOO", "Daily API already called today")
+            }
+        }
+    }
+
     fun setActivityPermissionAlertState(show: Boolean) {
         _showActivityPermissionAlert.value = show
     }
 
     fun setBackgroundLocationPermissionAlertState(show: Boolean) {
         _showBackgroundLocationPermissionAlert.value = show
+    }
+    
+    fun onEventModalDismissed() {
+        _showEventModal.value = false
+    }
+    
+    fun navigateToGainEggFromEventModal() {
+        _showEventModal.value = false
+        viewModelScope.launch {
+            _navigateToGainEgg.emit(Unit)
+        }
+    }
+    
+    
+    fun callDailyApiAndCheckEvent() {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (dataStore.shouldCallDailyApi()) {
+                Printer.d("JUNWOO", "Calling daily API...")
+                
+                try {
+                    // 1. Remote Config로 API 호출 여부 확인
+                    val shouldCallEventApi = userRepository.isEggEventEnabled()
+                    
+                    if (shouldCallEventApi) {
+                        // 2. 실제 서버 API 호출
+                        val hasEvent = callEventApi()
+                        
+                        // 3. API 반환값에 따라 팝업 표시
+                        if (hasEvent) {
+                            _showEventModal.value = true
+                        }
+                    }
+                    
+                    // API 호출 완료 후 마킹
+                    dataStore.markDailyApiCalled()
+                    Printer.d("JUNWOO", "Daily API call completed and marked")
+                } catch (e: Exception) {
+                    Printer.e("JUNWOO", "Daily API call failed: ${e.message}")
+                }
+            } else {
+                Printer.d("JUNWOO", "Daily API already called today")
+            }
+        }
+    }
+    
+    private suspend fun callEventApi(): Boolean {
+        return try {
+            // TODO: 여기에 실제 이벤트 API 호출 로직 구현
+            // 예시: eventRepository.checkDailyEvent() 또는 retrofit API 호출
+            Printer.d("JUNWOO", "Calling event API...")
+            
+            // 임시로 50% 확률로 이벤트 있음 반환 (실제 API 호출로 교체 필요)
+            // val hasEvent = (0..1).random() == 1
+            
+            // 테스트용: 무조건 true 반환
+            val hasEvent = true
+            
+            Printer.d("JUNWOO", "Event API response: $hasEvent")
+            hasEvent
+        } catch (e: Exception) {
+            Printer.e("JUNWOO", "Event API call failed: ${e.message}")
+            false // API 호출 실패시 기본값 false
+        }
     }
 }
 

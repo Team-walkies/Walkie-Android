@@ -23,4 +23,8 @@ interface StepDataStore {
     suspend fun getTodaySteps(): Int
     suspend fun resetTodaySteps()
     suspend fun checkAndResetForNewDay(): Int?
+    
+    // 일일 API 호출 관련
+    suspend fun shouldCallDailyApi(): Boolean
+    suspend fun markDailyApiCalled()
 }
