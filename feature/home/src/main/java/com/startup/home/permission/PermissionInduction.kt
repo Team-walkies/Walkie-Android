@@ -1,6 +1,8 @@
 package com.startup.home.permission
 
 import android.content.Context
+import android.content.Intent
+import android.provider.Settings
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -205,11 +207,16 @@ fun NotificationPermissionBottomSheet(
     onNeverAskAgain: (List<String>) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    
     val notificationPermissionDelegator = rememberPermissionRequestDelegator(
         permissions = listOf(UsePermissionHelper.Permission.POST_NOTIFICATIONS),
         doOnGranted = onAllowPermission,
         doOnShouldShowRequestPermissionRationale = onShowRationale,
-        doOnNeverAskAgain = onNeverAskAgain
+        doOnNeverAskAgain = { 
+            openNotificationSettings(context)
+            onNeverAskAgain(it)
+        }
     )
 
     PermissionBottomSheetContainer(modifier = modifier) {
@@ -327,6 +334,17 @@ fun PermissionItem(
  */
 fun openBatteryOptimizationSettings(context: Context) {
     val intent = BatteryOptimizationHelper.getBatteryOptimizationSettingsIntent(context)
+    context.startActivity(intent)
+}
+
+/**
+ * 알림 설정 화면으로 이동하는 함수
+ */
+fun openNotificationSettings(context: Context) {
+    val intent = Intent().apply {
+        action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+    }
     context.startActivity(intent)
 }
 
