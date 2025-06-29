@@ -15,6 +15,7 @@ internal fun Project.configureFirebaseApp() {
         add("implementation", libs.findLibrary("firebase.analytics").get())
         add("implementation", libs.findLibrary("firebase.crashlytics").get())
         add("implementation", libs.findLibrary("firebase.config").get())
+        add("implementation", libs.findLibrary("firebase-messaging").get())
     }
 }
 

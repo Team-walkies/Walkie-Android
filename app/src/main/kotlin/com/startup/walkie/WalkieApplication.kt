@@ -23,6 +23,17 @@ class WalkieApplication : Application() {
         initializeLogging()
         initialRemoteConfigSetting()
         KakaoSdk.init(this, BuildConfig.NATIVE_APP_KEY)
+//        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+//            if (!task.isSuccessful) {
+//                Printer.d("LMH", "Fetching FCM registration token failed ${task.exception}")
+//                return@OnCompleteListener
+//            }
+//
+//            // Get new FCM registration token
+//            val token = task.result
+//
+//            Printer.d("LMH", token)
+//        })
     }
 
     private fun initializeLogging() {
