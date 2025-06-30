@@ -105,6 +105,7 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 firebase-config = { group = "com.google.firebase", name = "firebase-config" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 kakao-login = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao-sdk" }
 lottie = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
 leakcanary-android = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
