@@ -14,6 +14,12 @@ data class AcquisitionCharacterInfoResponse(
     val type: Int?,
     @SerializedName("characterClass")
     val characterClass: Int?,
+    @SerializedName("characterDescription")
+    val characterDescription: String?,
+    @SerializedName("characterName")
+    val characterName: String?,
+    @SerializedName("characterImageUrl")
+    val characterImageUrl: String?,
     @SerializedName("obtainedDetails")
     val obtainedDetails: List<AcquisitionInfo>?,
 ) {
@@ -23,6 +29,9 @@ data class AcquisitionCharacterInfoResponse(
         characterClass = characterClass.orZero(),
         characterCount = characterCount.orZero(),
         rank = rank.orZero(),
+        characterDescription = characterDescription.orEmpty(),
+        characterName = characterName.orEmpty(),
+        characterImageUrl = characterImageUrl.orEmpty(),
         obtainInfo = obtainedDetails?.toDomain().orEmpty()
     )
 
