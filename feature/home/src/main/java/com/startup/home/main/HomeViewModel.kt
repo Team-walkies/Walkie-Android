@@ -30,6 +30,7 @@ import com.startup.model.egg.MyEggModel.Companion.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -72,6 +73,13 @@ class HomeViewModel @Inject constructor(
     // Navigation events
     private val _navigateToGainEgg = MutableSharedFlow<Unit>()
     val navigateToGainEgg: SharedFlow<Unit> = _navigateToGainEgg.asSharedFlow()
+
+    // Toast message for testing
+    private val _toastMessage = MutableSharedFlow<String>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val toastMessage: SharedFlow<String> = _toastMessage.asSharedFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _state = HomeViewStateImpl(
@@ -341,6 +349,7 @@ class HomeViewModel @Inject constructor(
             }
 
             if (shouldCallEventApi && dataStore.shouldCallDailyApi()) {
+                showToastMessage("Daily API 호출함 (오늘 첫 호출)")
                 getDailyEgg(Unit)
                     .catch { throwable ->
                         Printer.e("JUNWOO", "Daily egg API call failed: ${throwable.message}")
@@ -361,10 +370,19 @@ class HomeViewModel @Inject constructor(
             } else {
                 if (!shouldCallEventApi) {
                     Printer.d("JUNWOO", "Event API disabled by remote config")
+                    showToastMessage("Daily API 호출 안함 (RemoteConfig 비활성화)")
                 } else {
                     Printer.d("JUNWOO", "Daily API already called today")
+                    showToastMessage("Daily API 호출 안함 (오늘 이미 호출됨)")
                 }
             }
+        }
+    }
+
+    private fun showToastMessage(message: String) {
+        viewModelScope.launch {
+            Printer.d("JUNWOO", "Emitting toast message: $message")
+            _toastMessage.emit(message)
         }
     }
 }

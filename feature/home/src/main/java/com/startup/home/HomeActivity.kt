@@ -1,6 +1,7 @@
 package com.startup.home
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -17,12 +18,14 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import com.startup.common.util.Printer
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -54,6 +57,7 @@ import com.startup.navigation.LoginModuleNavigator
 import com.startup.navigation.SpotModuleNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -140,6 +144,17 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
         super.onCreate(savedInstanceState)
         setupPermissionManager()
         registerDailyResetReceiver()
+        
+        // 토스트 메시지 수집
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.toastMessage.collect { message ->
+                    Printer.d("JUNWOO", "Received toast message: $message")
+                    Toast.makeText(this@HomeActivity, message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        
         viewModel.callDailyApiAndCheckEvent()
 
         setContent {
