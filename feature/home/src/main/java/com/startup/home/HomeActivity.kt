@@ -36,7 +36,9 @@ import com.startup.common.base.UiEvent
 import com.startup.common.util.BatteryOptimizationHelper
 import com.startup.common.util.OsVersions
 import com.startup.common.util.UsePermissionHelper
+import com.startup.design_system.R
 import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.widget.modal.EventModal
 import com.startup.domain.provider.DateChangeListener
 import com.startup.domain.provider.DateChangeNotifier
 import com.startup.ga.AnalyticsHelper
@@ -138,6 +140,8 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
         super.onCreate(savedInstanceState)
         setupPermissionManager()
         registerDailyResetReceiver()
+        viewModel.callDailyApiAndCheckEvent()
+
         setContent {
             WalkieTheme {
                 MainScreenWithPermissionComponents()
@@ -183,6 +187,24 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                     context = this@HomeActivity,
                     permissionManager = permissionManager
                 )
+
+                val eventState by viewModel.eventState.collectAsStateWithLifecycle()
+
+                if (eventState.showEventModal) {
+                    EventModal(
+                        title = R.string.event_gift_title,
+                        subTitle = R.string.event_until_end,
+                        positiveText = R.string.event_show,
+                        negativeText = R.string.dialog_dismiss,
+                        dayCount = eventState.eventRemainingDays,
+                        imageRes = R.drawable.img_gift,
+                        onDismiss = { viewModel.onEventModalDismissed() },
+                        onClickPositive = {
+                            viewModel.navigateToGainEggFromEventModal()
+                        },
+                        onClickNegative = { viewModel.onEventModalDismissed() }
+                    )
+                }
             }
         }
     }
@@ -313,7 +335,9 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                     characterName = characterName,
                     characterImageResId = character.characterImageResId,
                     eggRank = eggRank,
-                    onDismiss = { viewModel.onHatchingAnimationDismissed() }
+                    onDismiss = {
+                        viewModel.onHatchingAnimationDismissed()
+                    }
                 )
             }
         }

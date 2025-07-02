@@ -12,7 +12,9 @@ import com.startup.domain.model.member.UserInfo
 import com.startup.domain.provider.StepCounterService
 import com.startup.domain.provider.StepDataStore
 import com.startup.domain.repository.LocationRepository
+import com.startup.domain.repository.UserRepository
 import com.startup.domain.usecase.character.GetHatchedCharacterCount
+import com.startup.domain.usecase.egg.GetDailyEgg
 import com.startup.domain.usecase.egg.GetGainEggCount
 import com.startup.domain.usecase.egg.UpdateEggOfStepCount
 import com.startup.domain.usecase.profile.GetMyData
@@ -43,13 +45,16 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val stepCounterService: StepCounterService,
     private val dataStore: StepDataStore,
     private val locationRepository: LocationRepository,
+    private val userRepository: UserRepository,
     private val updateEggOfStepCount: UpdateEggOfStepCount,
     private val getCurrentWalkEgg: GetCurrentWalkEgg,
+    private val getDailyEgg: GetDailyEgg,
     getGainEggCount: GetGainEggCount,
     getHatchedCharacterCount: GetHatchedCharacterCount,
     getMyData: GetMyData,
@@ -59,6 +64,14 @@ class HomeViewModel @Inject constructor(
 
     private val _showActivityPermissionAlert = MutableStateFlow(false)
     private val _showBackgroundLocationPermissionAlert = MutableStateFlow(false)
+
+    // Event UI State
+    private val _eventState = MutableStateFlow(EventUiState())
+    val eventState: StateFlow<EventUiState> = _eventState
+
+    // Navigation events
+    private val _navigateToGainEgg = MutableSharedFlow<Unit>()
+    val navigateToGainEgg: SharedFlow<Unit> = _navigateToGainEgg.asSharedFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _state = HomeViewStateImpl(
@@ -298,12 +311,61 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+
     fun setActivityPermissionAlertState(show: Boolean) {
         _showActivityPermissionAlert.value = show
     }
 
     fun setBackgroundLocationPermissionAlertState(show: Boolean) {
         _showBackgroundLocationPermissionAlert.value = show
+    }
+
+    fun onEventModalDismissed() {
+        _eventState.value = _eventState.value.copy(showEventModal = false)
+    }
+
+    fun navigateToGainEggFromEventModal() {
+        _eventState.value = _eventState.value.copy(showEventModal = false)
+        viewModelScope.launch {
+            _navigateToGainEgg.emit(Unit)
+        }
+    }
+
+    fun callDailyApiAndCheckEvent() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val shouldCallEventApi = runCatching {
+                userRepository.isEggEventEnabled()
+            }.getOrElse { exception ->
+                Printer.e("JUNWOO", "RemoteConfig call failed: $exception")
+                false
+            }
+
+            if (shouldCallEventApi && dataStore.shouldCallDailyApi()) {
+                getDailyEgg(Unit)
+                    .catch { throwable ->
+                        Printer.e("JUNWOO", "Daily egg API call failed: ${throwable.message}")
+                    }
+                    .collect { dailyEgg ->
+                        Printer.d(
+                            "JUNWOO",
+                            "Daily egg API response: receivedToday=${dailyEgg.receivedToday}, remainingDays=${dailyEgg.remainingDays}"
+                        )
+                        _eventState.value = _eventState.value.copy(
+                            eventRemainingDays = dailyEgg.remainingDays,
+                            showEventModal = dailyEgg.receivedToday // true 일 경우 모달 노출
+                        )
+                    }
+
+                // API 호출 완료 후 마킹
+                dataStore.markDailyApiCalled()
+            } else {
+                if (!shouldCallEventApi) {
+                    Printer.d("JUNWOO", "Event API disabled by remote config")
+                } else {
+                    Printer.d("JUNWOO", "Daily API already called today")
+                }
+            }
+        }
     }
 }
 
@@ -330,6 +392,11 @@ class HomeViewStateImpl(
     override val showBackgroundLocationPermissionAlert: StateFlow<Boolean>,
     override val userInfo: StateFlow<UserInfo?>
 ) : HomeViewState
+
+data class EventUiState(
+    val showEventModal: Boolean = false,
+    val eventRemainingDays: Int = 0
+)
 
 data class HatchingAnimationCharacterData(
     val isHatching: Boolean = false,

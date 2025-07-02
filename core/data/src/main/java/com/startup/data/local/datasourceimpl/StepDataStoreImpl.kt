@@ -30,6 +30,7 @@ class StepDataStoreImpl @Inject constructor(
         private val TARGET_STEP = intPreferencesKey("target_step")
         private val TARGET_REACHED = booleanPreferencesKey("target_reached")
         private val LAST_RESET_TIME = longPreferencesKey("last_reset_time")
+        private val LAST_DAILY_API_CALL = longPreferencesKey("last_daily_api_call")
     }
 
     private var cachedLastResetDayStart: Long = 0  // 마지막 리셋 날짜의 자정 시간
@@ -168,5 +169,22 @@ class StepDataStoreImpl @Inject constructor(
         saveLastResetDate()
         // 이전 걸음 수 반환
         return currentSteps
+    }
+
+    override suspend fun shouldCallDailyApi(): Boolean {
+        // 임시: 항상 true 반환 (테스트용)
+        //return true
+        
+         val lastApiCall = context.dataStore.data.first()[LAST_DAILY_API_CALL] ?: 0L
+         val currentTime = System.currentTimeMillis()
+        // 한 번도 호출하지 않았거나, 마지막 호출이 오늘이 아닌 경우
+         return lastApiCall == 0L || !isSameDay(lastApiCall, currentTime)
+    }
+
+    override suspend fun markDailyApiCalled() {
+        val currentTime = System.currentTimeMillis()
+        context.dataStore.edit { preferences ->
+            preferences[LAST_DAILY_API_CALL] = currentTime
+        }
     }
 }

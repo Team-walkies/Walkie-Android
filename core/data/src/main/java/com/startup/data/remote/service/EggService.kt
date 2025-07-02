@@ -2,6 +2,7 @@ package com.startup.data.remote.service
 
 import com.startup.data.remote.BaseResponse
 import com.startup.data.remote.dto.request.egg.UpdateEggOfStepCountRequest
+import com.startup.data.remote.dto.response.egg.DailyEggResponse
 import com.startup.data.remote.dto.response.egg.EggCountResponse
 import com.startup.data.remote.dto.response.egg.EggDetailDto
 import com.startup.data.remote.dto.response.egg.EggStepUpdateResponse
@@ -27,5 +28,9 @@ internal interface EggService {
     /** 보유한 알 갯수 조회 API */
     @GET("api/v1/eggs/count")
     suspend fun getMyEggCount(): BaseResponse<EggCountResponse>
+
+    /** 하루에 한번 알 획득 API */
+    @GET("api/v1/events/daily-egg")
+    suspend fun getDailyEgg(): BaseResponse<DailyEggResponse>
 
 }
