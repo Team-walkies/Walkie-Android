@@ -25,6 +25,7 @@ sealed interface HomeScreenNavigationEvent : ScreenNavigationEvent {
     data object MoveToGainCharacter : HomeScreenNavigationEvent
     data object MoveToNotification : HomeScreenNavigationEvent
     data object MoveToSpotArchive : HomeScreenNavigationEvent
+    data object MoveToHealthcare : HomeScreenNavigationEvent
 }
 
 sealed interface MyPageScreenNavigationEvent : ScreenNavigationEvent {

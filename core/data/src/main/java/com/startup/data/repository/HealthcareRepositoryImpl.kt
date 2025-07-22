@@ -1,5 +1,7 @@
 package com.startup.data.repository
 
+import com.startup.common.extension.orZero
+import com.startup.common.util.Printer
 import com.startup.data.datasource.HealthcareDataSource
 import com.startup.domain.model.healthcare.DailyHealthcareDetail
 import com.startup.domain.model.healthcare.DailyHealthcareListItem
@@ -13,12 +15,14 @@ internal class HealthcareRepositoryImpl @Inject constructor(private val healthca
     override fun getCalendarHealthcareList(startDate: String, endDate: String): Flow<List<DailyHealthcareListItem>> =
         healthcareDataSource.getCalendarHealthcareList(startDate, endDate)
             .map { list ->
-                list.map { item ->
-                    item.toDomain()
-                }
+                Printer.e("lmh", "GETET $list")
+                list.map { item -> item.toDomain() }
             }
 
     override fun getCalendarHealthcareDetail(searchDate: String): Flow<DailyHealthcareDetail> =
         healthcareDataSource.getCalendarHealthcareDetail(searchDate)
             .map { item -> item.toDomain() }
+
+    override fun getCalendarHealthcareContinueDays(): Flow<Int> =
+        healthcareDataSource.getCalendarHealthcareContinueDays().map { it.continuousDays.orZero() }
 }

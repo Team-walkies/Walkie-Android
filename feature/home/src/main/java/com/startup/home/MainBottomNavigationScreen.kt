@@ -138,6 +138,9 @@ fun MainBottomNavigationScreen(
             HomeScreenNavigationEvent.MoveToSpotArchive -> {
                 navController.navigate(MainScreenNav.HomeGraph.route + "/${HomeScreenNav.SpotArchive.route}")
             }
+            HomeScreenNavigationEvent.MoveToHealthcare -> {
+                navController.navigate(MainScreenNav.HomeGraph.route + "/${HomeScreenNav.Healthcare.route}")
+            }
         }
     }
 

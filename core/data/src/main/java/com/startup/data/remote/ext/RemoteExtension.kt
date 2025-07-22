@@ -22,7 +22,7 @@ internal suspend fun <T : BaseResponse<R>, R> FlowCollector<R>.emitRemote(
 internal fun <T> T?.requireNotNull(): T {
     return when (this) {
         is Unit? -> Unit as T // Unit? 타입이면 Unit 반환
-        is List<*> -> emptyList<Any?>() as T
+        is List<*>? -> (this ?: emptyList<Any?>()) as T
         else -> this ?: throw NullPointerException("값이 없음")
     }
 }

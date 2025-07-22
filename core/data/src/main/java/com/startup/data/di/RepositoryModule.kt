@@ -3,6 +3,7 @@ package com.startup.data.di
 import com.startup.data.repository.AuthRepositoryImpl
 import com.startup.data.repository.CharacterRepositoryImpl
 import com.startup.data.repository.EggRepositoryImpl
+import com.startup.data.repository.HealthcareRepositoryImpl
 import com.startup.data.repository.LocationRepositoryImpl
 import com.startup.data.repository.MemberRepositoryImpl
 import com.startup.data.repository.NoticeRepositoryImpl
@@ -12,6 +13,7 @@ import com.startup.data.repository.UserRepositoryImpl
 import com.startup.domain.repository.AuthRepository
 import com.startup.domain.repository.CharacterRepository
 import com.startup.domain.repository.EggRepository
+import com.startup.domain.repository.HealthcareRepository
 import com.startup.domain.repository.LocationRepository
 import com.startup.domain.repository.MemberRepository
 import com.startup.domain.repository.NoticeRepository
@@ -62,4 +64,8 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindReviewRepository(repository: ReviewRepositoryImpl): ReviewRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindHealthcareRepository(repository: HealthcareRepositoryImpl): HealthcareRepository
 }

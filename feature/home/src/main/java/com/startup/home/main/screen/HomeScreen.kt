@@ -590,6 +590,7 @@ fun EggLayout(
                 )
             )
             .noRippleClickable {
+                onNavigationEvent.invoke(HomeScreenNavigationEvent.MoveToHealthcare)
                 analyticsHelper.logEvent(EventNameConst.MAIN_BLUE_CARD)
             },
         contentAlignment = Alignment.Center

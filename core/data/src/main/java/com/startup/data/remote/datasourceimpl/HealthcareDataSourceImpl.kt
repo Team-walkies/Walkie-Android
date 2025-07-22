@@ -1,6 +1,8 @@
 package com.startup.data.remote.datasourceimpl
 
+import com.startup.common.util.Printer
 import com.startup.data.datasource.HealthcareDataSource
+import com.startup.data.remote.dto.response.healthcare.ResponseContinuousDays
 import com.startup.data.remote.dto.response.healthcare.ResponseDailyHealthcareDetail
 import com.startup.data.remote.dto.response.healthcare.ResponseDailyHealthcareListItem
 import com.startup.data.remote.ext.emitRemote
@@ -17,13 +19,21 @@ internal class HealthcareDataSourceImpl @Inject constructor(private val healthca
         endDate: String
     ): Flow<List<ResponseDailyHealthcareListItem>> = flow {
         handleExceptionIfNeed {
-            emitRemote(healthcareService.getCalendarHealthcareList(startDate, endDate))
+            val response = healthcareService.getCalendarHealthcareList(startDate, endDate)
+            Printer.e("LMH", "GET RESPONSE $response")
+            emitRemote(response)
         }
     }
 
     override fun getCalendarHealthcareDetail(searchDate: String): Flow<ResponseDailyHealthcareDetail> = flow {
         handleExceptionIfNeed {
             emitRemote(healthcareService.getCalendarHealthcareDetail(searchDate))
+        }
+    }
+
+    override fun getCalendarHealthcareContinueDays(): Flow<ResponseContinuousDays> = flow {
+        handleExceptionIfNeed {
+            emitRemote(healthcareService.getCalendarHealthcareContinueDays())
         }
     }
 }

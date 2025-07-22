@@ -27,6 +27,6 @@ data class ResponseDailyHealthcareDetail(
         nowCalories.orZero(),
         nowDistance.orZero(),
         nowSteps.orZero(),
-        targetSteps.orZero(),
+        targetSteps ?: 4_000,
     )
 }

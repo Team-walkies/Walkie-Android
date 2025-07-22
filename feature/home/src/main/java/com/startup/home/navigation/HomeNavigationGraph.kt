@@ -22,6 +22,8 @@ import com.startup.design_system.ui.WalkieTheme
 import com.startup.home.MainScreenNavigationEvent
 import com.startup.home.character.HatchingCharacterScreen
 import com.startup.home.character.HatchingCharacterViewModel
+import com.startup.home.healthcare.HealthcareViewModel
+import com.startup.home.healthcare.screen.HealthcareScreen
 import com.startup.home.notification.screen.NotificationListScreen
 
 @Composable
@@ -29,6 +31,7 @@ fun HomeNavigationGraph(
     destinationRoute: String,
     parentNavController: NavHostController,
     hatchingCharacterViewModel: HatchingCharacterViewModel = hiltViewModel(),
+    healthcareViewModel: HealthcareViewModel = hiltViewModel(),
     onNavigationEvent: (MainScreenNavigationEvent) -> Unit
 ) {
     val navController = rememberNavController()
@@ -84,6 +87,12 @@ fun HomeNavigationGraph(
                 }
                 composable(HomeScreenNav.Notification.route) {
                     NotificationListScreen(onNavigationEvent = ::handleNavigationEvent)
+                }
+                composable(HomeScreenNav.Healthcare.route) {
+                    HealthcareScreen(
+                        state = healthcareViewModel.state,
+                        uiEventSender = healthcareViewModel::notifyViewModelEvent,
+                        onBackPress = { parentNavController.navigateUp() })
                 }
             }
         }

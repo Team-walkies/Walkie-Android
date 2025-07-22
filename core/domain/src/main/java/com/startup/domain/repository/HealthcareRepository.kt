@@ -7,4 +7,5 @@ import kotlinx.coroutines.flow.Flow
 interface HealthcareRepository {
     fun getCalendarHealthcareList(startDate: String, endDate: String): Flow<List<DailyHealthcareListItem>>
     fun getCalendarHealthcareDetail(searchDate: String): Flow<DailyHealthcareDetail>
+    fun getCalendarHealthcareContinueDays(): Flow<Int>
 }

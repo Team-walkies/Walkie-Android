@@ -15,5 +15,11 @@ data class DailyHealthcareListItemModel(
             date = DateUtil.convertLocalDate(date),
             targetSteps = targetSteps
         )
+
+        fun orEmpty(): DailyHealthcareListItemModel = DailyHealthcareListItemModel(
+            nowSteps = 0,
+            date = LocalDate.now(),
+            targetSteps = 0
+        )
     }
 }
