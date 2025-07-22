@@ -16,7 +16,7 @@
     <string name="notification_default_message">알을 선택해 캐릭터를 부화시켜보세요.</string>
 
     <string name="home_step">걸음</string>
-    <string name="home_kilometer">%.2fkm</string>
+    <string name="kilometer">%.1fkm</string>
     <string name="home_movement">이동</string>
     <string name="home_my_history">나의 히스토리</string>
     <string name="home_gain_eggs">보유한 알</string>
@@ -249,4 +249,27 @@
     <string name="step_record_intro_description">원하는 목표 걸음 수를 달성하고 달성해 보세요!</string>
     <string name="step_record_start_button">사용해보기</string>
     <string name="step_record_later_button">나중에 하기</string>
+    <string name="healthcare_goal">목표</string>
+    <string name="healthcare_calories_title">만큼 칼로리 소모</string>
+    <string name="healthcare_calories_consume">소모 칼로리</string>
+    <string name="healthcare_move_distance">이동 거리</string>
+    <string name="healthcare_achieve">달성</string>
+    <string name="healthcare_continue_days">%d일 연속</string>
+    <string name="healthcare_continue_days_description">목표 달성 중</string>
+    <string name="healthcare_today_walk_detail">일일 걸음수</string>
+    <string name="healthcare_today_walk_goal_title">목표 걸음 설정하기</string>
+    <string name="healthcare_today_walk_goal_select_btn_text">변경하기</string>
+
+    <string name="healthcare_calories_type_air_name">공기</string>
+    <string name="healthcare_calories_type_air_description">들숨 날숨~ 숨쉬기 운동 중!</string>
+    <string name="healthcare_calories_type_candy_name">사탕 1개</string>
+    <string name="healthcare_calories_type_candy_description">이제 몸이 풀렸어요!</string>
+    <string name="healthcare_calories_type_banana_name">바나나 1개</string>
+    <string name="healthcare_calories_type_banana_description">슬슬 운동한 느낌 나죠?</string>
+    <string name="healthcare_calories_type_triangle_gimbap_name">삼각김밥 1개</string>
+    <string name="healthcare_calories_type_triangle_gimbap_description">편의점 인기템 클리어!</string>
+    <string name="healthcare_calories_type_chicken_leg_name">닭다리 1개</string>
+    <string name="healthcare_calories_type_chicken_leg_description">와, 간식 하나정도는 먹어도 되겠어요</string>
+    <string name="healthcare_calories_type_pasta_name">파스타 1접시</string>
+    <string name="healthcare_calories_type_pasta_description">대단해요! 당신의 다리에게 박수를!</string>
 </resources>

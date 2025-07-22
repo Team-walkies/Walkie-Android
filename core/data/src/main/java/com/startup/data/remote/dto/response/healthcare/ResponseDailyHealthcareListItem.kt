@@ -2,6 +2,7 @@ package com.startup.data.remote.dto.response.healthcare
 
 import com.google.gson.annotations.SerializedName
 import com.startup.common.extension.orZero
+import com.startup.common.util.DateUtil
 import com.startup.domain.model.healthcare.DailyHealthcareListItem
 
 data class ResponseDailyHealthcareListItem(
@@ -14,7 +15,7 @@ data class ResponseDailyHealthcareListItem(
 ) {
     fun toDomain(): DailyHealthcareListItem = DailyHealthcareListItem(
         nowSteps = nowSteps.orZero(),
-        date = responseDate.orEmpty(),
+        date = DateUtil.convertLocalDate(responseDate.orEmpty()),
         targetSteps = targetSteps.orZero()
     )
 }

@@ -8,6 +8,7 @@ import com.startup.common.util.NoCharacterException
 import com.startup.common.util.ResponseErrorException
 import com.startup.common.util.UnknownException
 import com.startup.common.util.UserAuthNotFoundException
+import kotlinx.coroutines.CancellationException
 import retrofit2.HttpException
 import java.io.InterruptedIOException
 import java.net.ConnectException
@@ -44,7 +45,7 @@ fun handleException(e: Throwable): Throwable {
         is SSLPeerUnverifiedException,
         is SSLException,
         is InterruptedIOException -> throw NetworkTemporaryException(message = e.message)
-
+        is CancellationException -> throw e
         else -> throw UnknownException(message = e.message)
     }
 }

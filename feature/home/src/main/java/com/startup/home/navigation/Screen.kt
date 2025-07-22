@@ -5,6 +5,7 @@ sealed class HomeScreenNav(val route: String) {
     data object GainCharacter : HomeScreenNav("gainCharacter")
     data object SpotArchive : HomeScreenNav("spotArchive")
     data object Notification : HomeScreenNav("notification")
+    data object Healthcare : HomeScreenNav("healthcare")
 }
 
 sealed class MyPageScreenNav(val route: String) {

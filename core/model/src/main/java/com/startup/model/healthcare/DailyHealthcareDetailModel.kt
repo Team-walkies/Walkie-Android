@@ -1,26 +1,31 @@
 package com.startup.model.healthcare
 
-import com.startup.common.extension.toAnnotatedString
 import com.startup.domain.model.healthcare.DailyHealthcareDetail
 
 data class DailyHealthcareDetailModel(
-    val caloriesDisplayModel: CaloriesDisplayModel,
+    val caloriesType: CaloriesType,
     val nowCalories: Int,
-    val nowDistance: Int,
+    val nowDistance: Double,
     val nowSteps: Int,
     val targetSteps: Int
 ) {
     companion object {
-        fun DailyHealthcareDetail.toUiModel(): DailyHealthcareDetailModel = DailyHealthcareDetailModel(
-            caloriesDisplayModel = CaloriesDisplayModel(
-                description = caloriesDescription,
-                title = caloriesName.toAnnotatedString(),
-                url = caloriesUrl
-            ),
-            nowCalories = nowCalories,
-            nowDistance = nowDistance,
-            nowSteps = nowSteps,
-            targetSteps = nowSteps
+        fun orEmpty(): DailyHealthcareDetailModel = DailyHealthcareDetailModel(
+            caloriesType = CaloriesType.orEmpty(),
+            nowDistance = 0.0,
+            nowCalories = 0,
+            targetSteps = 6_000,
+            nowSteps = 0
         )
+
+        fun DailyHealthcareDetail.toUiModel(): DailyHealthcareDetailModel {
+            return DailyHealthcareDetailModel(
+                caloriesType = CaloriesType.getStepOfCaloriesType(nowSteps),
+                nowCalories = nowCalories,
+                nowDistance = nowDistance,
+                nowSteps = nowSteps,
+                targetSteps = targetSteps
+            )
+        }
     }
 }

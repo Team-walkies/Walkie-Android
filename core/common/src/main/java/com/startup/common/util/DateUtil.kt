@@ -7,6 +7,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import java.util.Locale
 
 object DateUtil {
@@ -108,5 +109,19 @@ object DateUtil {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
             .withZone(ZoneId.systemDefault()) // 또는 ZoneId.of("Asia/Seoul")
         return formatter.format(instant)
+    }
+
+    /** 일자가 같은지 계산 */
+    fun isSameDay(time1: Long, time2: Long): Boolean {
+        val cal1 = Calendar.getInstance().apply {
+            timeInMillis = time1
+        }
+        val cal2 = Calendar.getInstance().apply {
+            timeInMillis = time2
+        }
+
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
+                cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH)
     }
 }

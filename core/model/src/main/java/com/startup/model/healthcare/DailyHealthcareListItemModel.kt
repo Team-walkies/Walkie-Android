@@ -12,8 +12,14 @@ data class DailyHealthcareListItemModel(
     companion object {
         fun DailyHealthcareListItem.toUiModel() = DailyHealthcareListItemModel(
             nowSteps = nowSteps,
-            date = DateUtil.convertLocalDate(date),
+            date = date,
             targetSteps = targetSteps
+        )
+
+        fun orEmpty(): DailyHealthcareListItemModel = DailyHealthcareListItemModel(
+            nowSteps = 0,
+            date = LocalDate.now(),
+            targetSteps = 0
         )
     }
 }
