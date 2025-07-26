@@ -61,7 +61,7 @@ internal class WalkieStepForegroundService @Inject constructor() : Service(), Se
     override fun onCreate() {
         super.onCreate()
         initStepSensor()
-        startForegroundService()
+        checkAndStartForeground()
         observeNotificationUpdateEvents()
     }
 
@@ -96,21 +96,25 @@ internal class WalkieStepForegroundService @Inject constructor() : Service(), Se
         if (!OsVersions.isGreaterThanOrEqualsQ() ||
             isGrantedPermissions(this, Manifest.permission.ACTIVITY_RECOGNITION)
         ) {
+            try {
+                serviceScope.launch {
+                    val currentSteps = stepDataStore.getEggCurrentSteps()
+                    val targetStep = stepDataStore.getHatchingTargetStep()
 
-            serviceScope.launch {
-                val currentSteps = stepDataStore.getEggCurrentSteps()
-                val targetStep = stepDataStore.getHatchingTargetStep()
-
-                ServiceCompat.startForeground(
-                    this@WalkieStepForegroundService,
-                    WALKIE_STEP_NOTIFICATION_ID,
-                    buildWalkieNotification(
+                    ServiceCompat.startForeground(
                         this@WalkieStepForegroundService,
-                        currentSteps,
-                        targetStep
-                    ),
-                    getCustomForegroundServiceType()
-                )
+                        WALKIE_STEP_NOTIFICATION_ID,
+                        buildWalkieNotification(
+                            this@WalkieStepForegroundService,
+                            currentSteps,
+                            targetStep
+                        ),
+                        getCustomForegroundServiceType()
+                    )
+                }
+            } catch (e: Exception) {
+                Printer.e("WalkieStepService", "Failed to start foreground service: ${e.message}")
+                stopSelf()
             }
         } else {
             showPermissionNotification(this)
