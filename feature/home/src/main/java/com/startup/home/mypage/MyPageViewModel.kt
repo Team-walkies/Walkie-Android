@@ -17,6 +17,7 @@ import com.startup.domain.usecase.notification.UpdateEggHatchedNotiEnabled
 import com.startup.domain.usecase.notification.UpdateTodayStepNotiEnabled
 import com.startup.domain.usecase.profile.ChangeUserProfileVisibility
 import com.startup.domain.usecase.profile.GetMyData
+import com.startup.domain.usecase.profile.UpdateNickname
 import com.startup.home.ErrorToastEvent
 import com.startup.home.MainScreenNavigationEvent
 import com.startup.home.R
@@ -44,6 +45,7 @@ class MyPageViewModel @Inject constructor(
     private val updateArriveSpotNotiEnabled: UpdateArriveSpotNotiEnabled,
     private val updateEggHatchedNotiEnabled: UpdateEggHatchedNotiEnabled,
     private val updateTodayStepNotiEnabled: UpdateTodayStepNotiEnabled,
+    private val updateNickname: UpdateNickname,
     private val unlink: Unlink,
     private val logout: Logout,
     @ApplicationContext private val context: Context,
@@ -67,13 +69,18 @@ class MyPageViewModel @Inject constructor(
         isNotificationEnabledTodayStep = getTodayStepNotiEnabled
             .invoke(Unit)
             .stateInViewModel(false),
-        userInfo = getMyData
-            .invoke(Unit)
-            .map {
-                BaseUiState(isShowShimmer = false, data = it)
-            }
-            .catch {
-                emit(BaseUiState(isShowShimmer = false, data = UserInfo.ofEmpty()))
+        userInfo = merge(
+            flow<Unit> { emit(Unit) },
+            viewModelEvent.filter { it == MyInfoViewModelEvent.OnNicknameUpdated })
+            .flatMapLatest {
+                getMyData
+                    .invoke(Unit)
+                    .map {
+                        BaseUiState(isShowShimmer = false, data = it)
+                    }
+                    .catch {
+                        emit(BaseUiState(isShowShimmer = false, data = UserInfo.ofEmpty()))
+                    }
             }
             .stateInViewModel(
                 initialValue = BaseUiState(
@@ -138,6 +145,20 @@ class MyPageViewModel @Inject constructor(
             }
             .catch {
                 notifyEvent(MainScreenNavigationEvent.MoveToLoginActivity)
+            }
+            .launchIn(viewModelScope)
+    }
+
+    fun updateNickname(nickname: String) {
+        updateNickname
+            .invoke(nickname)
+            .onEach {
+                notifyViewModelEvent(MyInfoViewModelEvent.OnNicknameUpdated)
+                notifyEvent(NicknameChangeToastEvent.ShowSuccessToast)
+            }
+            .catch {
+                Printer.e("LMH", "updateNickname Error $it")
+                notifyEvent(NicknameChangeToastEvent.ShowErrorToast)
             }
             .launchIn(viewModelScope)
     }

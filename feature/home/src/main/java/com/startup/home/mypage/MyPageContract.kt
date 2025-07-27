@@ -1,5 +1,6 @@
 package com.startup.home.mypage
 
+import androidx.compose.ui.text.input.TextFieldValue
 import com.startup.common.base.BaseEvent
 import com.startup.common.base.BaseState
 import com.startup.common.base.BaseUiState
@@ -15,7 +16,7 @@ interface MyInfoViewState : BaseState {
     val isNotificationEnabledSpotArrive: StateFlow<Boolean>
     val isNotificationEnabledEggHatched: StateFlow<Boolean>
     val isNotificationEnabledTodayStep: StateFlow<Boolean>
-    val userInfo : StateFlow<BaseUiState<UserInfo>>
+    val userInfo: StateFlow<BaseUiState<UserInfo>>
     val isGrantNotificationPermission: StateFlow<Boolean>
 }
 
@@ -39,9 +40,17 @@ class MyInfoViewStateImpl(
 
 sealed interface MyInfoUIEvent : UiEvent {
     data class OnChangedProfileAccessToggle(val enabled: Boolean) : MyInfoUIEvent
+    data object OnClickNicknameChange : MyInfoUIEvent
 }
+
 sealed interface MyInfoViewModelEvent : BaseEvent {
-    data object OnChangedProfileVisibility: MyInfoViewModelEvent
+    data object OnChangedProfileVisibility : MyInfoViewModelEvent
+    data object OnNicknameUpdated : MyInfoViewModelEvent
+}
+
+sealed interface NicknameChangeToastEvent : BaseEvent {
+    data object ShowSuccessToast : NicknameChangeToastEvent
+    data object ShowErrorToast : NicknameChangeToastEvent
 }
 
 sealed interface UnlinkUiEvent : UiEvent {
@@ -58,4 +67,19 @@ sealed interface PushSettingUIEvent : UiEvent {
     data class OnChangedArriveSpotNoti(val enabled: Boolean) : PushSettingUIEvent
     data class OnChangedEggHatchedNoti(val enabled: Boolean) : PushSettingUIEvent
     data object OnClickMoveNotificationSetting : PushSettingUIEvent
+}
+
+interface NicknameChangeViewState : BaseState {
+    val placeHolder: StateFlow<String>
+    val nickName: StateFlow<TextFieldValue>
+}
+
+class NicknameChangeViewStateImpl(
+    override val placeHolder: StateFlow<String>,
+    override val nickName: MutableStateFlow<TextFieldValue> = MutableStateFlow(TextFieldValue(""))
+) : NicknameChangeViewState
+
+sealed interface NicknameChangeUIEvent : UiEvent {
+    data class OnNickNameChanged(val nickName: TextFieldValue) : NicknameChangeUIEvent
+    data class OnClickNickNameConfirm(val nickName: String) : NicknameChangeUIEvent
 }

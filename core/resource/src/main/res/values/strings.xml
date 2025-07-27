@@ -166,9 +166,13 @@
     <string name="delete">삭제</string>
     <string name="cancel">취소</string>
     <string name="my_info_title">내 정보</string>
-    <string name="my_info_profile_access_title">프로필 공개 설정</string>
+    <string name="my_info_nickname_change_title">닉네임 변경</string>
+    <string name="my_info_profile_access_title">프로필 설정</string>
     <string name="my_info_profile_access_toggle_title">프로필 공개</string>
     <string name="my_info_profile_access_toggle_sub_title">내 후기가 다른 사람에게 공개돼요</string>
+    <string name="nickname_change_title">새로운 닉네임을\n 입력해주세요</string>
+    <string name="nickname_change_success">닉네임을 변경 했어요</string>
+    <string name="nickname_change_error">일시적 오류 입니다.</string>
     <string name="notice_title">공지사항</string>
     <string name="push_setting_title">푸시 알림</string>
     <string name="push_setting_spot_arrive_title">스팟 도착 알림</string>

@@ -13,6 +13,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -35,21 +37,27 @@ import androidx.navigation.navArgument
 import com.startup.common.base.NavigationEvent
 import com.startup.common.extension.moveToNotificationSetting
 import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.widget.toast.ShowAnimatedToast
 import com.startup.design_system.widget.toast.ShowToast
 import com.startup.home.ErrorToastEvent
 import com.startup.home.MainScreenNavigationEvent
 import com.startup.home.R
 import com.startup.home.mypage.MyInfoUIEvent
 import com.startup.home.mypage.MyPageViewModel
+import com.startup.home.mypage.NicknameChangeToastEvent
+import com.startup.home.mypage.NicknameChangeUIEvent
+import com.startup.home.mypage.NicknameChangeViewStateImpl
 import com.startup.home.mypage.PushSettingUIEvent
 import com.startup.home.mypage.UnlinkUiEvent
 import com.startup.home.mypage.screen.MyInfoScreen
+import com.startup.home.mypage.screen.NicknameChangeScreen
 import com.startup.home.mypage.screen.PersonalInfoPolicyScreen
 import com.startup.home.mypage.screen.PushSettingScreen
 import com.startup.home.mypage.screen.RequestUserOpinionScreen
 import com.startup.home.mypage.screen.ServiceTermScreen
 import com.startup.home.mypage.screen.UnlinkScreen
 import com.startup.home.notification.screen.NotificationListScreen
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun MyPageNavigationGraph(
@@ -63,6 +71,8 @@ fun MyPageNavigationGraph(
     // 홈화면(각각의 NavGraph), 지도화면(각각의 NavGraph), 마이페이지 화면(각각의 NavGraph)
     var showErrorToast by remember { mutableStateOf(false) }
     var errorMessageResId by remember { mutableIntStateOf(R.string.toast_common_error) }
+    var showSuccessToast by remember { mutableStateOf(false) }
+    var showNicknameErrorToast by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -77,6 +87,14 @@ fun MyPageNavigationGraph(
                     is ErrorToastEvent.ShowToast -> {
                         errorMessageResId = it.messageResId
                         showErrorToast = true
+                    }
+
+                    NicknameChangeToastEvent.ShowSuccessToast -> {
+                        showSuccessToast = true
+                    }
+
+                    NicknameChangeToastEvent.ShowErrorToast -> {
+                        showNicknameErrorToast = true
                     }
 
                     else -> {}
@@ -108,6 +126,10 @@ fun MyPageNavigationGraph(
         when (event) {
             is MyInfoUIEvent.OnChangedProfileAccessToggle -> {
                 myPageViewModel.updateProfileAccess()
+            }
+
+            MyInfoUIEvent.OnClickNicknameChange -> {
+                navController.navigate(MyPageScreenNav.NicknameChange.route)
             }
         }
     }
@@ -158,9 +180,39 @@ fun MyPageNavigationGraph(
                 startDestination = destinationRoute
             ) {
                 composable(MyPageScreenNav.MyInfo.route) {
+                    val userInfo by myPageViewModel.state.userInfo.collectAsState()
                     MyInfoScreen(
                         isProfileAccessFlow = myPageViewModel.state.isProfileAccess,
+                        userNickname = userInfo.data.memberNickName,
                         uiEventSender = ::handleMyInfoUiEvent,
+                        onNavigationEvent = ::handleNavigationEvent
+                    )
+                }
+                composable(MyPageScreenNav.NicknameChange.route) {
+                    val placeholder =
+                        stringResource(com.startup.resource.R.string.onboarding_nick_name_default_placeholder)
+                    val userInfo by myPageViewModel.state.userInfo.collectAsState()
+                    val currentNickname = userInfo.data?.memberNickName ?: ""
+                    val nicknameChangeViewState = remember(currentNickname) {
+                        NicknameChangeViewStateImpl(
+                            placeHolder = MutableStateFlow(placeholder),
+                            nickName = MutableStateFlow(TextFieldValue(currentNickname))
+                        )
+                    }
+                    NicknameChangeScreen(
+                        viewState = nicknameChangeViewState,
+                        uiEventSender = { event ->
+                            when (event) {
+                                is NicknameChangeUIEvent.OnNickNameChanged -> {
+                                    nicknameChangeViewState.nickName.value = event.nickName
+                                }
+
+                                is NicknameChangeUIEvent.OnClickNickNameConfirm -> {
+                                    myPageViewModel.updateNickname(event.nickName)
+                                    backPress()
+                                }
+                            }
+                        },
                         onNavigationEvent = ::handleNavigationEvent
                     )
                 }
@@ -223,6 +275,23 @@ fun MyPageNavigationGraph(
     if (showErrorToast) {
         ShowToast(stringResource(errorMessageResId), 2_000) {
             showErrorToast = false
+        }
+    }
+
+    if (showSuccessToast) {
+        ShowAnimatedToast(
+            message = stringResource(com.startup.resource.R.string.nickname_change_success),
+            duration = 2_500,
+            iconResId = com.startup.resource.R.drawable.ic_check,
+            tint = androidx.compose.ui.graphics.Color.Unspecified
+        ) {
+            showSuccessToast = false
+        }
+    }
+
+    if (showNicknameErrorToast) {
+        ShowToast(stringResource(com.startup.resource.R.string.nickname_change_error), 2_500) {
+            showNicknameErrorToast = false
         }
     }
 }
