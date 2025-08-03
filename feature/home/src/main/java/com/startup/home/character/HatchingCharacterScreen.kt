@@ -610,7 +610,7 @@ private fun CharacterDetailScrollableContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = stringResource(R.string.character_detail_wise_saying),
+            text = characterDetail.characterDescription,
             style = WalkieTheme.typography.body2.copy(color = colors.gray500),
             textAlign = TextAlign.Center,
         )

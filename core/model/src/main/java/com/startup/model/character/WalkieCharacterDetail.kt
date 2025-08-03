@@ -9,6 +9,7 @@ data class WalkieCharacterDetail(
     val rank: CharacterRankKind,
     val characterImageUrl: String,
     val characterName: String,
+    val characterDescription: String,
     val picked: Boolean,
     val count: Int,
     val obtainInfoList: List<CharacterObtainInfo>
@@ -27,6 +28,7 @@ data class WalkieCharacterDetail(
                 characterKind = characterKind,
                 characterImageUrl = characterImageUrl,
                 characterName = characterName,
+                characterDescription = characterDescription,
                 rank = characterRankKind,
                 picked = false,
                 count = characterCount,
