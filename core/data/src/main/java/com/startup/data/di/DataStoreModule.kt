@@ -1,6 +1,6 @@
 package com.startup.data.di
 
-import com.startup.data.local.datasourceimpl.StepDataStoreImpl
+import com.startup.data.remote.datasourceimpl.StepDataStoreImpl
 import com.startup.data.local.provider.LogoutManager
 import com.startup.data.local.provider.LogoutManagerImpl
 import com.startup.data.local.provider.NotificationDataStoreProvider
