@@ -1,4 +1,4 @@
-package com.startup.data.local.datasourceimpl
+package com.startup.data.remote.datasourceimpl
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -8,6 +8,11 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.startup.common.util.DateUtil
+import com.startup.common.util.Printer
+import com.startup.data.remote.dto.request.healthcare.PutTodayWalkRequest
+import com.startup.data.remote.service.HealthcareService
+import com.startup.data.util.handleExceptionIfNeed
 import com.startup.domain.provider.StepDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -16,15 +21,18 @@ import kotlinx.coroutines.flow.map
 import java.util.Calendar
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.round
 
 @Singleton
 class StepDataStoreImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val healthcareService: HealthcareService,
 ) : StepDataStore {
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "walkie_settings")
 
     private companion object {
         private val TODAY_STEPS = intPreferencesKey("today_steps")
+        private val TODAY_WALK_TARGET_STEP = intPreferencesKey("today_walk_target_step")
         private val CURRENT_STEPS = intPreferencesKey("current_steps")
         private val CURRENT_WALK_EGG_ID = longPreferencesKey("current_walk_egg_id")
         private val TARGET_STEP = intPreferencesKey("target_step")
@@ -65,6 +73,16 @@ class StepDataStoreImpl @Inject constructor(
     override suspend fun saveEggCurrentSteps(steps: Int) {
         context.dataStore.edit { preferences ->
             preferences[CURRENT_STEPS] = steps
+        }
+    }
+
+    override suspend fun getTodayWalkTargetStep(): Int {
+        return context.dataStore.data.first()[TODAY_WALK_TARGET_STEP] ?: 6_000
+    }
+
+    override suspend fun saveTodayWalkTargetStep(steps: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[TODAY_WALK_TARGET_STEP] = steps
         }
     }
 
@@ -116,6 +134,20 @@ class StepDataStoreImpl @Inject constructor(
         return cachedLastResetDayStart > 0 && isSameDay(cachedLastResetDayStart, cachedTodayStart)
     }
 
+    private suspend fun getLastResetDay(): Long {
+        val todayStart = getTodayStartTime()
+        if (todayStart != cachedTodayStart || cachedLastResetDayStart == 0L) {
+            val lastResetTime = context.dataStore.data.first()[LAST_RESET_TIME] ?: 0L
+            cachedLastResetDayStart = lastResetTime
+            cachedTodayStart = todayStart
+        }
+        return if (cachedLastResetDayStart > 0) {
+            cachedLastResetDayStart
+        } else {
+            System.currentTimeMillis()
+        }
+    }
+
     override suspend fun saveLastResetDate() {
         val currentTimeMillis = System.currentTimeMillis()
         context.dataStore.edit { preferences ->
@@ -163,6 +195,7 @@ class StepDataStoreImpl @Inject constructor(
         }
         // 현재 걸음 수 가져오기
         val currentSteps = getTodaySteps()
+        putHealthcareInfo(getLastResetDay(), currentSteps)
         // 걸음 수 초기화
         resetTodaySteps()
         // 마지막 초기화 날짜 업데이트
@@ -171,14 +204,39 @@ class StepDataStoreImpl @Inject constructor(
         return currentSteps
     }
 
+    private suspend fun putHealthcareInfo(targetDate: Long, currentSteps: Int) {
+        val distanceMeters = (round((0.0006 * currentSteps) * 100) / 100.0).toInt()
+        val calories = currentSteps / 30
+        if (isSameDay(targetDate, System.currentTimeMillis())) {
+            return
+        }
+        val targetDateStr = DateUtil.formatDateModern(targetDate)
+        Printer.e("LMH", "걸음 수 업데이트\nstep : $currentSteps\nday : $targetDateStr\ntoday : ${DateUtil.formatDateModern(System.currentTimeMillis())}")
+        runCatching {
+            handleExceptionIfNeed {
+                healthcareService.putHealthcareInfo(
+                    PutTodayWalkRequest(
+                        nowCalories = calories,
+                        nowDistance = distanceMeters,
+                        nowSteps = currentSteps,
+                        nowDay = targetDateStr,
+                        targetSteps = getTodayWalkTargetStep(),
+                    )
+                )
+            }
+        }.getOrElse {
+            Printer.e("LMH", "ERROR $it")
+        }
+    }
+
     override suspend fun shouldCallDailyApi(): Boolean {
         // 임시: 항상 true 반환 (테스트용)
         //return true
-        
-         val lastApiCall = context.dataStore.data.first()[LAST_DAILY_API_CALL] ?: 0L
-         val currentTime = System.currentTimeMillis()
+
+        val lastApiCall = context.dataStore.data.first()[LAST_DAILY_API_CALL] ?: 0L
+        val currentTime = System.currentTimeMillis()
         // 한 번도 호출하지 않았거나, 마지막 호출이 오늘이 아닌 경우
-         return lastApiCall == 0L || !isSameDay(lastApiCall, currentTime)
+        return lastApiCall == 0L || !isSameDay(lastApiCall, currentTime)
     }
 
     override suspend fun markDailyApiCalled() {

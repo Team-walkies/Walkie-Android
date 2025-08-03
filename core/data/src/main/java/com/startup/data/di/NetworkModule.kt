@@ -10,6 +10,7 @@ import com.startup.data.annotations.CommonRetrofit
 import com.startup.data.remote.service.AuthService
 import com.startup.data.remote.service.CharacterService
 import com.startup.data.remote.service.EggService
+import com.startup.data.remote.service.HealthcareService
 import com.startup.data.remote.service.MemberService
 import com.startup.data.remote.service.NoticeService
 import com.startup.data.remote.service.ReviewService
@@ -140,4 +141,10 @@ internal object NetworkModule {
     fun provideSpotService(
         @AuthRetrofit retrofit: Retrofit,
     ): SpotService = retrofit.create(SpotService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideHealthcareService(
+        @AuthRetrofit retrofit: Retrofit,
+    ): HealthcareService = retrofit.create(HealthcareService::class.java)
 }

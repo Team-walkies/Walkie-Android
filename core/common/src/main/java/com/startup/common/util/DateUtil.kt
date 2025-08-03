@@ -2,8 +2,10 @@ package com.startup.common.util
 
 import java.text.SimpleDateFormat
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -99,4 +101,12 @@ object DateUtil {
             if (minutes > 0 || hours == 0L) append("${minutes}m")
         }.trim()
     }.getOrNull().orEmpty()
+
+    /** Long 타입 날짜 데이터를 yyyy-mm-dd 타입으로 변경 */
+    fun formatDateModern(timestamp: Long): String {
+        val instant = Instant.ofEpochMilli(timestamp)
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            .withZone(ZoneId.systemDefault()) // 또는 ZoneId.of("Asia/Seoul")
+        return formatter.format(instant)
+    }
 }

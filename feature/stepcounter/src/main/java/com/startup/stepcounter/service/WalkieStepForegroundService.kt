@@ -24,31 +24,18 @@ import com.startup.stepcounter.notification.buildWalkieNotification
 import com.startup.stepcounter.notification.sendHatchingNotification
 import com.startup.stepcounter.notification.showPermissionNotification
 import com.startup.stepcounter.notification.updateStepNotification
-import dagger.hilt.EntryPoint
-import dagger.hilt.EntryPoints
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@EntryPoint
-@InstallIn(SingletonComponent::class)
-interface StepDataStoreEntryPoint {
-    fun stepDataStore(): StepDataStore
-}
-
+@AndroidEntryPoint
 internal class WalkieStepForegroundService @Inject constructor() : Service(), SensorEventListener {
 
-    private val stepDataStore: StepDataStore by lazy {
-        EntryPoints.get(
-            applicationContext,
-            StepDataStoreEntryPoint::class.java
-        ).stepDataStore()
-    }
-
+    @Inject
+    lateinit var stepDataStore: StepDataStore
     private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
 
     private val stepDetector = StepDetector()
