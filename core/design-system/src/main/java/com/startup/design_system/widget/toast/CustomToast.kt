@@ -2,6 +2,8 @@ package com.startup.design_system.widget.toast
 
 import android.widget.Toast
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -108,6 +111,62 @@ private fun IconToastOverlay(
     }
 }
 
+/**
+ * fade-in / out 효과적용을 위한 애니메이션 토스트 별도 분리
+ */
+@Composable
+private fun AnimatedIconToastOverlay(
+    @DrawableRes iconResId: Int,
+    message: String,
+    duration: Int = Toast.LENGTH_LONG,
+    tint: Color,
+    durationCallBack: () -> Unit
+) {
+    var isVisible by remember { mutableStateOf(true) }
+    var shouldStartFadeOut by remember { mutableStateOf(false) }
+    
+    val alpha by animateFloatAsState(
+        targetValue = if (shouldStartFadeOut) 0f else 1f,
+        animationSpec = tween(durationMillis = 300),
+        finishedListener = { if (shouldStartFadeOut) durationCallBack.invoke() }, label = ""
+    )
+    
+    if (isVisible) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 16.dp, end = 16.dp, bottom = 86.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(modifier = Modifier.weight(1F))
+            Row(
+                modifier = Modifier
+                    .alpha(alpha)
+                    .background(WalkieTheme.colors.gray700, shape = RoundedCornerShape(12.dp))
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(painter = painterResource(iconResId), tint = tint, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = message,
+                    style = WalkieTheme.typography.body2,
+                    color = Color.White,
+                )
+            }
+        }
+
+        LaunchedEffect(message) {
+            delay(300)
+            delay((duration - 600).toLong())
+            shouldStartFadeOut = true
+            delay(300)
+            isVisible = false
+        }
+    }
+}
+
 @Composable
 fun ShowToast(message: String, duration: Int, durationCallBack: () -> Unit) {
     ToastOverlay(message, duration, durationCallBack)
@@ -116,6 +175,11 @@ fun ShowToast(message: String, duration: Int, durationCallBack: () -> Unit) {
 @Composable
 fun ShowToast(message: String, duration: Int, iconResId: Int, tint: Color, durationCallBack: () -> Unit) {
     IconToastOverlay(iconResId, message, duration, tint, durationCallBack)
+}
+
+@Composable
+fun ShowAnimatedToast(message: String, duration: Int, iconResId: Int, tint: Color, durationCallBack: () -> Unit) {
+    AnimatedIconToastOverlay(iconResId, message, duration, tint, durationCallBack)
 }
 
 @Preview

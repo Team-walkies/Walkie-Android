@@ -19,6 +19,7 @@ import com.startup.common.util.Printer
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.widget.actionbar.PageActionBar
 import com.startup.design_system.widget.actionbar.PageActionBarType
+import com.startup.design_system.widget.clickable.ClickableWithText
 import com.startup.design_system.widget.toggle.ToggleWithText
 import com.startup.home.R
 import com.startup.home.mypage.MyInfoUIEvent
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun MyInfoScreen(
     isProfileAccessFlow: StateFlow<Boolean>,
+    userNickname: String,
     uiEventSender: (MyInfoUIEvent) -> Unit,
     onNavigationEvent: (NavigationEvent) -> Unit
 ) {
@@ -51,6 +53,14 @@ fun MyInfoScreen(
                 style = WalkieTheme.typography.head4.copy(color = WalkieTheme.colors.gray700)
             )
             Spacer(modifier = Modifier.height(12.dp))
+            ClickableWithText(
+                title = stringResource(R.string.my_info_nickname_change_title),
+                subTitle = userNickname,
+                onClick = {
+                    uiEventSender.invoke(MyInfoUIEvent.OnClickNicknameChange)
+                }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             ToggleWithText(
                 title = stringResource(R.string.my_info_profile_access_toggle_title),
                 subTitle = stringResource(R.string.my_info_profile_access_toggle_sub_title),
@@ -75,6 +85,7 @@ private fun PreviewMyInfoScreen() {
     WalkieTheme {
         MyInfoScreen(
             MutableStateFlow(false),
+            "테스트닉네임",
             {}, {}
         )
     }

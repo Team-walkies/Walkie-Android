@@ -9,6 +9,7 @@ sealed class HomeScreenNav(val route: String) {
 
 sealed class MyPageScreenNav(val route: String) {
     data object MyInfo : MyPageScreenNav("myInfo")
+    data object NicknameChange : MyPageScreenNav("nicknameChange")
     data object PushSetting : MyPageScreenNav("pushSetting")
     data object Notice : MyPageScreenNav("notice")
     data object PersonalInfoPolicy : MyPageScreenNav("personalInfoPolicy")
