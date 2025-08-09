@@ -19,7 +19,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.startup.common.base.NavigationEvent
@@ -28,6 +32,7 @@ import com.startup.design_system.widget.actionbar.PageActionBar
 import com.startup.design_system.widget.actionbar.PageActionBarType
 import com.startup.design_system.widget.button.DangerButton
 import com.startup.design_system.widget.checkbox.TextCheckBox
+import com.startup.design_system.widget.modal.ErrorTwoButtonModal
 import com.startup.home.R
 import com.startup.home.mypage.UnlinkUiEvent
 
@@ -38,6 +43,7 @@ fun UnlinkScreen(
     uiEventSender: (UnlinkUiEvent) -> Unit
 ) {
     var isCheckedNotice by remember { mutableStateOf(false) }
+    var showUnlinkConfirmModal by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -115,14 +121,40 @@ fun UnlinkScreen(
                 enabled = isCheckedNotice,
                 text = stringResource(R.string.unlink)
             ) {
-                uiEventSender.invoke(
-                    UnlinkUiEvent.UnlinkWalkie
-                )
+                showUnlinkConfirmModal = true
             }
 
         }
     }
+
+    if (showUnlinkConfirmModal) {
+        ErrorTwoButtonModal(
+            title = stringResource(R.string.unlink_modal_title),
+            subTitleAnnotated = createUnlinkModalSubTitle(),
+            negativeText = stringResource(R.string.unlink_modal_negative),
+            positiveText = stringResource(R.string.unlink_modal_positive),
+            onClickNegative = {
+                showUnlinkConfirmModal = false
+            },
+            onClickPositive = {
+                showUnlinkConfirmModal = false
+                uiEventSender.invoke(UnlinkUiEvent.UnlinkWalkie)
+            }
+        )
+    }
 }
+
+@Composable
+private fun createUnlinkModalSubTitle(): AnnotatedString = buildAnnotatedString {
+    withStyle(style = SpanStyle(color = WalkieTheme.colors.red100)) {
+        append(stringResource(R.string.unlink_modal_warning))
+    }
+    append("\n")
+    withStyle(style = SpanStyle(color = WalkieTheme.colors.gray500)) {
+        append(stringResource(R.string.unlink_modal_subtitle))
+    }
+}
+
 
 @PreviewScreenSizes
 @Composable

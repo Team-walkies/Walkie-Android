@@ -221,6 +221,11 @@
     <string name="unlink_description_title_2">스팟 리뷰는 직접 삭제해야 해요</string>
     <string name="unlink_description_sub_title_2">워키를 탈퇴해도 작성한 리뷰는 없어지지 않아요.\n기록이 남는 걸 원치않는다면 확인하고 삭제해 주세요.</string>
     <string name="unlink_approve_notice">안내사항을 모두 확인했으며, 이에 동의합니다</string>
+    <string name="unlink_modal_title">회원 탈퇴</string>
+    <string name="unlink_modal_warning">탈퇴 시 해당 계정으로 다시 가입할 수 없어요.</string>
+    <string name="unlink_modal_subtitle">탈퇴에 부득이한 사유가 있는 경우,\n워키 개발팀에 문의해주세요.\n\nwalkieofficial@gmail.com</string>
+    <string name="unlink_modal_negative">뒤로가기</string>
+    <string name="unlink_modal_positive">탈퇴하기</string>
     <string name="desc_calendar_previous">이전 달</string>
     <string name="desc_calendar_after">이후 달</string>
     <string name="desc_calendar_select">캘린더로 일자 선택</string>
