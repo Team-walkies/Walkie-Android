@@ -1,5 +1,6 @@
 package com.startup.design_system.widget.checkbox
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,10 +15,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.ui.noRippleClickable
 
 @Composable
 fun TextCheckBox(text: String, checked: Boolean, onCheckedChanged: (Boolean) -> Unit) {
-    Row(modifier = Modifier.wrapContentWidth(), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier
+            .wrapContentWidth()
+            .noRippleClickable { onCheckedChanged(!checked) },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         WalkieCheckBox(checked = checked, onCheckedChanged = onCheckedChanged)
         Spacer(modifier = Modifier.width(4.dp))
         Text(

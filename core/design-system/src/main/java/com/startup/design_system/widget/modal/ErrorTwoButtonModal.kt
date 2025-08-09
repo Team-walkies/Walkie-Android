@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,6 +30,7 @@ import com.startup.design_system.ui.noRippleClickable
 fun ErrorTwoButtonModal(
     title: String = "",
     subTitle: String = "",
+    subTitleAnnotated: AnnotatedString? = null,
     negativeText: String = "",
     positiveText: String = "",
     onClickNegative: () -> Unit,
@@ -55,7 +57,13 @@ fun ErrorTwoButtonModal(
                     title,
                     style = WalkieTheme.typography.head4.copy(color = WalkieTheme.colors.gray700, textAlign = TextAlign.Center)
                 )
-                if (subTitle.isNotEmpty()) {
+                if (subTitleAnnotated != null) {
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        subTitleAnnotated,
+                        style = WalkieTheme.typography.body2.copy(textAlign = TextAlign.Center)
+                    )
+                } else if (subTitle.isNotEmpty()) {
                     Spacer(Modifier.height(4.dp))
                     Text(
                         subTitle,
