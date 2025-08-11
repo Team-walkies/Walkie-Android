@@ -13,6 +13,7 @@ import com.startup.data.util.NOTIFICATION_EGG_HATCH_KEY_NAME
 import com.startup.data.util.NOTIFICATION_SPOT_ARRIVE_KEY_NAME
 import com.startup.data.util.NOTIFICATION_TODAY_STEP_KEY_NAME
 import com.startup.data.util.PROFILE_ACCESS_KEY_NAME
+import com.startup.data.util.HEALTHCARE_BOTTOM_SHEET_SHOWN_KEY_NAME
 import com.startup.data.util.REFRESH_ACCESS_TOKEN_KEY_NAME
 import com.startup.data.util.userNotificationDataStore
 import com.startup.data.util.userSettingDataStore
@@ -72,4 +73,9 @@ internal object DataStoreObjectModule {
     @Named(PROFILE_ACCESS_KEY_NAME)
     fun providesProfileAccessKey(): Preferences.Key<Boolean> =
         booleanPreferencesKey(PROFILE_ACCESS_KEY_NAME)
+
+    @Provides
+    @Named(HEALTHCARE_BOTTOM_SHEET_SHOWN_KEY_NAME)
+    fun providesHealthcareBottomSheetShownKey(): Preferences.Key<Boolean> =
+        booleanPreferencesKey(HEALTHCARE_BOTTOM_SHEET_SHOWN_KEY_NAME)
 }

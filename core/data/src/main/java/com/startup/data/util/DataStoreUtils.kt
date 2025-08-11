@@ -18,6 +18,7 @@ internal const val NOTIFICATION_SPOT_ARRIVE_KEY_NAME = "NotificationSpotArrive"
 internal const val NOTIFICATION_EGG_HATCH_KEY_NAME = "NotificationEggHatch"
 
 internal const val PROFILE_ACCESS_KEY_NAME = "ProfileAccess"
+internal const val HEALTHCARE_BOTTOM_SHEET_SHOWN_KEY_NAME = "HealthcareBottomSheetShown"
 
 internal val Context.userTokenDataStore: DataStore<Preferences> by preferencesDataStore(name = TOKEN_DATA_STORE_FILE_NAME)
 

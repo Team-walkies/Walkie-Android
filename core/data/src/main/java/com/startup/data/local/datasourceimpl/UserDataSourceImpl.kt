@@ -8,6 +8,7 @@ import com.startup.data.util.NOTIFICATION_EGG_HATCH_KEY_NAME
 import com.startup.data.util.NOTIFICATION_SPOT_ARRIVE_KEY_NAME
 import com.startup.data.util.NOTIFICATION_TODAY_STEP_KEY_NAME
 import com.startup.data.util.PROFILE_ACCESS_KEY_NAME
+import com.startup.data.util.HEALTHCARE_BOTTOM_SHEET_SHOWN_KEY_NAME
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Named
@@ -19,6 +20,7 @@ internal class UserDataSourceImpl @Inject constructor(
     @Named(NOTIFICATION_SPOT_ARRIVE_KEY_NAME) private val notificationSpotArriveKey: Preferences.Key<Boolean>,
     @Named(NOTIFICATION_EGG_HATCH_KEY_NAME) private val notificationEggHatchKey: Preferences.Key<Boolean>,
     @Named(PROFILE_ACCESS_KEY_NAME) private val profileAccessKey: Preferences.Key<Boolean>,
+    @Named(HEALTHCARE_BOTTOM_SHEET_SHOWN_KEY_NAME) private val healthcareBottomSheetShownKey: Preferences.Key<Boolean>,
 ) : UserDataSource {
     override fun getNotificationTodayStepEnabled(): Flow<Boolean> =
         notificationDataStoreProvider.getFlowValue(notificationTodayStepKey)
@@ -46,5 +48,13 @@ internal class UserDataSourceImpl @Inject constructor(
 
     override suspend fun updateProfileAccessEnabled(enabled: Boolean) {
         userSettingDataStoreProvider.putValue(profileAccessKey, enabled)
+    }
+
+    override suspend fun isHealthcareBottomSheetShown(): Boolean {
+        return userSettingDataStoreProvider.getValue(healthcareBottomSheetShownKey, false)
+    }
+
+    override suspend fun setHealthcareBottomSheetShown(shown: Boolean) {
+        userSettingDataStoreProvider.putValue(healthcareBottomSheetShownKey, shown)
     }
 }

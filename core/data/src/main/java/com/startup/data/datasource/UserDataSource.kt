@@ -11,4 +11,6 @@ interface UserDataSource {
     suspend fun updateNotificationEggHatchEnabled(enabled: Boolean)
     fun getProfileAccessEnabled(): Flow<Boolean>
     suspend fun updateProfileAccessEnabled(enabled: Boolean)
+    suspend fun isHealthcareBottomSheetShown(): Boolean
+    suspend fun setHealthcareBottomSheetShown(shown: Boolean)
 }

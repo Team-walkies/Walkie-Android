@@ -38,6 +38,7 @@ import com.startup.common.util.OsVersions
 import com.startup.common.util.UsePermissionHelper
 import com.startup.design_system.R
 import com.startup.design_system.ui.WalkieTheme
+import com.startup.design_system.widget.bottom_sheet.StepRecordIntroductionBottomSheet
 import com.startup.design_system.widget.modal.EventModal
 import com.startup.domain.provider.DateChangeListener
 import com.startup.domain.provider.DateChangeNotifier
@@ -91,6 +92,7 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
     @Inject
     lateinit var analyticsHelper: AnalyticsHelper
 
+
     private val permissionCallbacks = object : PermissionManager.PermissionManagerCallbacks {
         override fun startStepCounterService() {
             if (OsVersions.isGreaterThanOrEqualsO()) {
@@ -113,6 +115,10 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
             val intent =
                 BatteryOptimizationHelper.getBatteryOptimizationSettingsIntent(this@HomeActivity)
             batteryOptimizationLauncher.launch(intent)
+        }
+
+        override fun checkAndShowHealthcareBottomSheet() {
+            viewModel.checkAndShowHealthcareBottomSheet()
         }
     }
 
@@ -203,6 +209,23 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                             viewModel.navigateToGainEggFromEventModal()
                         },
                         onClickNegative = { viewModel.onEventModalDismissed() }
+                    )
+                }
+
+                val showHealthcareBottomSheet by viewModel.showHealthcareBottomSheet.collectAsStateWithLifecycle()
+
+                if (showHealthcareBottomSheet) {
+                    StepRecordIntroductionBottomSheet(
+                        onDismiss = {
+                            viewModel.onHealthcareBottomSheetDismissed()
+                        },
+                        onStartUsing = {
+                            //TODO HomeScreenNavigationEvent.MoveToHealthcare 헬스케어 뷰 랜딩 로직 추가
+                            viewModel.onHealthcareBottomSheetDismissed()
+                        },
+                        onLater = {
+                            viewModel.onHealthcareBottomSheetDismissed()
+                        }
                     )
                 }
             }

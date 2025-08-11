@@ -45,6 +45,14 @@ class UserRepositoryImpl @Inject constructor(
         userDataSource.updateProfileAccessEnabled(enabled)
     }
 
+    override suspend fun isHealthcareBottomSheetShown(): Boolean {
+        return userDataSource.isHealthcareBottomSheetShown()
+    }
+
+    override suspend fun setHealthcareBottomSheetShown(shown: Boolean) {
+        userDataSource.setHealthcareBottomSheetShown(shown)
+    }
+
     override suspend fun getMinAppVersionCode() = withContext(Dispatchers.IO) {
         withTimeout(3000) { // 3초 안에 fetch 못 하면 TimeoutCancellationException 발생 하도록
             suspendCancellableCoroutine { cont ->
@@ -101,8 +109,33 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun isHealthcareGuideBottomSheetVisible() = withContext(Dispatchers.IO) {
+        withTimeout(3000) {
+            suspendCancellableCoroutine { cont ->
+                remoteConfig.fetchAndActivate()
+                    .addOnCompleteListener { task ->
+                        val result = runCatching {
+                            if (task.isSuccessful) {
+                                val value = remoteConfig.getBoolean(KEY_HEALTHCARE_GUIDE_BOTTOM_SHEET_VISIBLE)
+                                Printer.d("JUNWOO", "RemoteConfig healthcareGuideBottomSheetVisible: $value")
+                                value
+                            } else {
+                                Printer.e("JUNWOO", "RemoteConfig 실패: ${task.exception}")
+                                false
+                            }
+                        }.getOrElse {
+                            Printer.e("JUNWOO", "RemoteConfig 예외: $it")
+                            false
+                        }
+                        if (cont.isActive) cont.resume(result)
+                    }
+            }
+        }
+    }
+
     companion object {
         private const val KEY_MIN_APP_VERSION = "AOS_MIN_APP_VERSION"
         private const val KEY_EGG_EVENT_ENABLED = "EGG_EVENT_ENABLED"
+        private const val KEY_HEALTHCARE_GUIDE_BOTTOM_SHEET_VISIBLE = "HEALTHCARE_GUIDE_BOTTOM_SHEET_VISIBLE"
     }
 }
