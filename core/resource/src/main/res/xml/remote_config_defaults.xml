@@ -8,4 +8,8 @@
     <key>EGG_EVENT_ENABLED</key>
     <value>false</value>
   </entry>
+  <entry>
+    <key>HEALTHCARE_GUIDE_BOTTOM_SHEET_VISIBLE</key>
+    <value>false</value>
+  </entry>
 </defaults>

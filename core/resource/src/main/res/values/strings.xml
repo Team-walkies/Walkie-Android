@@ -243,4 +243,10 @@
     <string name="event_day_count">D-%d</string>
     <string name="event_gift_title">알 1개를 선물 받았어요!</string>
     <string name="event_until_end">이벤트 종료까지</string>
+
+    <string name="step_record_new_label">New</string>
+    <string name="step_record_intro_title">이제 걸음 기록을 볼 수 있어요!</string>
+    <string name="step_record_intro_description">원하는 목표 걸음 수를 달성하고 달성해 보세요!</string>
+    <string name="step_record_start_button">사용해보기</string>
+    <string name="step_record_later_button">나중에 하기</string>
 </resources>

@@ -24,6 +24,7 @@ class PermissionManager(
         fun emitUiEvent(event: UiEvent)
         fun launchPermissionSettings()
         fun launchBatteryOptimizationSettings()
+        fun checkAndShowHealthcareBottomSheet()
     }
 
     // 권한 상태 데이터 클래스
@@ -104,6 +105,7 @@ class PermissionManager(
         ) {
             updateUiState { it.copy(showNotificationPermissionSheet = true) }
         } else {
+            callbacks.checkAndShowHealthcareBottomSheet()
             callbacks.startStepCounterService()
         }
     }
@@ -223,6 +225,8 @@ class PermissionManager(
      */
     fun handleNotificationPermissionEvents(action: NotificationAction) {
         updateUiState { it.copy(showNotificationPermissionSheet = false) }
+        callbacks.checkAndShowHealthcareBottomSheet()
+        callbacks.startStepCounterService()
     }
 
     /**

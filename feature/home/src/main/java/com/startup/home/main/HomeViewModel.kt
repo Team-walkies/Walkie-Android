@@ -21,6 +21,7 @@ import com.startup.domain.usecase.profile.GetMyData
 import com.startup.domain.usecase.spot.GetRecordedSpotCount
 import com.startup.domain.usecase.walk.GetCurrentWalkCharacter
 import com.startup.domain.usecase.walk.GetCurrentWalkEgg
+import com.startup.domain.usecase.user.CheckHealthcareBottomSheetUseCase
 import com.startup.home.HomeScreenViewModelEvent
 import com.startup.model.character.WalkieCharacter
 import com.startup.model.character.WalkieCharacter.Companion.toUiModel
@@ -60,6 +61,7 @@ class HomeViewModel @Inject constructor(
     getMyData: GetMyData,
     getCurrentRecordedSpotCount: GetRecordedSpotCount,
     getCurrentWalkCharacter: GetCurrentWalkCharacter,
+    private val checkHealthcareBottomSheetUseCase: CheckHealthcareBottomSheetUseCase,
 ) : BaseViewModel() {
 
     private val _showActivityPermissionAlert = MutableStateFlow(false)
@@ -68,6 +70,10 @@ class HomeViewModel @Inject constructor(
     // Event UI State
     private val _eventState = MutableStateFlow(EventUiState())
     val eventState: StateFlow<EventUiState> = _eventState
+
+    // Healthcare Bottom Sheet State
+    private val _showHealthcareBottomSheet = MutableStateFlow(false)
+    val showHealthcareBottomSheet: StateFlow<Boolean> = _showHealthcareBottomSheet
 
     // Navigation events
     private val _navigateToGainEgg = MutableSharedFlow<Unit>()
@@ -365,6 +371,22 @@ class HomeViewModel @Inject constructor(
                     Printer.d("JUNWOO", "Daily API already called today")
                 }
             }
+        }
+    }
+
+    fun checkAndShowHealthcareBottomSheet() {
+        viewModelScope.launch {
+            val shouldShow = checkHealthcareBottomSheetUseCase.shouldShowHealthcareBottomSheet()
+            if (shouldShow) {
+                _showHealthcareBottomSheet.value = true
+            }
+        }
+    }
+
+    fun onHealthcareBottomSheetDismissed() {
+        _showHealthcareBottomSheet.value = false
+        viewModelScope.launch {
+            checkHealthcareBottomSheetUseCase.markHealthcareBottomSheetAsShown()
         }
     }
 }

@@ -13,4 +13,7 @@ interface UserRepository {
     suspend fun updateProfileAccessEnabled(enabled: Boolean)
     suspend fun getMinAppVersionCode(): Long
     suspend fun isEggEventEnabled(): Boolean
+    suspend fun isHealthcareBottomSheetShown(): Boolean
+    suspend fun setHealthcareBottomSheetShown(shown: Boolean)
+    suspend fun isHealthcareGuideBottomSheetVisible(): Boolean
 }
