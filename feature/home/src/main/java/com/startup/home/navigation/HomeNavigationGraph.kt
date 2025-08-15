@@ -22,6 +22,7 @@ import com.startup.design_system.ui.WalkieTheme
 import com.startup.home.MainScreenNavigationEvent
 import com.startup.home.character.HatchingCharacterScreen
 import com.startup.home.character.HatchingCharacterViewModel
+import com.startup.home.healthcare.screen.HealthcareScreen
 import com.startup.home.notification.screen.NotificationListScreen
 
 @Composable
@@ -84,6 +85,10 @@ fun HomeNavigationGraph(
                 }
                 composable(HomeScreenNav.Notification.route) {
                     NotificationListScreen(onNavigationEvent = ::handleNavigationEvent)
+                }
+                composable(HomeScreenNav.Healthcare.route) {
+                    HealthcareScreen(
+                        onBackPress = { parentNavController.navigateUp() })
                 }
             }
         }

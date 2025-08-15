@@ -79,6 +79,10 @@ class HomeViewModel @Inject constructor(
     private val _navigateToGainEgg = MutableSharedFlow<Unit>()
     val navigateToGainEgg: SharedFlow<Unit> = _navigateToGainEgg.asSharedFlow()
 
+    // Navigation events
+    private val _navigateToHealthCare = MutableSharedFlow<Unit>()
+    val navigateToHealthCare: SharedFlow<Unit> = _navigateToHealthCare.asSharedFlow()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _state = HomeViewStateImpl(
         stepsUiState = stepCounterService.observeSteps()
@@ -266,7 +270,7 @@ class HomeViewModel @Inject constructor(
 
     private fun updateEggWithLocationData(eggId: Long, steps: Int) {
         viewModelScope.launch {
-            locationRepository.getCurrentLocation().collect { locationData ->
+            locationRepository.getCurrentLocation().catch {  }.collect { locationData ->
                 Printer.e(
                     "JUNWOO",
                     "latitude : ${locationData.latitude} , longitude : ${locationData.longitude}"
@@ -336,6 +340,14 @@ class HomeViewModel @Inject constructor(
             _navigateToGainEgg.emit(Unit)
         }
     }
+
+    fun navigateToHealthCare() {
+        viewModelScope.launch {
+            _navigateToHealthCare.emit(Unit)
+        }
+    }
+
+
 
     fun callDailyApiAndCheckEvent() {
         viewModelScope.launch(Dispatchers.IO) {

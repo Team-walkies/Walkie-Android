@@ -53,19 +53,6 @@ class StepDataStoreImpl @Inject constructor(
         return calendar.timeInMillis
     }
 
-    private fun isSameDay(time1: Long, time2: Long): Boolean {
-        val cal1 = Calendar.getInstance().apply {
-            timeInMillis = time1
-        }
-        val cal2 = Calendar.getInstance().apply {
-            timeInMillis = time2
-        }
-
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
-                cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH)
-    }
-
     override suspend fun getEggCurrentSteps(): Int {
         return context.dataStore.data.first()[CURRENT_STEPS] ?: 0
     }
@@ -78,6 +65,10 @@ class StepDataStoreImpl @Inject constructor(
 
     override suspend fun getTodayWalkTargetStep(): Int {
         return context.dataStore.data.first()[TODAY_WALK_TARGET_STEP] ?: 6_000
+    }
+
+    override fun getTodayWalkTargetStepFlow(): Flow<Int> {
+        return context.dataStore.data.map { it[TODAY_WALK_TARGET_STEP] ?: 6_000 }
     }
 
     override suspend fun saveTodayWalkTargetStep(steps: Int) {
@@ -131,7 +122,7 @@ class StepDataStoreImpl @Inject constructor(
             cachedTodayStart = todayStart
         }
 
-        return cachedLastResetDayStart > 0 && isSameDay(cachedLastResetDayStart, cachedTodayStart)
+        return cachedLastResetDayStart > 0 && DateUtil.isSameDay(cachedLastResetDayStart, cachedTodayStart)
     }
 
     private suspend fun getLastResetDay(): Long {
@@ -207,7 +198,7 @@ class StepDataStoreImpl @Inject constructor(
     private suspend fun putHealthcareInfo(targetDate: Long, currentSteps: Int) {
         val distanceMeters = (round((0.0006 * currentSteps) * 100) / 100.0).toInt()
         val calories = currentSteps / 30
-        if (isSameDay(targetDate, System.currentTimeMillis())) {
+        if (DateUtil.isSameDay(targetDate, System.currentTimeMillis())) {
             return
         }
         val targetDateStr = DateUtil.formatDateModern(targetDate)
@@ -236,7 +227,7 @@ class StepDataStoreImpl @Inject constructor(
         val lastApiCall = context.dataStore.data.first()[LAST_DAILY_API_CALL] ?: 0L
         val currentTime = System.currentTimeMillis()
         // 한 번도 호출하지 않았거나, 마지막 호출이 오늘이 아닌 경우
-        return lastApiCall == 0L || !isSameDay(lastApiCall, currentTime)
+        return lastApiCall == 0L || !DateUtil.isSameDay(lastApiCall, currentTime)
     }
 
     override suspend fun markDailyApiCalled() {

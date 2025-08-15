@@ -120,6 +120,13 @@ fun MainBottomNavigationScreen(
             }
         }
     }
+    LaunchedEffect(Unit) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            homeViewModel.navigateToHealthCare.collect {
+                navController.navigate(MainScreenNav.HomeGraph.route + "/${HomeScreenNav.Healthcare.route}")
+            }
+        }
+    }
 
     fun handleHomeScreenNavigationEvent(navigationEvent: HomeScreenNavigationEvent) {
         when (navigationEvent) {
@@ -137,6 +144,9 @@ fun MainBottomNavigationScreen(
 
             HomeScreenNavigationEvent.MoveToSpotArchive -> {
                 navController.navigate(MainScreenNav.HomeGraph.route + "/${HomeScreenNav.SpotArchive.route}")
+            }
+            HomeScreenNavigationEvent.MoveToHealthcare -> {
+                navController.navigate(MainScreenNav.HomeGraph.route + "/${HomeScreenNav.Healthcare.route}")
             }
         }
     }

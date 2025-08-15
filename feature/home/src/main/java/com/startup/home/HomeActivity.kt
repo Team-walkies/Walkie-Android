@@ -220,8 +220,8 @@ class HomeActivity : BaseActivity<UiEvent, NavigationEvent>(),
                             viewModel.onHealthcareBottomSheetDismissed()
                         },
                         onStartUsing = {
-                            //TODO HomeScreenNavigationEvent.MoveToHealthcare 헬스케어 뷰 랜딩 로직 추가
                             viewModel.onHealthcareBottomSheetDismissed()
+                            viewModel.navigateToHealthCare()
                         },
                         onLater = {
                             viewModel.onHealthcareBottomSheetDismissed()

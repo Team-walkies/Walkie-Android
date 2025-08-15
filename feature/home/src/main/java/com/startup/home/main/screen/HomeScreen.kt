@@ -23,8 +23,10 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -590,6 +592,7 @@ fun EggLayout(
                 )
             )
             .noRippleClickable {
+                onNavigationEvent.invoke(HomeScreenNavigationEvent.MoveToHealthcare)
                 analyticsHelper.logEvent(EventNameConst.MAIN_BLUE_CARD)
             },
         contentAlignment = Alignment.Center
@@ -711,7 +714,7 @@ private fun StepInformation(step: Int) {
             verticalAlignment = Alignment.Bottom,
             modifier = Modifier
                 .wrapContentHeight()
-                .padding(top = 20.dp, start = 16.dp)
+                .padding(top = 12.dp, start = 16.dp, end = 20.dp)
         ) {
             Text(
                 text = step.formatWithLocale(),
@@ -725,24 +728,42 @@ private fun StepInformation(step: Int) {
                 color = Color.White,
                 modifier = Modifier.padding(bottom = 5.dp)
             )
+            Spacer(modifier = Modifier.weight(1F))
+            Icon(
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .size(32.dp)
+                    .align(Alignment.Top),
+                painter = painterResource(R.drawable.ic_arrow_right),
+                tint = WalkieTheme.colors.white,
+                contentDescription = null
+            )
         }
-        Spacer(Modifier.height(3.dp))
+        Spacer(Modifier.height(4.dp))
         Row(
-            verticalAlignment = Alignment.Bottom,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .wrapContentHeight()
                 .padding(start = 20.dp)
         ) {
             Text(
                 text = stringResource(
-                    R.string.home_kilometer, kotlin.math.round((0.0006 * step) * 100) / 100.0
+                    R.string.kilometer, kotlin.math.round((0.0006 * step) * 100) / 100.0
                 ),
-                style = WalkieTheme.typography.head2,
+                style = WalkieTheme.typography.body1,
                 color = Color.White
             )
-            Spacer(Modifier.width(5.dp))
+            Spacer(Modifier.width(8.dp))
+            VerticalDivider(
+                modifier = Modifier
+                    .padding(vertical = 4.dp)
+                    .height(16.dp),
+                thickness = 1.dp,
+                color = WalkieTheme.colors.white
+            )
+            Spacer(Modifier.width(8.dp))
             Text(
-                text = stringResource(R.string.home_movement),
+                text = "${step / 30}Kcal",
                 style = WalkieTheme.typography.body2,
                 color = Color.White,
             )

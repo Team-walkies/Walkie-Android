@@ -6,6 +6,7 @@ interface StepDataStore {
     suspend fun getEggCurrentSteps(): Int
     suspend fun saveEggCurrentSteps(steps: Int)
     suspend fun getTodayWalkTargetStep(): Int
+    fun getTodayWalkTargetStepFlow(): Flow<Int>
     suspend fun saveTodayWalkTargetStep(steps: Int)
     suspend fun getHatchingTargetStep(): Int
     suspend fun setHatchingTargetStep(target: Int)
