@@ -8,7 +8,7 @@ data class PutTodayWalkRequest(
     @SerializedName("nowDay")
     val nowDay: String,
     @SerializedName("nowDistance")
-    val nowDistance: Int,
+    val nowDistance: Double,
     @SerializedName("nowSteps")
     val nowSteps: Int,
     @SerializedName("targetSteps")
