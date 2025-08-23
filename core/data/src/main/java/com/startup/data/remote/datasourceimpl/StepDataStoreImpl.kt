@@ -18,6 +18,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.util.Calendar
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -187,36 +189,49 @@ class StepDataStoreImpl @Inject constructor(
         // 현재 걸음 수 가져오기
         val currentSteps = getTodaySteps()
         putHealthcareInfo(getLastResetDay(), currentSteps)
-        // 걸음 수 초기화
-        resetTodaySteps()
-        // 마지막 초기화 날짜 업데이트
-        saveLastResetDate()
         // 이전 걸음 수 반환
         return currentSteps
     }
 
+
+    private val mutex = Mutex()
+
+
     private suspend fun putHealthcareInfo(targetDate: Long, currentSteps: Int) {
-        val distanceMeters = (round((0.0006 * currentSteps) * 100) / 100.0)
-        val calories = currentSteps / 30
         if (DateUtil.isSameDay(targetDate, System.currentTimeMillis())) {
             return
         }
-        val targetDateStr = DateUtil.formatDateModern(targetDate)
-        Printer.e("LMH", "걸음 수 업데이트\nstep : $currentSteps\nday : $targetDateStr\ntoday : ${DateUtil.formatDateModern(System.currentTimeMillis())}")
-        runCatching {
-            handleExceptionIfNeed {
-                healthcareService.putHealthcareInfo(
-                    PutTodayWalkRequest(
-                        nowCalories = calories,
-                        nowDistance = distanceMeters,
-                        nowSteps = currentSteps,
-                        nowDay = targetDateStr,
-                        targetSteps = getTodayWalkTargetStep(),
-                    )
-                )
+        mutex.withLock {
+            val distanceMeters = (round((0.0006 * currentSteps) * 100) / 100.0)
+            val calories = currentSteps / 30
+            if (DateUtil.isSameDay(targetDate, System.currentTimeMillis())) {
+                return
             }
-        }.getOrElse {
-            Printer.e("LMH", "ERROR $it")
+            val targetDateStr = DateUtil.formatDateModern(targetDate)
+            Printer.e(
+                "LMH",
+                "걸음 수 업데이트\nstep : $currentSteps\nday : $targetDateStr\ntoday : ${DateUtil.formatDateModern(System.currentTimeMillis())}"
+            )
+            try {
+                handleExceptionIfNeed {
+                    healthcareService.putHealthcareInfo(
+                        PutTodayWalkRequest(
+                            nowCalories = calories,
+                            nowDistance = distanceMeters,
+                            nowSteps = currentSteps,
+                            nowDay = targetDateStr,
+                            targetSteps = getTodayWalkTargetStep(),
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                Printer.e("LMH", "ERROR $e")
+            } finally {
+                // 걸음 수 초기화
+                resetTodaySteps()
+                // 마지막 초기화 날짜 업데이트
+                saveLastResetDate()
+            }
         }
     }
 
