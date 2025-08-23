@@ -196,7 +196,7 @@ class StepDataStoreImpl @Inject constructor(
     }
 
     private suspend fun putHealthcareInfo(targetDate: Long, currentSteps: Int) {
-        val distanceMeters = (round((0.0006 * currentSteps) * 100) / 100.0).toInt()
+        val distanceMeters = (round((0.0006 * currentSteps) * 100) / 100.0)
         val calories = currentSteps / 30
         if (DateUtil.isSameDay(targetDate, System.currentTimeMillis())) {
             return

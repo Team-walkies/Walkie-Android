@@ -8,7 +8,7 @@ data class ResponseDailyHealthcareDetail(
     @SerializedName("nowCalories")
     val nowCalories: Int?,
     @SerializedName("nowDistance")
-    val nowDistance: Int?,
+    val nowDistance: Double?,
     @SerializedName("nowSteps")
     val nowSteps: Int?,
     @SerializedName("targetSteps")
@@ -16,7 +16,7 @@ data class ResponseDailyHealthcareDetail(
 ) {
     fun toDomain(): DailyHealthcareDetail = DailyHealthcareDetail(
         nowCalories = nowCalories.orZero(),
-        nowDistance = nowDistance.orZero().toDouble(),
+        nowDistance = nowDistance.orZero(),
         nowSteps = nowSteps.orZero(),
         targetSteps = targetSteps ?: 6_000,
     )
