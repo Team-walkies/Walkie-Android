@@ -142,7 +142,10 @@ private fun WeeklyView(
             Column(
                 modifier = Modifier
                     .weight(1F)
-                    .padding(bottom = 5.dp),
+                    .padding(bottom = 5.dp)
+                    .noRippleClickable(enabled = !isFuture) {
+                        onDateSelected(date)
+                    },
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Column(
@@ -166,10 +169,7 @@ private fun WeeklyView(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Box(
-                        modifier = Modifier
-                            .noRippleClickable(enabled = !isFuture) {
-                                onDateSelected(date)
-                            },
+                        modifier = Modifier,
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
