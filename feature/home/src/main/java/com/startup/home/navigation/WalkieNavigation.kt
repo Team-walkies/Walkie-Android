@@ -3,7 +3,6 @@ package com.startup.home.navigation
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,10 +10,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -22,7 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -33,7 +29,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.startup.common.extension.springClickable
 import com.startup.design_system.R
 import com.startup.design_system.ui.WalkieTheme
-import com.startup.design_system.ui.noRippleClickable
 
 sealed class BottomNavItem(
     val route: String,
@@ -44,9 +39,6 @@ sealed class BottomNavItem(
     data object Spot : BottomNavItem("spot", R.drawable.ic_map, R.string.navigation_spot)
     data object MyPage :
         BottomNavItem("mypage", R.drawable.ic_mypage_off, R.string.navigation_mypage)
-
-    // 중앙 아이템인지 확인하는 함수
-    fun isCenterItem(): Boolean = this is Spot
 }
 
 @Composable
@@ -102,7 +94,11 @@ fun WalkieBottomNavigation(
                 }
 
                 Box(modifier = Modifier.weight(1f)) {
-                    // 여기는 비워둠 (중앙 아이템이 위에 올라갈 것임)
+                    CreateTabItem(
+                        item = items.last { it is BottomNavItem.Spot },
+                        currentRoute = currentRoute,
+                        onItemClick = { onCenterItemClick.invoke() }
+                    )
                 }
 
                 Box(modifier = Modifier.weight(1f)) {
@@ -114,44 +110,9 @@ fun WalkieBottomNavigation(
                 }
             }
         }
-
-        items.find { it.isCenterItem() }?.let { centerItem ->
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .align(Alignment.BottomCenter)
-                    .offset(y = (-6.5).dp),
-                contentAlignment = Alignment.Center
-            ) {
-                // (테두리 역할)
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .background(WalkieTheme.colors.gray50, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(49.dp)
-                            .background(WalkieTheme.colors.blue300, CircleShape)
-                            .noRippleClickable { onCenterItemClick.invoke() },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(id = centerItem.icon),
-                            contentDescription = null,
-                            tint = WalkieTheme.colors.white,
-                            modifier = Modifier
-                                .size(28.dp)
-                        )
-                    }
-                }
-            }
-        }
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CreateTabItem(
     item: BottomNavItem,
