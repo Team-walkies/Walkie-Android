@@ -20,7 +20,6 @@ internal class HealthcareDataSourceImpl @Inject constructor(private val healthca
     ): Flow<List<ResponseDailyHealthcareListItem>> = flow {
         handleExceptionIfNeed {
             val response = healthcareService.getCalendarHealthcareList(startDate, endDate)
-            Printer.e("LMH", "GET RESPONSE $response")
             emitRemote(response)
         }
     }

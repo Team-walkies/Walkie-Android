@@ -7,8 +7,8 @@ import com.startup.data.remote.dto.response.healthcare.ResponseContinuousDays
 import com.startup.data.remote.dto.response.healthcare.ResponseDailyHealthcareDetail
 import com.startup.data.remote.dto.response.healthcare.ResponseDailyHealthcareListItem
 import retrofit2.http.Body
-import retrofit2.http.PUT
 import retrofit2.http.GET
+import retrofit2.http.PUT
 import retrofit2.http.Query
 
 interface HealthcareService {

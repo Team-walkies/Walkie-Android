@@ -1,5 +1,6 @@
 package com.startup.model.healthcare
 
+import com.startup.design_system.widget.badge.EggBadgeStatus
 import com.startup.domain.model.healthcare.DailyHealthcareDetail
 
 data class DailyHealthcareDetailModel(
@@ -7,7 +8,8 @@ data class DailyHealthcareDetailModel(
     val nowCalories: Int,
     val nowDistance: Double,
     val nowSteps: Int,
-    val targetSteps: Int
+    val targetSteps: Int,
+    val eggBadgeStatus: EggBadgeStatus,
 ) {
     companion object {
         fun orEmpty(): DailyHealthcareDetailModel = DailyHealthcareDetailModel(
@@ -15,7 +17,8 @@ data class DailyHealthcareDetailModel(
             nowDistance = 0.0,
             nowCalories = 0,
             targetSteps = 6_000,
-            nowSteps = 0
+            nowSteps = 0,
+            eggBadgeStatus = EggBadgeStatus.NotReady
         )
 
         fun DailyHealthcareDetail.toUiModel(): DailyHealthcareDetailModel {
@@ -24,7 +27,12 @@ data class DailyHealthcareDetailModel(
                 nowCalories = nowCalories,
                 nowDistance = nowDistance,
                 nowSteps = nowSteps,
-                targetSteps = targetSteps
+                targetSteps = targetSteps,
+                eggBadgeStatus = when {
+                    award -> EggBadgeStatus.GetNow
+                    nowSteps >= targetSteps -> EggBadgeStatus.Already
+                    else -> EggBadgeStatus.NotReady
+                }
             )
         }
     }
