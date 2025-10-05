@@ -127,20 +127,6 @@ class StepDataStoreImpl @Inject constructor(
         return cachedLastResetDayStart > 0 && DateUtil.isSameDay(cachedLastResetDayStart, cachedTodayStart)
     }
 
-    private suspend fun getLastResetDay(): Long {
-        val todayStart = getTodayStartTime()
-        if (todayStart != cachedTodayStart || cachedLastResetDayStart == 0L) {
-            val lastResetTime = context.dataStore.data.first()[LAST_RESET_TIME] ?: 0L
-            cachedLastResetDayStart = lastResetTime
-            cachedTodayStart = todayStart
-        }
-        return if (cachedLastResetDayStart > 0) {
-            cachedLastResetDayStart
-        } else {
-            System.currentTimeMillis()
-        }
-    }
-
     override suspend fun saveLastResetDate() {
         val currentTimeMillis = System.currentTimeMillis()
         context.dataStore.edit { preferences ->
@@ -186,9 +172,19 @@ class StepDataStoreImpl @Inject constructor(
         if (isLastResetToday()) {
             return null  // 이미 초기화됨
         }
-        // 현재 걸음 수 가져오기
+
+        // 최초 실행 등으로 마지막 리셋 시간이 비어있을 수 있음
+        val lastResetTime = context.dataStore.data.first()[LAST_RESET_TIME] ?: 0L
+
+        if (lastResetTime == 0L) {
+            // 기준점을 오늘로 설정만 하고 네트워크/리셋은 수행하지 않음
+            saveLastResetDate()
+            return null
+        }
+
+        // 직전 일자의 누적 걸음 수를 서버로 전송 후 리셋
         val currentSteps = getTodaySteps()
-        putHealthcareInfo(getLastResetDay(), currentSteps)
+        putHealthcareInfo(lastResetTime, currentSteps)
         // 이전 걸음 수 반환
         return currentSteps
     }
@@ -198,38 +194,36 @@ class StepDataStoreImpl @Inject constructor(
 
 
     private suspend fun putHealthcareInfo(targetDate: Long, currentSteps: Int) {
-        if (DateUtil.isSameDay(targetDate, System.currentTimeMillis())) {
-            return
-        }
         mutex.withLock {
-            val distanceMeters = (round((0.0006 * currentSteps) * 100) / 100.0)
-            val calories = currentSteps / 30
-            if (DateUtil.isSameDay(targetDate, System.currentTimeMillis())) {
-                return
-            }
-            val targetDateStr = DateUtil.formatDateModern(targetDate)
-            Printer.e(
-                "LMH",
-                "걸음 수 업데이트\nstep : $currentSteps\nday : $targetDateStr\ntoday : ${DateUtil.formatDateModern(System.currentTimeMillis())}"
-            )
+            val isSameDay = DateUtil.isSameDay(targetDate, System.currentTimeMillis())
             try {
-                handleExceptionIfNeed {
-                    healthcareService.putHealthcareInfo(
-                        PutTodayWalkRequest(
-                            nowCalories = calories,
-                            nowDistance = distanceMeters,
-                            nowSteps = currentSteps,
-                            nowDay = targetDateStr,
-                            targetSteps = getTodayWalkTargetStep(),
-                        )
+                if (!isSameDay) {
+                    val distanceMeters = (round((0.0006 * currentSteps) * 100) / 100.0)
+                    val calories = currentSteps / 30
+                    val targetDateStr = DateUtil.formatDateModern(targetDate)
+                    Printer.e(
+                        "LMH",
+                        "걸음 수 업데이트\nstep : $currentSteps\nday : $targetDateStr\ntoday : ${DateUtil.formatDateModern(System.currentTimeMillis())}"
                     )
+                    handleExceptionIfNeed {
+                        healthcareService.putHealthcareInfo(
+                            PutTodayWalkRequest(
+                                nowCalories = calories,
+                                nowDistance = distanceMeters,
+                                nowSteps = currentSteps,
+                                nowDay = targetDateStr,
+                                targetSteps = getTodayWalkTargetStep(),
+                            )
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 Printer.e("LMH", "ERROR $e")
             } finally {
-                // 걸음 수 초기화
-                resetTodaySteps()
-                // 마지막 초기화 날짜 업데이트
+                // 동일 일자일 경우에는 리셋은 하지 않되 기준점은 업데이트
+                if (!isSameDay) {
+                    resetTodaySteps()
+                }
                 saveLastResetDate()
             }
         }
