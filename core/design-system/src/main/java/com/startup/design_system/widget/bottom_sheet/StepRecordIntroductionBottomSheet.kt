@@ -48,7 +48,7 @@ fun StepRecordIntroductionBottomSheet(
     val lottieHeight = screenHeight * 0.43f
 
     val composition by rememberLottieComposition(
-        LottieCompositionSpec.Asset("walkie_healthcare1.json")
+        LottieCompositionSpec.Asset("walkie_healthcare1_1.json.json")
     )
 
     ModalBottomSheet(
