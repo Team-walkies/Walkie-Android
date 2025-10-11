@@ -4,5 +4,6 @@ data class DailyHealthcareDetail(
     val nowCalories: Int,
     val nowDistance: Double,
     val nowSteps: Int,
-    val targetSteps: Int
+    val targetSteps: Int,
+    val award: Boolean
 )

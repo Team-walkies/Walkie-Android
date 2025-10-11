@@ -27,8 +27,8 @@ internal class EggRepositoryImpl @Inject constructor(
             UpdateEggOfStepCountRequest(
                 eggId = request.eggId,
                 nowStep = request.nowStep,
-                longitude = request.longitude,
-                latitude = request.latitude
+                longitude = request.longitude ?: -1.0,
+                latitude = request.latitude ?: -1.0
             )
         ).map { it.toDomain() }
 

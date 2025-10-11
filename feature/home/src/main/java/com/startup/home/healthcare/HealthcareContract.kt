@@ -34,4 +34,5 @@ class HealthcareViewStateImpl(
 sealed interface HealthcareUiEvent : BaseEvent {
     data class OnDateChanged(val calendarModel: CalendarModel) : HealthcareUiEvent
     data class OnTargetStepChanged(val targetStep: Int) : HealthcareUiEvent
+    data class GetEgg(val targetDate: LocalDate) : HealthcareUiEvent
 }

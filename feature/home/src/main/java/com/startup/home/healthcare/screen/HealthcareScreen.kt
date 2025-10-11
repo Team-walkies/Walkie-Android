@@ -49,6 +49,7 @@ import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.ui.noRippleClickable
 import com.startup.design_system.widget.actionbar.PageActionBar
 import com.startup.design_system.widget.actionbar.PageActionBarType
+import com.startup.design_system.widget.badge.EggBadgeStatus
 import com.startup.design_system.widget.chart.DonutChart
 import com.startup.home.R
 import com.startup.home.healthcare.HealthcareUiEvent
@@ -184,6 +185,9 @@ internal fun HealthcareScreen(
                     },
                     onClickTargetBottomSheet = {
                         isTodayWalkGoalBottomModalShow = true
+                    },
+                    getEgg = {
+                        uiEventSender.invoke(HealthcareUiEvent.GetEgg(selectedDate.date))
                     })
                 Spacer(modifier = Modifier.height(8.dp))
                 CaloriesComponent(currentDetail.data.caloriesType)
@@ -317,6 +321,7 @@ private fun HealthcareDetailComponent(
     dailyHealthcareDetail: DailyHealthcareDetailModel,
     targetStep: Int,
     onClickTargetBottomSheet: () -> Unit,
+    getEgg: () -> Unit,
 ) {
     val currentContinueDayWithToday = if (isToday && targetStep <= dailyHealthcareDetail.nowSteps) {
         currentContinueDay + 1
@@ -364,18 +369,22 @@ private fun HealthcareDetailComponent(
                 text = stringResource(R.string.healthcare_today_walk_detail),
                 style = WalkieTheme.typography.head5.copy(color = WalkieTheme.colors.gray700),
             )
-            if (targetStep > 0 && targetStep <= dailyHealthcareDetail.nowSteps) {
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Image(painter = painterResource(R.drawable.ic_firebadge), contentDescription = null)
-                    Text(
-                        stringResource(R.string.healthcare_achieve),
-                        style = WalkieTheme.typography.caption1.copy(color = WalkieTheme.colors.blue400)
-                    )
-                }
+
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .noRippleClickable {
+                        if (dailyHealthcareDetail.eggBadgeStatus == EggBadgeStatus.GetNow) {
+                            getEgg.invoke()
+                        }
+                    },
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(painter = painterResource(dailyHealthcareDetail.eggBadgeStatus.eggResId), contentDescription = null)
+                Text(
+                    stringResource(dailyHealthcareDetail.eggBadgeStatus.eggStrResId),
+                    style = WalkieTheme.typography.caption1.copy(color = if (dailyHealthcareDetail.eggBadgeStatus == EggBadgeStatus.GetNow) WalkieTheme.colors.blue400 else WalkieTheme.colors.gray500)
+                )
             }
 
             Column(
@@ -559,6 +568,6 @@ private fun CaloriesSkeletonComponent() {
 @PreviewScreenSizes
 private fun PreviewHealthcareScreen() {
     WalkieTheme {
-        HealthcareScreen(onBackPress = {})
+        HealthcareDetailComponent(isToday = true, targetStep = 4000, dailyHealthcareDetail = DailyHealthcareDetailModel(caloriesType = CaloriesType.Air, nowCalories = 100, nowDistance = 23.0, targetSteps = 4000, nowSteps = 4000, eggBadgeStatus = EggBadgeStatus.GetNow), currentContinueDay = 1, onClickTargetBottomSheet = {}, getEgg = {})
     }
 }

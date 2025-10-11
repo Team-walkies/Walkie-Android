@@ -1,5 +1,6 @@
 package com.startup.home.healthcare
 
+import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseEvent
 import com.startup.common.base.BaseUiState
@@ -7,8 +8,12 @@ import com.startup.common.base.BaseViewModel
 import com.startup.common.util.DateUtil
 import com.startup.common.util.DateUtil.getStartOfWeek
 import com.startup.common.util.Printer
+import com.startup.common.util.ResponseErrorException
+import com.startup.domain.model.egg.GetEggAWard
+import com.startup.domain.repository.LocationRepository
 import com.startup.domain.usecase.healthcare.GetCalendarHealthcareContinueDays
 import com.startup.domain.usecase.healthcare.GetDailyHealthcareDetail
+import com.startup.domain.usecase.healthcare.GetEggAwardSpecificDate
 import com.startup.domain.usecase.healthcare.GetRangeOfWeekDailyHealthcareList
 import com.startup.domain.usecase.healthcare.GetTargetStep
 import com.startup.domain.usecase.healthcare.PutTargetStep
@@ -18,9 +23,11 @@ import com.startup.model.healthcare.DailyHealthcareListItemModel.Companion.toUiM
 import com.startup.model.spot.CalendarModel
 import com.startup.model.spot.WeekFetchDirection
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -36,8 +43,11 @@ class HealthcareViewModel @Inject constructor(
     private val getDailyHealthcareDetail: GetDailyHealthcareDetail,
     private val getRangeOfWeekDailyHealthcareList: GetRangeOfWeekDailyHealthcareList,
     private val putTargetStep: PutTargetStep,
+    private val getEggAwardSpecificDate: GetEggAwardSpecificDate,
+    private val locationRepository: LocationRepository,
+    @ApplicationContext private val context: Context,
     getCalendarHealthcareContinueDays: GetCalendarHealthcareContinueDays,
-    getTargetStep: GetTargetStep
+    getTargetStep: GetTargetStep,
 ) : BaseViewModel() {
     private val _state = HealthcareViewStateImpl(
         currentContinueDays = getCalendarHealthcareContinueDays.invoke(Unit).catch { emit(0) }.stateInViewModel(0),
@@ -58,6 +68,10 @@ class HealthcareViewModel @Inject constructor(
 
             is HealthcareUiEvent.OnTargetStepChanged -> {
                 onTargetStepChange(event.targetStep)
+            }
+
+            is HealthcareUiEvent.GetEgg -> {
+                getEggSelectedDate(event.targetDate)
             }
         }
     }
@@ -166,7 +180,6 @@ class HealthcareViewModel @Inject constructor(
                         }
                 }
                 .map {
-                    Printer.e("lmh", "get $it")
                     it.map { domainModel -> domainModel.toUiModel() }
                 }
                 .onEach { fullEventList ->
@@ -251,6 +264,29 @@ class HealthcareViewModel @Inject constructor(
                 val next = newWeekStart.plusWeeks(1) to newWeekStart.plusWeeks(1).plusDays(6)
                 listOf(prev, curr, next)
             }
+        }
+    }
+
+    private fun getEggSelectedDate(targetDate: LocalDate) {
+        viewModelScope.launch {
+
+            val location = locationRepository.getCurrentLocation().firstOrNull()
+            getEggAwardSpecificDate
+                .invoke(
+                    GetEggAWard(
+                        longitude = location?.longitude ?: -1.0,
+                        latitude = location?.latitude ?: -1.0,
+                        healthcareEggAcquiredAt = DateUtil.convertTranslatorDateFormat(targetDate)
+                    )
+                )
+                .catch {
+                    if (it is ResponseErrorException) {
+
+                    }
+                }
+                .collect {
+                    initializeHealthcare()
+                }
         }
     }
 }

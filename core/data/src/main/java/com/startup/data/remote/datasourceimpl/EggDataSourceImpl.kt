@@ -1,6 +1,7 @@
 package com.startup.data.remote.datasourceimpl
 
 import com.startup.data.datasource.EggDataSource
+import com.startup.data.remote.dto.request.egg.EggAwardGetRequest
 import com.startup.data.remote.dto.request.egg.UpdateEggOfStepCountRequest
 import com.startup.data.remote.dto.response.egg.DailyEggResponse
 import com.startup.data.remote.dto.response.egg.EggCountResponse
@@ -16,6 +17,13 @@ import javax.inject.Inject
 
 internal class EggDataSourceImpl @Inject constructor(private val eggService: EggService) :
     EggDataSource {
+
+    override fun postEggGet(request: EggAwardGetRequest): Flow<Unit>  = flow {
+        handleExceptionIfNeed {
+            emitRemote(eggService.postEggGet(request))
+        }
+    }
+
     override fun getEggDetailInfo(eggId: Long): Flow<EggDetailDto> = flow {
         handleExceptionIfNeed {
             emitRemote(eggService.getEggDetailInfo(eggId))

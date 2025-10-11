@@ -185,7 +185,8 @@ private fun WeeklyView(
                                 todayTargetStep
                             } else {
                                 healthCareData.targetSteps
-                            }
+                            },
+                    isPossibleEggAward = healthCareData.isPossibleEggAward
                 )
             }
         }
@@ -200,7 +201,7 @@ private fun PreviewWalkieWeekHealthcareCalendar() {
         WalkieWeekHealthcareCalendar(
             selectDate = CalendarModel(date = LocalDate.now(), false),
             todayTargetStep = 6_000,
-            events = listOf(DailyHealthcareListItemModel(nowSteps = 300, LocalDate.now(), targetSteps = 1000)),
+            events = listOf(DailyHealthcareListItemModel(nowSteps = 300, LocalDate.now(), targetSteps = 1000, isPossibleEggAward = true)),
             onWeekChanged = {},
             onCompleteMove = {},
             onDateSelected = {}

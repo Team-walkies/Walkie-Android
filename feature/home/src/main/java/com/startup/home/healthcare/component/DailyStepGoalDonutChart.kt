@@ -14,17 +14,17 @@ import com.startup.design_system.widget.chart.DonutChart
 import com.startup.home.R
 
 @Composable
-fun DailyStepGoalDonutChart(percentage: Float) {
+fun DailyStepGoalDonutChart(percentage: Float, isPossibleEggAward: Boolean) {
     val convertPercentage = if (percentage.isNaN()) 0F else percentage.coerceIn(0F, 1F)
     DonutChart(
         modifier = Modifier.size(36.dp),
         strokeWidth = 5.dp,
         percentage = convertPercentage,
     ) {
-        if (convertPercentage >= 1F) {
+        if (isPossibleEggAward) {
             Image(
                 modifier = Modifier.size(18.dp),
-                painter = painterResource(R.drawable.ic_fire),
+                painter = painterResource(R.drawable.ic_egg_badge_get),
                 contentDescription = null
             )
         }
@@ -36,7 +36,7 @@ fun DailyStepGoalDonutChart(percentage: Float) {
 fun PreviewDailyStepGoalDonutChart() {
     WalkieTheme {
         Box(modifier = Modifier.background(WalkieTheme.colors.white)) {
-            DailyStepGoalDonutChart(0.1F)
+            DailyStepGoalDonutChart(1F, isPossibleEggAward = false)
         }
     }
 }
