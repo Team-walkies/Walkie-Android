@@ -49,6 +49,8 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.startup.common.R
 import com.startup.common.util.OsVersions
+import com.startup.common.util.triggerVibration
+import com.startup.design_system.LottieAssets
 import com.startup.design_system.ui.WalkieTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -82,11 +84,11 @@ fun EggHatchingAnimation(
     // 알 등급에 따른 로티 선택
     val eggLottieAsset = remember(eggRank) {
         when (eggRank) {
-            0 -> "walkie_EggBlue.json"     // Normal
-            1 -> "walkie_EggGreen.json"    // Rare
-            2 -> "walkie_EggYellow.json"   // Epic
-            3 -> "walkie_EggPurple.json"   // Legend
-            else -> "walkie_EggBlue.json"  // Default
+            0 -> LottieAssets.EGG_NORMAL
+            1 -> LottieAssets.EGG_RARE
+            2 -> LottieAssets.EGG_EPIC
+            3 -> LottieAssets.EGG_LEGEND
+            else -> LottieAssets.EGG_NORMAL
         }
     }
 
@@ -95,7 +97,7 @@ fun EggHatchingAnimation(
     )
 
     val explosionComposition by rememberLottieComposition(
-        LottieCompositionSpec.Asset("walkie_Confetti.json")
+        LottieCompositionSpec.Asset(LottieAssets.CONFETTI)
     )
 
     // 애니메이션 상태
@@ -288,28 +290,6 @@ suspend fun animateVibration(vibrateAnim: Animatable<Float, AnimationVector1D>) 
     vibrateAnim.animateTo(0f)
 }
 
-@SuppressLint("MissingPermission")
-fun triggerVibration(context: Context) {
-    if (OsVersions.isGreaterThanOrEqualsS()) {
-        val vibratorManager =
-            context.getSystemService(android.os.VibratorManager::class.java)
-        val vibrator = vibratorManager.defaultVibrator
-        vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
-    } else {
-        val vibrator =
-            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        if (OsVersions.isGreaterThanOrEqualsO()) {
-            vibrator.vibrate(
-                VibrationEffect.createOneShot(
-                    50,
-                    VibrationEffect.DEFAULT_AMPLITUDE
-                )
-            )
-        } else {
-            vibrator.vibrate(50)
-        }
-    }
-}
 
 /**
  * 애니메이션 텍스트 컴포넌트
@@ -320,7 +300,8 @@ fun AnimatedText(
     visible: Boolean,
     style: TextStyle,
     yOffset: Dp,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    textColor: androidx.compose.ui.graphics.Color = WalkieTheme.colors.white
 ) {
     val alpha by animateFloatAsState(
         targetValue = if (visible) 1f else 0f,
@@ -337,7 +318,7 @@ fun AnimatedText(
         ) {
             Text(
                 text = text,
-                color = WalkieTheme.colors.white.copy(alpha = alpha),
+                color = textColor.copy(alpha = alpha),
                 style = style,
                 modifier = modifier,
                 textAlign = TextAlign.Center

@@ -29,6 +29,7 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.startup.design_system.LottieAssets
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.widget.button.PrimaryButton
 import com.startup.resource.R
@@ -48,7 +49,7 @@ fun StepRecordIntroductionBottomSheet(
     val lottieHeight = screenHeight * 0.43f
 
     val composition by rememberLottieComposition(
-        LottieCompositionSpec.Asset("walkie_healthcare1_1.json.json")
+        LottieCompositionSpec.Asset(LottieAssets.HEALTHCARE_INTRO)
     )
 
     ModalBottomSheet(
