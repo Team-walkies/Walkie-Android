@@ -262,3 +262,50 @@ fun showPermissionNotification(context: Context) {
     val notification = buildPermissionInductionNotification(context)
     notificationManager.notify(ACTIVITY_PERMISSION_NOTIFICATION_ID, notification)
 }
+
+/**
+ * 일일 목표 달성시 생성할 알림
+ */
+fun buildDailyGoalAchievedNotification(context: Context): Notification {
+    return NotificationCompat.Builder(context, NotificationCode.DAILY_GOAL_ACHIEVED_NOTIFICATION_CHANNEL_ID)
+        .setSmallIcon(R.drawable.ic_walkie_notification)
+        .setContentTitle(context.getString(R.string.notification_daily_goal_achieved_title))
+        .setContentText(context.getString(R.string.notification_daily_goal_achieved_message))
+        .setAutoCancel(true)
+        .setContentIntent(createPendingIntent(context))
+        .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
+        .build()
+}
+
+/**
+ * 일일 목표 달성 알림 채널 생성
+ */
+private fun createDailyGoalAchievedNotificationChannel(context: Context) {
+    val channel = NotificationChannel(
+        NotificationCode.DAILY_GOAL_ACHIEVED_NOTIFICATION_CHANNEL_ID,
+        NotificationCode.DAILY_GOAL_ACHIEVED_NOTIFICATION_CHANNEL_NAME,
+        NotificationManager.IMPORTANCE_HIGH
+    ).apply {
+        description = NotificationCode.DAILY_GOAL_ACHIEVED_NOTIFICATION_DESCRIPTION
+        enableVibration(true)
+        vibrationPattern = longArrayOf(1000, 1000, 1000, 1000, 1000)
+    }
+
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.createNotificationChannel(channel)
+}
+
+/**
+ * 일일 목표 달성 알림을 발송하는 함수
+ */
+fun sendDailyGoalAchievedNotification(context: Context) {
+    createDailyGoalAchievedNotificationChannel(context)
+
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.notify(
+        NotificationCode.DAILY_GOAL_ACHIEVED_NOTIFICATION_ID,
+        buildDailyGoalAchievedNotification(context)
+    )
+}

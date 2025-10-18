@@ -30,4 +30,8 @@ interface StepDataStore {
     // 일일 API 호출 관련
     suspend fun shouldCallDailyApi(): Boolean
     suspend fun markDailyApiCalled()
+
+    // 일일 목표 달성 관련
+    suspend fun isDailyGoalReached(): Boolean
+    suspend fun setDailyGoalReached(reached: Boolean)
 }

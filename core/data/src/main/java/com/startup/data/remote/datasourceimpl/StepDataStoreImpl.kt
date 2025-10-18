@@ -41,6 +41,7 @@ class StepDataStoreImpl @Inject constructor(
         private val TARGET_REACHED = booleanPreferencesKey("target_reached")
         private val LAST_RESET_TIME = longPreferencesKey("last_reset_time")
         private val LAST_DAILY_API_CALL = longPreferencesKey("last_daily_api_call")
+        private val DAILY_GOAL_REACHED = booleanPreferencesKey("daily_goal_reached")
     }
 
     private var cachedLastResetDayStart: Long = 0  // 마지막 리셋 날짜의 자정 시간
@@ -185,6 +186,8 @@ class StepDataStoreImpl @Inject constructor(
         // 직전 일자의 누적 걸음 수를 서버로 전송 후 리셋
         val currentSteps = getTodaySteps()
         putHealthcareInfo(lastResetTime, currentSteps)
+        // 일일 목표 달성 여부도 리셋
+        setDailyGoalReached(false)
         // 이전 걸음 수 반환
         return currentSteps
     }
@@ -243,6 +246,16 @@ class StepDataStoreImpl @Inject constructor(
         val currentTime = System.currentTimeMillis()
         context.dataStore.edit { preferences ->
             preferences[LAST_DAILY_API_CALL] = currentTime
+        }
+    }
+
+    override suspend fun isDailyGoalReached(): Boolean {
+        return context.dataStore.data.first()[DAILY_GOAL_REACHED] ?: false
+    }
+
+    override suspend fun setDailyGoalReached(reached: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[DAILY_GOAL_REACHED] = reached
         }
     }
 }
