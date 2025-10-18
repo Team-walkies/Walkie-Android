@@ -5,5 +5,5 @@ data class DailyHealthcareDetail(
     val nowDistance: Double,
     val nowSteps: Int,
     val targetSteps: Int,
-    val award: Boolean
+    val award: String
 )

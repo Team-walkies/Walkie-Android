@@ -74,7 +74,7 @@ internal fun WalkieWeekCalendar(
             .map { (page, _) -> page }
             .distinctUntilChanged()
             .collect { page ->
-                Printer.e("LMH", "PAGE! $page, $latestSelectDate")
+                Printer.d("LMH", "PAGE! $page, $latestSelectDate")
                 if (!latestSelectDate.isSpecificDate) {
                     val weekChangeOfToDay =
                         today.plusWeeks((page.toLong() + 1) - (Int.MAX_VALUE.toLong()))
@@ -87,7 +87,7 @@ internal fun WalkieWeekCalendar(
                             to = weekChangeOfToDay,
                             today = today
                         )
-                        Printer.e("LMH", "WEEK CHANGED $alignWeekDate")
+                        Printer.d("LMH", "WEEK CHANGED $alignWeekDate")
                         onWeekChanged(alignWeekDate)
                     }
                 }

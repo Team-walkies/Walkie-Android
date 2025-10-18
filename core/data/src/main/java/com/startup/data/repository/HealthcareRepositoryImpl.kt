@@ -2,10 +2,10 @@ package com.startup.data.repository
 
 import com.startup.common.extension.orZero
 import com.startup.common.util.DateUtil
-import com.startup.common.util.Printer
 import com.startup.data.datasource.EggDataSource
 import com.startup.data.datasource.HealthcareDataSource
 import com.startup.data.remote.dto.request.egg.EggAwardGetRequest
+import com.startup.domain.model.egg.EggDetail
 import com.startup.domain.model.egg.GetEggAWard
 import com.startup.domain.model.healthcare.DailyHealthcareDetail
 import com.startup.domain.model.healthcare.DailyHealthcareListItem
@@ -23,13 +23,13 @@ internal class HealthcareRepositoryImpl @Inject constructor(
     private val eggDataSource: EggDataSource,
     private val stepDataStore: StepDataStore
 ) : HealthcareRepository {
-    override fun postEggGet(getEggAward: GetEggAWard): Flow<Unit> = eggDataSource.postEggGet(
+    override fun postEggGet(getEggAward: GetEggAWard): Flow<EggDetail> = eggDataSource.postEggGet(
         EggAwardGetRequest(
             latitude = getEggAward.latitude,
             longitude = getEggAward.longitude,
             healthcareEggAcquiredAt = getEggAward.healthcareEggAcquiredAt
         )
-    )
+    ).map { it.toDomain() }
 
     override fun getCalendarHealthcareList(startDate: String, endDate: String): Flow<List<DailyHealthcareListItem>> {
         val now = LocalDate.now()
@@ -40,14 +40,10 @@ internal class HealthcareRepositoryImpl @Inject constructor(
                     if (convertItem.date.isEqual(now)) {
                         val currentSteps = stepDataStore.getTodaySteps()
                         val targetStep = stepDataStore.getTodayWalkTargetStep()
-                        if (currentSteps > convertItem.nowSteps) {
-                            convertItem.copy(
-                                nowSteps = currentSteps,
-                                targetSteps = targetStep,
-                            )
-                        } else {
-                            convertItem
-                        }
+                        convertItem.copy(
+                            nowSteps = currentSteps,
+                            targetSteps = targetStep,
+                        )
                     } else {
                         convertItem
                     }
@@ -71,16 +67,12 @@ internal class HealthcareRepositoryImpl @Inject constructor(
                     val targetStep = stepDataStore.getTodayWalkTargetStep()
                     val distanceMeters = (round((0.0006 * currentSteps) * 100) / 100.0)
                     val calories = currentSteps / 30
-                    if (currentSteps > convertItem.nowSteps) {
-                        convertItem.copy(
-                            nowCalories = calories,
-                            nowDistance = distanceMeters,
-                            nowSteps = currentSteps,
-                            targetSteps = targetStep
-                        )
-                    } else {
-                        convertItem
-                    }
+                    convertItem.copy(
+                        nowCalories = calories,
+                        nowDistance = distanceMeters,
+                        nowSteps = currentSteps,
+                        targetSteps = targetStep,
+                    )
                 } else {
                     convertItem
                 }

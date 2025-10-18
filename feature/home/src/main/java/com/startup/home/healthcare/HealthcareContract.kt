@@ -3,6 +3,7 @@ package com.startup.home.healthcare
 import com.startup.common.base.BaseEvent
 import com.startup.common.base.BaseState
 import com.startup.common.base.BaseUiState
+import com.startup.model.egg.EggDetailModel
 import com.startup.model.healthcare.DailyHealthcareDetailModel
 import com.startup.model.healthcare.DailyHealthcareListItemModel
 import com.startup.model.spot.CalendarModel
@@ -35,4 +36,8 @@ sealed interface HealthcareUiEvent : BaseEvent {
     data class OnDateChanged(val calendarModel: CalendarModel) : HealthcareUiEvent
     data class OnTargetStepChanged(val targetStep: Int) : HealthcareUiEvent
     data class GetEgg(val targetDate: LocalDate) : HealthcareUiEvent
+}
+
+sealed interface HealthcareViewModelEvent : BaseEvent {
+    data class GetAwardOfEgg(val eggDetail: EggDetailModel) : HealthcareViewModelEvent
 }

@@ -29,6 +29,7 @@ import com.startup.common.util.DateUtil.matchWeekdayInSameWeekUntilToday
 import com.startup.common.util.Printer
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.ui.noRippleClickable
+import com.startup.design_system.widget.badge.EggBadgeStatus
 import com.startup.model.healthcare.DailyHealthcareListItemModel
 import com.startup.model.spot.CalendarModel
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -74,7 +75,7 @@ fun WalkieWeekHealthcareCalendar(
             .map { (page, _) -> page }
             .distinctUntilChanged()
             .collect { page ->
-                Printer.e("LMH", "PAGE! $page, $latestSelectDate")
+                Printer.d("LMH", "PAGE! $page, $latestSelectDate")
                 if (!latestSelectDate.isSpecificDate) {
                     val weekChangeOfToDay =
                         today.plusWeeks((page.toLong() + 1) - (Int.MAX_VALUE.toLong()))
@@ -87,7 +88,7 @@ fun WalkieWeekHealthcareCalendar(
                             to = weekChangeOfToDay,
                             today = today
                         )
-                        Printer.e("LMH", "WEEK CHANGED $alignWeekDate")
+                        Printer.d("LMH", "WEEK CHANGED $alignWeekDate")
                         onWeekChanged(alignWeekDate)
                     }
                 }
@@ -186,7 +187,11 @@ private fun WeeklyView(
                             } else {
                                 healthCareData.targetSteps
                             },
-                    isPossibleEggAward = healthCareData.isPossibleEggAward
+                    isPossibleEggAward = if (date.isEqual(today) && healthCareData.eggBadgeStatus == EggBadgeStatus.PENDING && todayTargetStep <= healthCareData.nowSteps) {
+                        true
+                    } else {
+                        healthCareData.eggBadgeStatus == EggBadgeStatus.AVAILABLE
+                    }
                 )
             }
         }
@@ -201,7 +206,14 @@ private fun PreviewWalkieWeekHealthcareCalendar() {
         WalkieWeekHealthcareCalendar(
             selectDate = CalendarModel(date = LocalDate.now(), false),
             todayTargetStep = 6_000,
-            events = listOf(DailyHealthcareListItemModel(nowSteps = 300, LocalDate.now(), targetSteps = 1000, isPossibleEggAward = true)),
+            events = listOf(
+                DailyHealthcareListItemModel(
+                    nowSteps = 300,
+                    LocalDate.now(),
+                    targetSteps = 1000,
+                    eggBadgeStatus = EggBadgeStatus.PENDING
+                )
+            ),
             onWeekChanged = {},
             onCompleteMove = {},
             onDateSelected = {}

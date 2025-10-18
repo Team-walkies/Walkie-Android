@@ -8,6 +8,7 @@ import com.startup.data.remote.dto.response.egg.EggCountResponse
 import com.startup.data.remote.dto.response.egg.EggDetailDto
 import com.startup.data.remote.dto.response.egg.EggStepUpdateResponse
 import com.startup.data.remote.dto.response.egg.MyEggResponse
+import com.startup.data.remote.dto.response.egg.EggAwardsPostDto
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -17,7 +18,7 @@ import retrofit2.http.Path
 internal interface EggService {
 
     @POST("api/v1/eggs/awards")
-    suspend fun postEggGet(@Body request: EggAwardGetRequest): BaseResponse<Unit>
+    suspend fun postEggGet(@Body request: EggAwardGetRequest): BaseResponse<EggAwardsPostDto>
 
     /** 알 상세정보 조회 API */
     @GET("eggs/{eggId}")

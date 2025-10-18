@@ -1,6 +1,5 @@
 package com.startup.home.healthcare
 
-import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.startup.common.base.BaseEvent
 import com.startup.common.base.BaseUiState
@@ -17,13 +16,13 @@ import com.startup.domain.usecase.healthcare.GetEggAwardSpecificDate
 import com.startup.domain.usecase.healthcare.GetRangeOfWeekDailyHealthcareList
 import com.startup.domain.usecase.healthcare.GetTargetStep
 import com.startup.domain.usecase.healthcare.PutTargetStep
+import com.startup.model.egg.EggDetailModel.Companion.toUiModel
 import com.startup.model.healthcare.DailyHealthcareDetailModel
 import com.startup.model.healthcare.DailyHealthcareDetailModel.Companion.toUiModel
 import com.startup.model.healthcare.DailyHealthcareListItemModel.Companion.toUiModel
 import com.startup.model.spot.CalendarModel
 import com.startup.model.spot.WeekFetchDirection
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
@@ -45,7 +44,6 @@ class HealthcareViewModel @Inject constructor(
     private val putTargetStep: PutTargetStep,
     private val getEggAwardSpecificDate: GetEggAwardSpecificDate,
     private val locationRepository: LocationRepository,
-    @ApplicationContext private val context: Context,
     getCalendarHealthcareContinueDays: GetCalendarHealthcareContinueDays,
     getTargetStep: GetTargetStep,
 ) : BaseViewModel() {
@@ -104,7 +102,7 @@ class HealthcareViewModel @Inject constructor(
         fetchCurrentDateDetail(date.date)
         fetchWeeklyHealthcareList(date.date, weeksToFetch)
         _state.currentSelectedDate.update { date }
-        Printer.e("LMH", "WEEK CHANGED $date")
+        Printer.d("LMH", "WEEK CHANGED $date")
     }
 
     private fun fetchCurrentDateDetail(date: LocalDate) {
@@ -132,8 +130,8 @@ class HealthcareViewModel @Inject constructor(
                         }
                     }
                 }.collect { item ->
-                    Printer.d("LMH", "get Detail $item")
                     _state.currentDailyHealthcareDetail.update { BaseUiState(isShowShimmer = false, item) }
+                    Printer.d("LMH", "get Detail $item")
                 }
         }
     }
@@ -269,7 +267,6 @@ class HealthcareViewModel @Inject constructor(
 
     private fun getEggSelectedDate(targetDate: LocalDate) {
         viewModelScope.launch {
-
             val location = locationRepository.getCurrentLocation().firstOrNull()
             getEggAwardSpecificDate
                 .invoke(
@@ -285,6 +282,9 @@ class HealthcareViewModel @Inject constructor(
                     }
                 }
                 .collect {
+                    val uiModel = it.toUiModel()
+                    Printer.d("LMH", "Get Award Of Egg $uiModel")
+                    notifyEvent(HealthcareViewModelEvent.GetAwardOfEgg(uiModel))
                     initializeHealthcare()
                 }
         }

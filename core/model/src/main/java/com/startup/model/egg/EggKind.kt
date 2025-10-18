@@ -99,7 +99,13 @@ enum class EggKind(
             }
         }
     }
-
+    fun kindOfRankId():Int = when (this) {
+        Empty -> -1
+        Normal -> 0
+        Rare -> 1
+        Epic -> 2
+        Legend -> 3
+    }
     companion object {
 
         fun rankOfEggKind(rank: Int): EggKind {

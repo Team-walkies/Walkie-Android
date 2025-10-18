@@ -67,7 +67,7 @@ class SpotArchiveViewModel @Inject constructor(
         )
         fetchWeeklyReviewList(date.date, weeksToFetch)
         _state.currentSelectedDate.update { date }
-        Printer.e("LMH", "WEEK CHANGED $date")
+        Printer.d("LMH", "WEEK CHANGED $date")
     }
 
     private fun fetchWeeklyReviewList(
