@@ -21,6 +21,7 @@ import com.startup.domain.provider.StepDataStore
 import com.startup.stepcounter.broadcastReciver.RestartServiceReceiver
 import com.startup.stepcounter.notification.NotificationCode.WALKIE_STEP_NOTIFICATION_ID
 import com.startup.stepcounter.notification.buildWalkieNotification
+import com.startup.stepcounter.notification.sendDailyGoalAchievedNotification
 import com.startup.stepcounter.notification.sendHatchingNotification
 import com.startup.stepcounter.notification.showPermissionNotification
 import com.startup.stepcounter.notification.updateStepNotification
@@ -168,10 +169,21 @@ internal class WalkieStepForegroundService @Inject constructor() : Service(), Se
             val targetSteps = stepDataStore.getHatchingTargetStep()
             val isAlreadyReached = stepDataStore.isTargetReached()
 
+            // 알 부화 목표 달성 체크
             if (targetSteps in 1..eggCurrentStep && !isAlreadyReached) {
                 stepDataStore.setTargetReached(true)
                 EventContainer.triggerHatchingAnimation()
                 sendHatchingNotification(context)
+            }
+
+            // 일일 목표 달성 체크
+            val todaySteps = stepDataStore.getTodaySteps()
+            val dailyTargetSteps = stepDataStore.getTodayWalkTargetStep()
+            val isDailyGoalAlreadyReached = stepDataStore.isDailyGoalReached()
+
+            if (dailyTargetSteps > 0 && todaySteps >= dailyTargetSteps && !isDailyGoalAlreadyReached) {
+                stepDataStore.setDailyGoalReached(true)
+                sendDailyGoalAchievedNotification(context)
             }
 
             updateStepNotification(context = context, steps = eggCurrentStep, target = targetSteps)
