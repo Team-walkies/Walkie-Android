@@ -16,11 +16,11 @@ data class EggDetailModel(
             it.toUiModel()
         }
 
-        private fun EggDetail.toUiModel(): EggDetailModel = EggDetailModel(
+        fun EggDetail.toUiModel(): EggDetailModel = EggDetailModel(
             eggId = eggId,
             needStep = needStep,
             nowStep = nowStep,
-            eggKind = com.startup.model.egg.EggKind.rankOfEggKind(rank),
+            eggKind = EggKind.rankOfEggKind(rank),
             obtainedPosition = obtainedPosition,
             obtainedDate = DateUtil.convertDateTimeFormat(obtainedDate)
         )

@@ -6,5 +6,5 @@ data class DailyHealthcareListItem(
     val nowSteps: Int,
     val date: LocalDate,
     val targetSteps: Int,
-    val award: Boolean
+    val award: String
 )

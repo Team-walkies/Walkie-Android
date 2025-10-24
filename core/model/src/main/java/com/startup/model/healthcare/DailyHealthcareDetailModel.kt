@@ -1,5 +1,6 @@
 package com.startup.model.healthcare
 
+import com.startup.common.extension.safeEnumOf
 import com.startup.design_system.widget.badge.EggBadgeStatus
 import com.startup.domain.model.healthcare.DailyHealthcareDetail
 
@@ -18,7 +19,7 @@ data class DailyHealthcareDetailModel(
             nowCalories = 0,
             targetSteps = 6_000,
             nowSteps = 0,
-            eggBadgeStatus = EggBadgeStatus.NotReady
+            eggBadgeStatus = EggBadgeStatus.PENDING
         )
 
         fun DailyHealthcareDetail.toUiModel(): DailyHealthcareDetailModel {
@@ -28,11 +29,7 @@ data class DailyHealthcareDetailModel(
                 nowDistance = nowDistance,
                 nowSteps = nowSteps,
                 targetSteps = targetSteps,
-                eggBadgeStatus = when {
-                    award -> EggBadgeStatus.GetNow
-                    nowSteps >= targetSteps -> EggBadgeStatus.Already
-                    else -> EggBadgeStatus.NotReady
-                }
+                eggBadgeStatus = safeEnumOf(award, EggBadgeStatus.PENDING)
             )
         }
     }

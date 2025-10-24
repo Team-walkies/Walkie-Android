@@ -64,7 +64,7 @@ object DateUtil {
     ): LocalDate {
         val fromDayOfWeek = from.dayOfWeek.value % 7
         val toStartOfWeek = getStartOfWeek(to)
-        Printer.e("LMH", "from $fromDayOfWeek startWeek $toStartOfWeek")
+        Printer.d("LMH", "from $fromDayOfWeek startWeek $toStartOfWeek")
         val aligned = toStartOfWeek.plusDays((fromDayOfWeek).toLong())
         return if (aligned.isAfter(today)) today else aligned
     }

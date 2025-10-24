@@ -19,15 +19,15 @@ fun EggBadge(modifier: Modifier = Modifier, status: EggBadgeStatus) {
 }
 
 enum class EggBadgeStatus(@DrawableRes val eggResId: Int, @StringRes val eggStrResId: Int) {
-    NotReady(
+    PENDING(
         eggResId = R.drawable.ic_egg_badge_not_ready,
         eggStrResId = R.string.healthcare_egg_get
     ),
-    GetNow(
+    AVAILABLE(
         eggResId = R.drawable.ic_egg_badge_get,
         eggStrResId = R.string.healthcare_egg_get
     ),
-    Already(
+    RECEIVED(
         eggResId = R.drawable.ic_egg_badge_already,
         eggStrResId = R.string.healthcare_egg_got
     )
