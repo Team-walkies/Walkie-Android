@@ -30,6 +30,10 @@ enum class EggBadgeStatus(@DrawableRes val eggResId: Int, @StringRes val eggStrR
     RECEIVED(
         eggResId = R.drawable.ic_egg_badge_already,
         eggStrResId = R.string.healthcare_egg_got
+    ),
+    MISSED(
+        eggResId = R.drawable.ic_eggbadge_broken,
+        eggStrResId = R.string.healthcare_egg_missed
     )
 }
 

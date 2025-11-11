@@ -274,6 +274,7 @@
     <string name="healthcare_calories_type_pasta_description">대단해요! 당신의 다리에게 박수를!</string>
     <string name="healthcare_egg_get">알 받기</string>
     <string name="healthcare_egg_got">완료</string>
+    <string name="healthcare_egg_missed">알 깨짐</string>
 
     <!-- 걸음 목표 달성 애니메이션 -->
     <string name="step_goal_achievement_congratulations">축하해요!</string>
