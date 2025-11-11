@@ -187,10 +187,10 @@ private fun WeeklyView(
                             } else {
                                 healthCareData.targetSteps
                             },
-                    isPossibleEggAward = if (date.isEqual(today) && healthCareData.eggBadgeStatus == EggBadgeStatus.PENDING && todayTargetStep <= healthCareData.nowSteps) {
-                        true
+                    eggResId = if (date.isEqual(today) && healthCareData.eggBadgeStatus == EggBadgeStatus.PENDING && todayTargetStep <= healthCareData.nowSteps) {
+                        EggBadgeStatus.AVAILABLE.eggResId
                     } else {
-                        healthCareData.eggBadgeStatus == EggBadgeStatus.AVAILABLE
+                        healthCareData.eggBadgeStatus.takeIf { it == EggBadgeStatus.MISSED }?.eggResId ?: -1
                     }
                 )
             }
