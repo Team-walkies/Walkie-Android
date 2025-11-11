@@ -40,6 +40,7 @@ import com.startup.model.spot.WeekendType
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.ui.noRippleClickable
 import java.time.LocalDate
+import java.time.YearMonth
 
 /** 바텀 시트, Preview 를 위해 뷰 파일과 분리 */
 
@@ -85,9 +86,13 @@ private fun BottomSheetCalendarContent(
         mutableStateOf(selectDateTime)
     }
     val today = LocalDate.now()
-    var isNextMonthEnabled by remember { mutableStateOf(today.isAfter(currentDate)) }
+    var isNextMonthEnabled by remember {
+        mutableStateOf(
+            YearMonth.from(currentDate).isBefore(YearMonth.from(today))
+        )
+    }
     LaunchedEffect(currentDate.month) {
-        isNextMonthEnabled = today.isAfter(currentDate)
+        isNextMonthEnabled = YearMonth.from(currentDate).isBefore(YearMonth.from(today))
         val targetDay = selectDate.dayOfMonth
         val lastDayOfNewMonth = currentDate.lengthOfMonth()
         val correctedDay = minOf(targetDay, lastDayOfNewMonth)
