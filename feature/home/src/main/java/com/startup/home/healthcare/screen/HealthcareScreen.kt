@@ -90,6 +90,10 @@ import java.time.LocalDate
 import java.util.Locale
 import kotlin.math.roundToInt
 
+enum class EggTooltipType {
+    None, Missed, Pending
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun HealthcareScreen(
@@ -118,8 +122,9 @@ internal fun HealthcareScreen(
     val today = LocalDate.now()
     var eggDetail: EggDetailModel? by remember { mutableStateOf(null) }
 
-    var isMissedTooltipShow by remember { mutableStateOf(false) }
-    var isPendingTooltipShow by remember { mutableStateOf(false) }
+    var eggTooltipType by remember { mutableStateOf(EggTooltipType.None) }
+    // 애니메이션 도중 이전 텍스트를 유지하기 위한 상태
+    var lastShownTooltipType by remember { mutableStateOf(EggTooltipType.Pending) }
     val lifecycleOwner = LocalLifecycleOwner.current
 
 
@@ -163,7 +168,15 @@ internal fun HealthcareScreen(
     }
 
     val isShowTooltip =
-        (isMissedTooltipShow || isPendingTooltipShow) && isTooltipOffsetValid && isTooltipBelowContentStart
+        eggTooltipType != EggTooltipType.None && isTooltipOffsetValid && isTooltipBelowContentStart
+
+    // 툴팁이 표시될 때 마지막 타입 저장
+    LaunchedEffect(eggTooltipType) {
+        if (eggTooltipType != EggTooltipType.None) {
+            lastShownTooltipType = eggTooltipType
+        }
+    }
+
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             healthcareViewModel.event.collect {
@@ -279,11 +292,11 @@ internal fun HealthcareScreen(
                         } else {
                             currentDetail.data.targetSteps
                         },
-                        visibilityChangedMissedTooltip = {
-                            isMissedTooltipShow = it
+                        visibilityChangedMissedTooltip = { show ->
+                            eggTooltipType = if (show) EggTooltipType.Missed else EggTooltipType.None
                         },
-                        visibilityChangedPendingTooltip = {
-                            isPendingTooltipShow = it
+                        visibilityChangedPendingTooltip = { show ->
+                            eggTooltipType = if (show) EggTooltipType.Pending else EggTooltipType.None
                         },
                         onClickTargetBottomSheet = {
                             isTodayWalkGoalBottomModalShow = true
@@ -319,27 +332,19 @@ internal fun HealthcareScreen(
                     modifier = Modifier
                         .matchParentSize()
                         .noRippleClickable {
-                            isMissedTooltipShow = false
-                            isPendingTooltipShow = false
+                            eggTooltipType = EggTooltipType.None
                         }
                 )
                 WalkieTooltip(
                     modifier = Modifier,
-                    text = if (isPendingTooltipShow) {
-                        stringResource(R.string.healthcare_egg_pending_tooltip)
-                    } else if (isMissedTooltipShow) {
-                        stringResource(R.string.healthcare_egg_missed_tooltip)
-                    } else {
-                        ""
+                    text = when (if (eggTooltipType != EggTooltipType.None) eggTooltipType else lastShownTooltipType) {
+                        EggTooltipType.Pending -> stringResource(R.string.healthcare_egg_pending_tooltip)
+                        EggTooltipType.Missed -> stringResource(R.string.healthcare_egg_missed_tooltip)
+                        EggTooltipType.None -> ""
                     },
                     anchorPosition = WalkieTooltipArrowPosition.TopEnd,
                     onClose = {
-                        if (isPendingTooltipShow) {
-                            isPendingTooltipShow = false
-                        }
-                        if (isMissedTooltipShow) {
-                            isMissedTooltipShow = false
-                        }
+                        eggTooltipType = EggTooltipType.None
                     },
                     anchorOffset = tooltipOffset,
                     onTooltipSizeCalculated = { size -> tooltipSize = size }
