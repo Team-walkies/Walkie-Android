@@ -275,6 +275,8 @@
     <string name="healthcare_egg_get">알 받기</string>
     <string name="healthcare_egg_got">완료</string>
     <string name="healthcare_egg_missed">알 깨짐</string>
+    <string name="healthcare_egg_missed_tooltip">알은 걸음 수를 채운 당일에만 받을 수 있어요</string>
+    <string name="healthcare_egg_pending_tooltip">걸음 수를 채우면 알을 받아요</string>
 
     <!-- 걸음 목표 달성 애니메이션 -->
     <string name="step_goal_achievement_congratulations">축하해요!</string>
