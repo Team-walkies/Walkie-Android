@@ -1,5 +1,8 @@
 package com.startup.home.healthcare.screen
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,19 +30,30 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -58,6 +72,8 @@ import com.startup.design_system.widget.actionbar.PageActionBar
 import com.startup.design_system.widget.actionbar.PageActionBarType
 import com.startup.design_system.widget.badge.EggBadgeStatus
 import com.startup.design_system.widget.chart.DonutChart
+import com.startup.design_system.widget.tooltip.WalkieTooltip
+import com.startup.design_system.widget.tooltip.WalkieTooltipArrowPosition
 import com.startup.home.R
 import com.startup.home.healthcare.HealthcareUiEvent
 import com.startup.home.healthcare.HealthcareViewModel
@@ -72,6 +88,11 @@ import com.startup.model.healthcare.DailyHealthcareDetailModel
 import com.startup.model.spot.CalendarModel
 import java.time.LocalDate
 import java.util.Locale
+import kotlin.math.roundToInt
+
+enum class EggTooltipType {
+    None, Missed, Pending
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,6 +100,8 @@ internal fun HealthcareScreen(
     healthcareViewModel: HealthcareViewModel = hiltViewModel(),
     onBackPress: () -> Unit
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val density = LocalDensity.current
     val monthCalendarSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val todayWalkGoalSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isCalendarBottomModalShow by remember {
@@ -100,8 +123,58 @@ internal fun HealthcareScreen(
     val eventList = eventMap.entries.flatMap { it.value }
     val today = LocalDate.now()
     var eggDetail: EggDetailModel? by remember { mutableStateOf(null) }
+    var bottomCenterPosition: Offset by remember { mutableStateOf(Offset.Zero) }
+    var targetWidth: Int by remember { mutableIntStateOf(0) }
+    // 툴팁 크기
+    var tooltipSize by remember { mutableStateOf(IntSize.Zero) }
 
-    val lifecycleOwner = LocalLifecycleOwner.current
+    // content 기준 y 위치 (Scaffold content 시작점)
+    var contentStartY by remember { mutableFloatStateOf(0f) }
+    var rootWidth by remember { mutableIntStateOf(0) }
+    var overlayOriginInRoot by remember { mutableStateOf(Offset.Zero) }
+    var overlayWidth by remember { mutableIntStateOf(0) }
+
+    // 위치 계산
+    val tooltipOffset by remember(tooltipSize, overlayWidth, overlayOriginInRoot, bottomCenterPosition, targetWidth) {
+        derivedStateOf {
+            val arrowRatio = 0.85f
+            val desiredLeftX =
+                (bottomCenterPosition.x - (tooltipSize.width * arrowRatio) - overlayOriginInRoot.x).roundToInt()
+            val maxLeftX = ((if (overlayWidth == 0) rootWidth else overlayWidth) - tooltipSize.width).coerceAtLeast(0)
+            val x = desiredLeftX.coerceIn(0, maxLeftX)
+            val y = ((bottomCenterPosition.y - overlayOriginInRoot.y) + (with(density) { 4.dp.toPx() })).roundToInt()
+                .coerceAtLeast(0)
+            IntOffset(x, y)
+        }
+    }
+
+    // tooltip 위치가 유효한지 판단
+    val isTooltipOffsetValid by remember(tooltipOffset, tooltipSize) {
+        derivedStateOf {
+            tooltipOffset.x >= 0 && tooltipOffset.y >= 0
+        }
+    }
+
+    // tooltip 이 content 영역 아래에 위치 하는지 판단
+    val isTooltipBelowContentStart by remember(tooltipOffset, contentStartY) {
+        derivedStateOf {
+            tooltipOffset.y >= contentStartY
+        }
+    }
+
+    var eggTooltipType by remember { mutableStateOf(EggTooltipType.None) }
+    // 애니메이션 도중 이전 텍스트를 유지하기 위한 상태
+    var lastShownTooltipType by remember { mutableStateOf(EggTooltipType.Pending) }
+
+    val isShowTooltip = eggTooltipType != EggTooltipType.None && isTooltipOffsetValid && isTooltipBelowContentStart
+
+    // 툴팁이 표시될 때 마지막 타입 저장
+    LaunchedEffect(eggTooltipType) {
+        if (eggTooltipType != EggTooltipType.None) {
+            lastShownTooltipType = eggTooltipType
+        }
+    }
+
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             healthcareViewModel.event.collect {
@@ -113,10 +186,20 @@ internal fun HealthcareScreen(
             }
         }
     }
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .onGloballyPositioned { coordinates ->
+                    runCatching {
+                        val pos = coordinates.positionInRoot()
+                        contentStartY = pos.y
+                        rootWidth = coordinates.size.width
+                    }
+                }
                 .background(color = WalkieTheme.colors.gray50)
         ) {
             PageActionBar(PageActionBarType.JustBackActionBarType(onBackPress))
@@ -207,11 +290,25 @@ internal fun HealthcareScreen(
                         } else {
                             currentDetail.data.targetSteps
                         },
+                        visibilityChangedMissedTooltip = { show ->
+                            eggTooltipType = if (show) EggTooltipType.Missed else EggTooltipType.None
+                        },
+                        visibilityChangedPendingTooltip = { show ->
+                            eggTooltipType = if (show) EggTooltipType.Pending else EggTooltipType.None
+                        },
                         onClickTargetBottomSheet = {
                             isTodayWalkGoalBottomModalShow = true
                         },
                         getEgg = {
                             uiEventSender.invoke(HealthcareUiEvent.GetEgg(selectedDate.date))
+                        },
+                        onGloballyPositioned = { layoutCoordinates ->
+                            bottomCenterPosition = layoutCoordinates.boundsInRoot().bottomCenter
+                            targetWidth = layoutCoordinates.size.width
+                            Printer.e(
+                                "LMH",
+                                "tooltipOffset will changed $bottomCenterPosition, targetWidth $targetWidth"
+                            )
                         })
                     Spacer(modifier = Modifier.height(8.dp))
                     CaloriesComponent(currentDetail.data.caloriesType)
@@ -219,7 +316,39 @@ internal fun HealthcareScreen(
                 }
             }
         }
-
+        AnimatedVisibility(visible = isShowTooltip, enter = fadeIn(), exit = fadeOut()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .onGloballyPositioned { coords ->
+                        overlayOriginInRoot = coords.positionInRoot()
+                        overlayWidth = coords.size.width
+                    }
+            ) {
+                // 화면 전체 오버레이: 아무 곳이나 터치 시 닫기 (툴팁 영역 제외)
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .noRippleClickable {
+                            eggTooltipType = EggTooltipType.None
+                        }
+                )
+                WalkieTooltip(
+                    modifier = Modifier,
+                    text = when (if (eggTooltipType != EggTooltipType.None) eggTooltipType else lastShownTooltipType) {
+                        EggTooltipType.Pending -> stringResource(R.string.healthcare_egg_pending_tooltip)
+                        EggTooltipType.Missed -> stringResource(R.string.healthcare_egg_missed_tooltip)
+                        EggTooltipType.None -> ""
+                    },
+                    anchorPosition = WalkieTooltipArrowPosition.TopEnd,
+                    onClose = {
+                        eggTooltipType = EggTooltipType.None
+                    },
+                    anchorOffset = tooltipOffset,
+                    onTooltipSizeCalculated = { size -> tooltipSize = size }
+                )
+            }
+        }
         if (isCalendarBottomModalShow) {
             BottomSheetMonthCalendarComponent(
                 currentSelectedDate = selectedDate.date,
@@ -355,8 +484,11 @@ private fun HealthcareDetailComponent(
     currentContinueDay: Int,
     dailyHealthcareDetail: DailyHealthcareDetailModel,
     targetStep: Int,
+    visibilityChangedMissedTooltip: (Boolean) -> Unit,
+    visibilityChangedPendingTooltip: (Boolean) -> Unit,
     onClickTargetBottomSheet: () -> Unit,
     getEgg: () -> Unit,
+    onGloballyPositioned: (LayoutCoordinates) -> Unit,
 ) {
     val currentContinueDayWithToday = if (isToday && targetStep <= dailyHealthcareDetail.nowSteps) {
         currentContinueDay + 1
@@ -369,6 +501,7 @@ private fun HealthcareDetailComponent(
         } else {
             dailyHealthcareDetail.eggBadgeStatus
         }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -413,24 +546,41 @@ private fun HealthcareDetailComponent(
 
             Column(
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .noRippleClickable {
-                        if (eggBadgeStatus == EggBadgeStatus.AVAILABLE) {
-                            getEgg.invoke()
-                        }
-                    },
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .align(Alignment.TopEnd),
+                horizontalAlignment = Alignment.End
             ) {
-                Image(
-                    painter = painterResource(eggBadgeStatus.eggResId),
-                    contentDescription = null
-                )
-                Text(
-                    stringResource(eggBadgeStatus.eggStrResId),
-                    style = WalkieTheme.typography.caption1.copy(color = if (eggBadgeStatus == EggBadgeStatus.AVAILABLE) WalkieTheme.colors.blue400 else WalkieTheme.colors.gray500)
-                )
-            }
+                Column(
+                    modifier = Modifier
+                        .onGloballyPositioned(onGloballyPositioned)
+                        .noRippleClickable {
+                            when (eggBadgeStatus) {
+                                EggBadgeStatus.AVAILABLE -> {
+                                    getEgg.invoke()
+                                }
 
+                                EggBadgeStatus.PENDING -> {
+                                    visibilityChangedPendingTooltip.invoke(true)
+                                }
+
+                                EggBadgeStatus.MISSED -> {
+                                    visibilityChangedMissedTooltip.invoke(true)
+                                }
+
+                                else -> {}
+                            }
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(eggBadgeStatus.eggResId),
+                        contentDescription = null
+                    )
+                    Text(
+                        stringResource(eggBadgeStatus.eggStrResId),
+                        style = WalkieTheme.typography.caption1.copy(color = if (eggBadgeStatus == EggBadgeStatus.AVAILABLE) WalkieTheme.colors.blue400 else WalkieTheme.colors.gray500)
+                    )
+                }
+            }
             Column(
                 modifier = Modifier
                     .align(Alignment.Center)
@@ -624,7 +774,11 @@ private fun PreviewHealthcareScreen() {
                 eggBadgeStatus = EggBadgeStatus.AVAILABLE
             ),
             currentContinueDay = 1,
+            visibilityChangedMissedTooltip = {},
+            visibilityChangedPendingTooltip = {},
             onClickTargetBottomSheet = {},
-            getEgg = {})
+            getEgg = {},
+            onGloballyPositioned = {}
+        )
     }
 }
