@@ -1,7 +1,11 @@
 package com.startup.home.healthcare.screen
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,19 +31,29 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -58,6 +72,8 @@ import com.startup.design_system.widget.actionbar.PageActionBar
 import com.startup.design_system.widget.actionbar.PageActionBarType
 import com.startup.design_system.widget.badge.EggBadgeStatus
 import com.startup.design_system.widget.chart.DonutChart
+import com.startup.design_system.widget.tooltip.WalkieTooltip
+import com.startup.design_system.widget.tooltip.WalkieTooltipArrowPosition
 import com.startup.home.R
 import com.startup.home.healthcare.HealthcareUiEvent
 import com.startup.home.healthcare.HealthcareViewModel
@@ -72,6 +88,7 @@ import com.startup.model.healthcare.DailyHealthcareDetailModel
 import com.startup.model.spot.CalendarModel
 import java.time.LocalDate
 import java.util.Locale
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,7 +118,56 @@ internal fun HealthcareScreen(
     val today = LocalDate.now()
     var eggDetail: EggDetailModel? by remember { mutableStateOf(null) }
 
+    var isMissedTooltipShow by remember { mutableStateOf(false) }
+    var isPendingTooltipShow by remember { mutableStateOf(false) }
     val lifecycleOwner = LocalLifecycleOwner.current
+
+
+    val density = LocalDensity.current
+    var anchorBottom by remember { mutableIntStateOf(0) }
+    var anchorRight by remember { mutableIntStateOf(0) }
+    var anchorWidth by remember { mutableIntStateOf(0) }
+
+    // 툴팁 크기
+    var tooltipSize by remember { mutableStateOf(IntSize.Zero) }
+
+    // content 기준 y 위치 (Scaffold content 시작점)
+    var contentStartY by remember { mutableFloatStateOf(0f) }
+    var rootWidth by remember { mutableIntStateOf(0) }
+
+    // 위치 계산
+    val tooltipOffset by remember(anchorRight, anchorWidth, tooltipSize, anchorBottom, rootWidth) {
+        derivedStateOf {
+            // Align arrow (TopEnd -> 85% of width) to anchor center X and clamp within root width
+            val arrowFraction = 0.85f
+            var x = (anchorRight - (anchorWidth / 2f) - (tooltipSize.width * arrowFraction)).roundToInt()
+            // For Top* arrow, WalkieTooltip internally offsets content by +ARROW_HEIGHT/2 (4.dp)
+            // Place Box so that arrow tip aligns with anchor bottom: y = anchorBottom - 4.dp
+            val y = anchorBottom - with(density) { 4.dp.toPx().roundToInt() }
+            if (rootWidth > 0 && tooltipSize.width > 0) {
+                x = x.coerceIn(0, (rootWidth - tooltipSize.width).coerceAtLeast(0))
+            }
+            IntOffset(x, y)
+        }
+    }
+
+    // tooltip 위치가 유효한지 판단
+    val isTooltipOffsetValid by remember(tooltipOffset, tooltipSize) {
+        derivedStateOf {
+            tooltipOffset.x >= 0 && tooltipOffset.y >= 0
+        }
+    }
+
+    // tooltip 이 content 영역 아래에 위치 하는지 판단
+    val isTooltipBelowContentStart by remember(tooltipOffset, contentStartY) {
+        derivedStateOf {
+            tooltipOffset.y >= contentStartY
+        }
+    }
+
+    val isShowTooltip =
+        (isMissedTooltipShow || isPendingTooltipShow) && isTooltipOffsetValid && isTooltipBelowContentStart
+    Printer.e("LMH", "tooltipOffset: $tooltipOffset, isTooltipBelowContentStart $isTooltipBelowContentStart isTooltipOffsetValid $isTooltipOffsetValid anchorBottom: $anchorBottom shouldShowTooltip $isShowTooltip isMissedTooltipShow $isMissedTooltipShow isPendingTooltipShow $isPendingTooltipShow")
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             healthcareViewModel.event.collect {
@@ -113,11 +179,30 @@ internal fun HealthcareScreen(
             }
         }
     }
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .onGloballyPositioned { coordinates ->
+                    runCatching {
+                        val pos = coordinates.positionInRoot()
+                        contentStartY = pos.y
+                        rootWidth = coordinates.size.width
+                    }
+                }
                 .background(color = WalkieTheme.colors.gray50)
+                .pointerInput(isShowTooltip) {
+                    if (isShowTooltip) {
+                        detectTapGestures {
+                            // 아무 곳이나 터치 시 툴팁 닫기
+                            isMissedTooltipShow = false
+                            isPendingTooltipShow = false
+                        }
+                    }
+                }
         ) {
             PageActionBar(PageActionBarType.JustBackActionBarType(onBackPress))
             Row(
@@ -207,11 +292,22 @@ internal fun HealthcareScreen(
                         } else {
                             currentDetail.data.targetSteps
                         },
+                        visibilityChangedMissedTooltip = {
+                            isMissedTooltipShow = it
+                        },
+                        visibilityChangedPendingTooltip = {
+                            isPendingTooltipShow = it
+                        },
                         onClickTargetBottomSheet = {
                             isTodayWalkGoalBottomModalShow = true
                         },
                         getEgg = {
                             uiEventSender.invoke(HealthcareUiEvent.GetEgg(selectedDate.date))
+                        },
+                        onAnchorPositionResolved = { bottom, right, width ->
+                            anchorBottom = bottom
+                            anchorRight = right
+                            anchorWidth = width
                         })
                     Spacer(modifier = Modifier.height(8.dp))
                     CaloriesComponent(currentDetail.data.caloriesType)
@@ -219,7 +315,37 @@ internal fun HealthcareScreen(
                 }
             }
         }
-
+        AnimatedVisibility(
+            visible = isShowTooltip,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            if (isPendingTooltipShow) {
+                WalkieTooltip(
+                    text = stringResource(R.string.healthcare_egg_pending_tooltip),
+                    anchorPosition = WalkieTooltipArrowPosition.TopEnd,
+                    onClose = {
+                        isPendingTooltipShow = false
+                    },
+                    anchorOffset = tooltipOffset,
+                    onTooltipSizeCalculated = { size ->
+                        tooltipSize = size
+                    }
+                )
+            } else if (isMissedTooltipShow) {
+                WalkieTooltip(
+                    text = stringResource(R.string.healthcare_egg_missed_tooltip),
+                    anchorPosition = WalkieTooltipArrowPosition.TopEnd,
+                    onClose = {
+                        isMissedTooltipShow = false
+                    },
+                    anchorOffset = tooltipOffset,
+                    onTooltipSizeCalculated = { size ->
+                        tooltipSize = size
+                    }
+                )
+            }
+        }
         if (isCalendarBottomModalShow) {
             BottomSheetMonthCalendarComponent(
                 currentSelectedDate = selectedDate.date,
@@ -355,8 +481,11 @@ private fun HealthcareDetailComponent(
     currentContinueDay: Int,
     dailyHealthcareDetail: DailyHealthcareDetailModel,
     targetStep: Int,
+    visibilityChangedMissedTooltip: (Boolean) -> Unit,
+    visibilityChangedPendingTooltip: (Boolean) -> Unit,
     onClickTargetBottomSheet: () -> Unit,
     getEgg: () -> Unit,
+    onAnchorPositionResolved: (bottom: Int, right: Int, width: Int) -> Unit,
 ) {
     val currentContinueDayWithToday = if (isToday && targetStep <= dailyHealthcareDetail.nowSteps) {
         currentContinueDay + 1
@@ -369,6 +498,7 @@ private fun HealthcareDetailComponent(
         } else {
             dailyHealthcareDetail.eggBadgeStatus
         }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -413,24 +543,46 @@ private fun HealthcareDetailComponent(
 
             Column(
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .noRippleClickable {
-                        if (eggBadgeStatus == EggBadgeStatus.AVAILABLE) {
-                            getEgg.invoke()
-                        }
-                    },
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .align(Alignment.TopEnd),
+                horizontalAlignment = Alignment.End
             ) {
-                Image(
-                    painter = painterResource(eggBadgeStatus.eggResId),
-                    contentDescription = null
-                )
-                Text(
-                    stringResource(eggBadgeStatus.eggStrResId),
-                    style = WalkieTheme.typography.caption1.copy(color = if (eggBadgeStatus == EggBadgeStatus.AVAILABLE) WalkieTheme.colors.blue400 else WalkieTheme.colors.gray500)
-                )
-            }
+                Column(
+                    modifier = Modifier
+                        .onGloballyPositioned { coordinates ->
+                            val position = coordinates.positionInRoot()
+                            val bottom = (position.y + coordinates.size.height).roundToInt()
+                            val right = (position.x + coordinates.size.width).roundToInt()
+                            onAnchorPositionResolved(bottom, right, coordinates.size.width)
+                        }
+                        .noRippleClickable {
+                            when (eggBadgeStatus) {
+                                EggBadgeStatus.AVAILABLE -> {
+                                    getEgg.invoke()
+                                }
 
+                                EggBadgeStatus.PENDING -> {
+                                    visibilityChangedPendingTooltip.invoke(true)
+                                }
+
+                                EggBadgeStatus.MISSED -> {
+                                    visibilityChangedMissedTooltip.invoke(true)
+                                }
+
+                                else -> {}
+                            }
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(eggBadgeStatus.eggResId),
+                        contentDescription = null
+                    )
+                    Text(
+                        stringResource(eggBadgeStatus.eggStrResId),
+                        style = WalkieTheme.typography.caption1.copy(color = if (eggBadgeStatus == EggBadgeStatus.AVAILABLE) WalkieTheme.colors.blue400 else WalkieTheme.colors.gray500)
+                    )
+                }
+            }
             Column(
                 modifier = Modifier
                     .align(Alignment.Center)
@@ -624,7 +776,11 @@ private fun PreviewHealthcareScreen() {
                 eggBadgeStatus = EggBadgeStatus.AVAILABLE
             ),
             currentContinueDay = 1,
+            visibilityChangedMissedTooltip = {},
+            visibilityChangedPendingTooltip = {},
             onClickTargetBottomSheet = {},
-            getEgg = {})
+            getEgg = {},
+            onAnchorPositionResolved = { _, _, _ -> }
+        )
     }
 }
