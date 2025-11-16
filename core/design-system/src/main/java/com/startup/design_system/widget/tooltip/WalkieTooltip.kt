@@ -68,8 +68,7 @@ fun WalkieTooltip(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                modifier = Modifier
-                    .weight(1f),
+                modifier = Modifier,
                 text = text,
                 maxLines = 2,
                 style = WalkieTheme.typography.body2.copy(
