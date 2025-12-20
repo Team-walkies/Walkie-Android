@@ -4,6 +4,7 @@ import android.graphics.BlurMaskFilter
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -73,3 +74,27 @@ fun Modifier.noRippleClickable(
     role = role,
     onClick = onClick,
 )
+
+@Composable
+fun Modifier.noRippleSingleClickable(
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    enabled: Boolean = true,
+    role: Role? = null,
+    debounceTime: Long = 500L,
+    onClick: () -> Unit,
+): Modifier {
+    val lastClickTime = remember { mutableLongStateOf(0L) }
+    return this.clickable(
+        interactionSource = interactionSource,
+        indication = null,
+        enabled = enabled,
+        role = role,
+        onClick = {
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastClickTime.longValue > debounceTime) {
+                lastClickTime.longValue = currentTime
+                onClick()
+            }
+        },
+    )
+}
