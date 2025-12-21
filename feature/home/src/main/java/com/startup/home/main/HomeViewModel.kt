@@ -191,24 +191,17 @@ class HomeViewModel @Inject constructor(
 
     private fun observeEggHatchingEvents() {
         viewModelScope.launch {
-            EventContainer.hatchingAnimationFlow.collect { isHatching ->
-                if (isHatching) {
-                    getCurrentWalkEgg.invoke(Unit)
-                        .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
-                        .catch { emit(BaseUiState(isShowShimmer = false, data = MyEggModel.empty())) }
-                        .collect { eggState ->
-                            updateHatchingInfo(eggState.data)
+            EventContainer.hatchingAnimationFlow.collect {
+                getCurrentWalkEgg.invoke(Unit)
+                    .map { BaseUiState(isShowShimmer = false, data = it.toUiModel()) }
+                    .catch { emit(BaseUiState(isShowShimmer = false, data = MyEggModel.empty())) }
+                    .collect { eggState ->
+                        updateHatchingInfo(eggState.data)
 
-                            if (eggState.data.eggId != 0L) {
-                                updateEggWithLocationData(eggState.data.eggId, dataStore.getEggCurrentSteps())
-                            }
+                        if (eggState.data.eggId != 0L) {
+                            updateEggWithLocationData(eggState.data.eggId, dataStore.getEggCurrentSteps())
                         }
-                } else {
-                    _hatchingInfo.value = BaseUiState(
-                        isShowShimmer = false,
-                        data = HatchingAnimationCharacterData(isHatching = false)
-                    )
-                }
+                    }
             }
         }
     }
