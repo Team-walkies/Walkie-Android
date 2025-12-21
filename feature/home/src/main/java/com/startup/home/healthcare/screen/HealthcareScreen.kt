@@ -68,6 +68,7 @@ import com.startup.common.util.DateUtil
 import com.startup.common.util.Printer
 import com.startup.design_system.ui.WalkieTheme
 import com.startup.design_system.ui.noRippleClickable
+import com.startup.design_system.ui.noRippleSingleClickable
 import com.startup.design_system.widget.actionbar.PageActionBar
 import com.startup.design_system.widget.actionbar.PageActionBarType
 import com.startup.design_system.widget.badge.EggBadgeStatus
@@ -552,7 +553,7 @@ private fun HealthcareDetailComponent(
                 Column(
                     modifier = Modifier
                         .onGloballyPositioned(onGloballyPositioned)
-                        .noRippleClickable {
+                        .noRippleSingleClickable {
                             when (eggBadgeStatus) {
                                 EggBadgeStatus.AVAILABLE -> {
                                     getEgg.invoke()
