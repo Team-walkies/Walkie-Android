@@ -1,17 +1,17 @@
 package com.startup.common.event
 
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 
 object EventContainer {
-    private val _hatchingAnimationFlow = MutableSharedFlow<Boolean>(
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
+    private val _hatchingAnimationChannel = Channel<Unit>(capacity = Channel.BUFFERED)
 
-    val hatchingAnimationFlow: SharedFlow<Boolean> = _hatchingAnimationFlow.asSharedFlow()
+    val hatchingAnimationFlow: Flow<Unit> = _hatchingAnimationChannel.receiveAsFlow()
 
     private val _updateNotificationFlow = MutableSharedFlow<Int>(
         extraBufferCapacity = 1,
@@ -27,7 +27,7 @@ object EventContainer {
     val homeRefreshEventFlow: SharedFlow<Unit> = _homeRefreshEventFlow.asSharedFlow()
 
     suspend fun triggerHatchingAnimation() {
-        _hatchingAnimationFlow.emit(true)
+        _hatchingAnimationChannel.send(Unit)
     }
 
     suspend fun onRefreshEvent() {
