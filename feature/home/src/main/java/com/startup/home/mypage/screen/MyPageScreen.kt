@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.startup.common.extension.getAppVersion
 import com.startup.common.extension.noRippleClickable
-import com.startup.common.extension.openBrowser
 import com.startup.common.extension.orZero
 import com.startup.common.extension.shimmerEffect
 import com.startup.common.extension.withColor
@@ -50,7 +49,6 @@ import com.startup.ga.logEvent
 import com.startup.home.MyPageScreenNavigationEvent
 import com.startup.home.R
 import com.startup.home.mypage.MyInfoViewState
-import com.startup.webview.WalkieWebConstants
 
 @Composable
 fun MyPageScreen(
@@ -163,7 +161,7 @@ fun MyPageScreen(
                     .padding(16.dp)
                     .noRippleClickable {
                         analyticsHelper.logEvent(EventNameConst.MY_PAGE_SURVEY)
-                        context.openBrowser(WalkieWebConstants.FAQ_URL)
+                        onNavigationEvent.invoke(MyPageScreenNavigationEvent.MoveToRequestUserOpinion)
                     }
             ) {
                 Row(

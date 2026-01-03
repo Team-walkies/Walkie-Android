@@ -287,4 +287,11 @@
 
     <string name="notification_daily_goal_achieved_title">목표 걸음수를 채웠어요!</string>
     <string name="notification_daily_goal_achieved_message">지금 바로 알을 얻어보세요</string>
+
+    <string name="request_opinion_page_title">의견 남기기</string>
+    <string name="request_opinion_submit">제출</string>
+    <string name="request_opinion_description">불편한 점이나 의견 남겨주시면\n개선에 반영할게요.</string>
+    <string name="request_opinion_placeholder">불편한 점이 자세할수록 개선에 도움이 돼요.</string>
+    <string name="request_opinion_modal_title">소중한 의견 감사합니다</string>
+    <string name="request_opinion_modal_content">더 나은 서비스를 위해 노력하는\n워키가 되겠습니다.</string>
 </resources>
