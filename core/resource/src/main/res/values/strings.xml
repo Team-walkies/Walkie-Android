@@ -215,17 +215,26 @@
     <string name="dialog_dismiss">닫기</string>
 
     <string name="unlink_header_title">탈퇴하기</string>
-    <string name="unlink_title">%s이 떠나시다니,\n너무 아쉬워요</string>
+    <string name="unlink_title">%s님이\n떠나시다니 너무 아쉬워요.</string>
+    <string name="unlink_sub_title">탈퇴 사유가 있다면 알려주세요.\n더 나은 서비스를 만드는데 도움이 됩니다.</string>
+    <string name="unlink_reason_select_label">탈퇴 사유를 선택해 주세요.</string>
+    <string name="unlink_reason_lack_of_fun">캐릭터 모으는 재미가 부족해요</string>
+    <string name="unlink_reason_battery_drain">배터리가 너무 빨리 닳아요</string>
+    <string name="unlink_reason_inconvenient">서비스 이용이 불편해요</string>
+    <string name="unlink_reason_etc">기타</string>
+    <string name="unlink_next">다음</string>
     <string name="unlink_description_title_1">모든 데이터가 삭제돼요</string>
     <string name="unlink_description_sub_title_1">스팟 기록, 알, 캐릭터 등 모든 정보가 즉시 삭제돼요.\n모든 데이터는 복구할 수 없어요.</string>
     <string name="unlink_description_title_2">스팟 리뷰는 직접 삭제해야 해요</string>
     <string name="unlink_description_sub_title_2">워키를 탈퇴해도 작성한 리뷰는 없어지지 않아요.\n기록이 남는 걸 원치않는다면 확인하고 삭제해 주세요.</string>
     <string name="unlink_approve_notice">안내사항을 모두 확인했으며, 이에 동의합니다</string>
-    <string name="unlink_modal_title">회원 탈퇴</string>
-    <string name="unlink_modal_warning">탈퇴 시 해당 계정으로 다시 가입할 수 없어요.</string>
-    <string name="unlink_modal_subtitle">탈퇴에 부득이한 사유가 있는 경우,\n워키 개발팀에 문의해주세요.\n\nwalkieofficial@gmail.com</string>
-    <string name="unlink_modal_negative">뒤로가기</string>
-    <string name="unlink_modal_positive">탈퇴하기</string>
+    <string name="unlink_bottom_sheet_title">탈퇴 전에 꼭 읽어주세요!</string>
+    <string name="unlink_bottom_sheet_info_1_title">탈퇴 시 해당 계정으로 다시 가입할 수 없어요</string>
+    <string name="unlink_bottom_sheet_info_1_desc">재가입이 필요하신 경우 개발팀에 문의해주세요.</string>
+    <string name="unlink_bottom_sheet_info_2_title">모든 데이터가 삭제돼요</string>
+    <string name="unlink_bottom_sheet_info_2_desc">알, 캐릭터 등 모든 정보가 즉시 삭제돼요.\n모든 데이터는 복구할 수 없어요.</string>
+    <string name="unlink_bottom_sheet_agree">안내사항을 모두 확인했으며, 이에 동의합니다</string>
+    <string name="copy">복사</string>
     <string name="desc_calendar_previous">이전 달</string>
     <string name="desc_calendar_after">이후 달</string>
     <string name="desc_calendar_select">캘린더로 일자 선택</string>
@@ -287,4 +296,12 @@
 
     <string name="notification_daily_goal_achieved_title">목표 걸음수를 채웠어요!</string>
     <string name="notification_daily_goal_achieved_message">지금 바로 알을 얻어보세요</string>
+
+    <string name="request_opinion_page_title">의견 남기기</string>
+    <string name="request_opinion_submit">제출</string>
+    <string name="request_opinion_description">불편한 점이나 의견 남겨주시면\n개선에 반영할게요.</string>
+    <string name="request_opinion_placeholder">불편한 점이 자세할수록 개선에 도움이 돼요.</string>
+    <string name="request_opinion_modal_title">소중한 의견 감사합니다</string>
+    <string name="request_opinion_modal_content">더 나은 서비스를 위해 노력하는\n워키가 되겠습니다.</string>
+    <string name="email_copied">이메일 주소가 복사되었습니다</string>
 </resources>

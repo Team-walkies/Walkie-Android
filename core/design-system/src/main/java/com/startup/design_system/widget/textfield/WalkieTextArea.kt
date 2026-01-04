@@ -31,7 +31,7 @@ import com.startup.design_system.ui.WalkieTheme
 /**
  * 워키 공통 TextField
  *
- * TextField 높이 258dp 고정, 입력 내용이 넘칠 경우 내부 스크롤
+ * TextField 높이 커스터마이징 가능, 입력 내용이 넘칠 경우 내부 스크롤
  * 텍스트 입력 영역 내부 패딩: 16dp
  *
  * @param value 입력된 텍스트 값
@@ -42,6 +42,7 @@ import com.startup.design_system.ui.WalkieTheme
  * @param isError 에러 상태 여부
  * @param supportingText 하단 서포팅 텍스트 (에러 메시지 등)
  * @param maxLength 최대 글자수 (null이면 글자수 표시 안함)
+ * @param height TextField 높이 (기본값 258.dp)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +54,8 @@ fun WalkieTextArea(
     enabled: Boolean = true,
     isError: Boolean = false,
     supportingText: String? = null,
-    maxLength: Int? = null
+    maxLength: Int? = null,
+    height: androidx.compose.ui.unit.Dp = 258.dp
 ) {
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -64,7 +66,7 @@ fun WalkieTextArea(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(258.dp)
+                .height(height)
         ) {
             BasicTextField(
                 value = value,
@@ -81,7 +83,7 @@ fun WalkieTextArea(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(258.dp),
+                    .height(height),
                 enabled = enabled,
                 textStyle = WalkieTheme.typography.body2.copy(
                     color = WalkieTheme.colors.gray900
